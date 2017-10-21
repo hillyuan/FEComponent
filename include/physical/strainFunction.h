@@ -54,7 +54,7 @@ namespace GNCLib
      public:
        static PhysicalTable& Instance();
 
-       void PhysicalFunction(double[][numcomponents][numdofs]) const
+       double*** PhysicalFunction(double[][numcomponents][numdofs]) const
        {return TPhysicalFunction;}
    };
 
@@ -175,7 +175,7 @@ namespace GNCLib
      public:
        static PhysicalTable& Instance();
 
-       void PhysicalFunction(double[][numcomponents][numdofs]) const
+       double*** PhysicalFunction(double[][numcomponents][numdofs]) const
        {return TPhysicalFunction;}
    };
 
@@ -290,7 +290,7 @@ namespace GNCLib
      public:
        static PhysicalTable& Instance();
 
-       void PhysicalFunction(double[][numcomponents][numdofs]) const
+       double*** PhysicalFunction(double[][numcomponents][numdofs]) const
        {return TPhysicalFunction;}
    };
 
@@ -399,7 +399,7 @@ namespace GNCLib
      public:
        static PhysicalTable& Instance();
 
-       void PhysicalFunction(double[][numcomponents][numdofs]) const
+       double*** PhysicalFunction(double[][numcomponents][numdofs]) const
        {return TPhysicalFunction;}
    };
 
