@@ -1,7 +1,6 @@
 import wx
 import vtk
 from vtk.wx.wxVTKRenderWindowInteractor import wxVTKRenderWindowInteractor
-from vtk.util.colors import tomato
  
 class vtkPanel(wx.Panel):
     def __init__(self,parent):
@@ -51,6 +50,17 @@ class vtkPanel(wx.Panel):
             cam.Azimuth(70)
             self.isploted = True
             
+class TextPanel(wx.Panel):
+
+    def __init__(self,parent):
+    
+        wx.Panel.__init__(self, parent, wx.ID_ANY)
+        
+        calc_text = wx.TextCtrl(self, wx.ID_ANY, style=wx.TE_RIGHT)
+        layout = wx.BoxSizer(wx.HORIZONTAL)
+        layout.Add(calc_text, 1)
+        self.SetSizer(layout)
+            
 class MainMenu(wx.MenuBar):
 
     def __init__(self):
@@ -71,22 +81,11 @@ class MainFrame(wx.Frame):
     def __init__(self,parent,title):
         wx.Frame.__init__(self,parent,title=title,size=(650,600), style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|
                   wx.CAPTION|wx.CLOSE_BOX|wx.CLIP_CHILDREN|wx.RESIZE_BORDER)
-        self.sp = wx.SplitterWindow(self,wx.ID_ANY)
-        self.p1 = vtkPanel(self)
+        self.sp = wx.SplitterWindow(self)
+        self.p1 = vtkPanel(self.sp)
         self.p2 = wx.Panel(self.sp,style=wx.SUNKEN_BORDER)
-        self.p3 = wx.TextCtrl(self.sp, -1, "This is the Edit", style=wx.TE_MULTILINE)
-        
-        grid_sizer = wx.FlexGridSizer(1, 2, 3, 3)
-        grid_sizer.Add(self.p1,1,wx.EXPAND,0)
          
-        self.sp.SplitHorizontally(self.p2,self.p3,470)
-        grid_sizer.Add(self.sp,1,wx.EXPAND,0)
-        self.SetSizer(grid_sizer)
-        grid_sizer.Fit(self)
-        grid_sizer.AddGrowableRow(0)
-        grid_sizer.AddGrowableCol(0)
-        grid_sizer.AddGrowableCol(1)
-        self.Layout()
+        self.sp.SplitHorizontally(self.p1,self.p2,470)
  
         self.statusbar = self.CreateStatusBar()
         self.statusbar.SetStatusText("Click on the Plot Button")
