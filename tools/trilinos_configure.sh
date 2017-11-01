@@ -41,6 +41,8 @@ cmake .. -G "MSYS Makefiles" \
   -DTrilinos_ENABLE_SEACAS=OFF \
   -DTrilinos_ENABLE_Kokkos=OFF \
   -DTrilinos_ENABLE_Anasazi=ON \
+  -DTrilinos_ENABLE_Zoltan=ON \
+  -DTrilinos_ENABLE_Isorropia=ON \
   -DTrilinos_ENABLE_ALL_PACKAGES:BOOL=ON \
 $EXTRA_ARGS \
 #$TRILINOS_PATH
