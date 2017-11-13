@@ -19,6 +19,9 @@
 #define _materialbase_h_
 
 
+#include <unordered_map>
+
+
 namespace GNCLib
 {
   /*
@@ -31,10 +34,40 @@ namespace GNCLib
      It is a const singleton. Template classes used to define it is supposed
      Singleton with memeber function Instance() also?
    */
-   struct MaterialBase
+   class MaterialBase
    {
-     public:
-       virtual void ConstitutiveMatrix()=0;
+	   public:
+          static unsigned n_parameters = 0;      // number material constants
+          static unsigned n_status = 0;          // number status descript needed elastic/plastic e.g.
+          static unsigned n_status_parameters=0; // intermediate variables needed. e.g 6 plastic strain components
+	   
+	   protected:
+	      std::unordered_map<string, vector<double> > dictionary;
+	   
+	   public:
+          virtual void ConstitutiveMatrix()=0;
+   };
+   
+   class IsoElastic: public MaterialBase 
+   {
+	   public:
+          static unsigned n_parameters = 2;      // Youngs Modulus, Poisson's ratio
+          static unsigned n_status = 0;          // elastic only
+          static unsigned n_status_parameters=0; // no state changs ?
+	   
+	   public:
+          virtual void ConstitutiveMatrix();
+   };
+   
+   class MisesPlastic: public MaterialBase 
+   {
+	   public:
+          static unsigned n_parameters = 2;      // Youngs Modulus, Poisson's ratio
+          static unsigned n_status = 1;          // 0: elastic/ 1: plastic
+          static unsigned n_status_parameters=7; // equivalent strain 1 + plastic strain 6
+		  
+	   public:
+          virtual void ConstitutiveMatrix();
    };
 
 
