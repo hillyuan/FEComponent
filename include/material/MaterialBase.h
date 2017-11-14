@@ -18,9 +18,7 @@
 #ifndef _materialbase_h_
 #define _materialbase_h_
 
-
-#include <unordered_map>
-
+#include "factory.hpp"
 
 namespace GNCLib
 {
@@ -48,6 +46,10 @@ namespace GNCLib
           virtual void ConstitutiveMatrix()=0;
    };
    
+   // A preprocessor define used by derived classes
+	#define REGISTER_CLASS(NAME, TYPE) static Registrar registrar(NAME, [](void) -> MaterialBase * { return new TYPE();});
+   
+ 
    class IsoElastic: public MaterialBase 
    {
 	   public:
@@ -56,6 +58,10 @@ namespace GNCLib
           static unsigned n_status_parameters=0; // no state changs ?
 	   
 	   public:
+		  IsoElastic() {
+			  auto instance = BaseFactory<IsoElastic>:: Instance()->Create("ELASTIC");
+			  REGISTER_CLASS("ELASTIC", IsoElastic);
+		  };
           virtual void ConstitutiveMatrix();
    };
    
