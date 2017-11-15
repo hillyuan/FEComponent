@@ -21,7 +21,7 @@
 
 #include <array>
 #include <memory>
-#include "registry.h"
+#include "misc/registry.h"
 
 namespace GNCLib
 {
