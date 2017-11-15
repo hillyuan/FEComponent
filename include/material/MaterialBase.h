@@ -20,7 +20,8 @@
 
 
 #include <array>
-#include "factory.hpp"
+#include <memory>
+#include "registry.h"
 
 namespace GNCLib
 {
@@ -49,9 +50,6 @@ namespace GNCLib
 	   public:
           virtual void ConstitutiveMatrix()=0;
    };
-   
-   // A preprocessor define used by derived classes
-	#define REGISTER_CLASS(NAME, TYPE) static Registrar registrar(NAME, [](void) -> MaterialBase * { return new TYPE();});
 	
    class CompositeMaterial: public MaterialBase
    {
@@ -60,6 +58,7 @@ namespace GNCLib
 	
    class Elastic: public MaterialBase
    {};
+   REGISTER_SUBCLASS(MaterialBase, Elastic);
    
  
    class IsotropicElastic: public Elastic 
@@ -73,15 +72,13 @@ namespace GNCLib
           static unsigned n_status_parameters=0; // no state changs ?
 	   
 	   public:
-		  IsotropicElastic() {
-			  auto instance = BaseFactory<IsotropicElastic>:: Instance()->Create("ELASTIC");
-			  REGISTER_CLASS("ELASTIC", IsotropicElastic);
-		  };
+	      IsotropicElastic() {};
           virtual void ConstitutiveMatrix();
 		  
 	   private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(Elastic, IsotropicElastic);
    
    class OrthotropicElastic: public Elastic
    {
@@ -94,17 +91,14 @@ namespace GNCLib
           static unsigned n_status_parameters=0; // no state changs ?
 	   
 	   public:
-		  OrthotropicElastic() {
-			  auto instance = BaseFactory<OrthotropicElastic>:: Instance()->Create("ELASTIC");
-			  REGISTER_CLASS("ELASTIC", OrthotropicElastic);
-		  };
           virtual void ConstitutiveMatrix();
 		  
        private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(Elastic, OrthotropicElastic);
    
-   class MonneyRivlin: public Elastic
+   class MooneyRivlin: public Elastic
    {
 	   typedef std::array<double, 3>  constants_type;               // C10, C01, D1
        typedef std::function< constants_type(std::vetcor<double>)> material_constants;
@@ -115,15 +109,12 @@ namespace GNCLib
           static unsigned n_status_parameters=0; 
 	   
 	   public:
-		  OrthotropicElastic() {
-			  auto instance = BaseFactory<OrthotropicElastic>:: Instance()->Create("ELASTIC");
-			  REGISTER_CLASS("ELASTIC", OrthotropicElastic);
-		  };
           virtual void ConstitutiveMatrix();
 		  
        private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(Elastic, MooneyRivlin);
    
    struct YieldFunction
    {
@@ -151,6 +142,7 @@ namespace GNCLib
 	   private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(YieldFunction, Mises);
    
    class DruckerPrager: public YieldFunction
    {
@@ -166,6 +158,7 @@ namespace GNCLib
 	   private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(YieldFunction, DruckerPrager);
    
    class MohrCoulomb: public YieldFunction
    {
@@ -181,6 +174,7 @@ namespace GNCLib
 	   private:
 	      material_constants mc;
    };
+   REGISTER_SUBCLASS(YieldFunction, MohrCoulomb);
    
    template<typename CYield>                 // kinematic type?
    class Plastic: public MaterialBase 
@@ -197,7 +191,7 @@ namespace GNCLib
           virtual void ConstitutiveMatrix();
 		  
 	   private:
-		  Elastic* Elastic_pt;
+		  std::shared_ptr<Elastic> Elastic_pt;
 		  yield y;
 		  kinematic k;
    };
