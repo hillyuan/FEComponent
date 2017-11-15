@@ -43,6 +43,7 @@ namespace GNCLib
           static unsigned n_status_parameters=0; // intermediate variables needed. e.g 6 plastic strain components
 	   
 	   protected:
+	      std::string :: name;
 	      std::unordered_map<string, vector<double> > dictionary;   // temp, when reading?
 	   
 	   public:
@@ -51,6 +52,11 @@ namespace GNCLib
    
    // A preprocessor define used by derived classes
 	#define REGISTER_CLASS(NAME, TYPE) static Registrar registrar(NAME, [](void) -> MaterialBase * { return new TYPE();});
+	
+   class CompositeMaterial: public MaterialBase
+   {
+	   std::vector<MaterialBase*> :: materials;
+   }
 	
    class Elastic: public MaterialBase
    {};
