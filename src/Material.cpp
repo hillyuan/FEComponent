@@ -1,14 +1,15 @@
 #include "material/MaterialBase.h"
 
-/*Constitutive_type IsotropicElastic::ConstitutiveMatrix(std::vector<double>& depends)
+
+namespace GNCLib
+{
+
+Constitutive_type IsotropicElastic::ConstitutiveMatrix()
 {
 	Constitutive_type matrix;
-	double e, nu, ee;
+	double ee;
 
-    e  = this->E;
-    nu = this->nu;
-
-    ee = e / ( ( 1. + nu ) * ( 1. - 2. * nu ) );
+    ee = E / ( ( 1. + nu ) * ( 1. - 2. * nu ) );
 
     matrix(1, 1) =  1. - nu;
     matrix(1, 2) =  nu;
@@ -23,7 +24,7 @@
     matrix(4, 4) =  ( 1. - 2. * nu ) * 0.5;
     matrix(5, 5) =  ( 1. - 2. * nu ) * 0.5;
     matrix(6, 6) =  ( 1. - 2. * nu ) * 0.5;
-}	*/
+}
 
 /*
 void
@@ -79,3 +80,5 @@ HyperElasticMaterial :: give3dMaterialStiffnessMatrix(FloatMatrix &answer, MatRe
     answer.at(4, 6) = answer.at(6, 4) = A * c23 * c12 + B / 2. * ( c12 * c23 + c22 * c13 );
     answer.at(5, 6) = answer.at(6, 5) = A * c13 * c12 + B / 2. * ( c11 * c23 + c12 * c13 );
 }*/
+
+}

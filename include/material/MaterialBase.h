@@ -81,6 +81,7 @@ namespace GNCLib
 		  
 	   private:
 	      material_constants mc;
+		  double E,nu;      // temp var, get from mc in depdends given
    };
    REGISTER_SUBCLASS(Elastic, IsotropicElastic);
    
