@@ -28,6 +28,7 @@
 namespace GNCLib
 {
 	enum StainType {Inifinite=0, GreenLagrangian, Log};
+	typedef Eigen::Matrix<double,6,6> Constitutive_type;
   /*
      Values of shape functions and shape derivatives in some specified points,
      which are generally defined by quadrature strategy, are stored in this table.
@@ -39,7 +40,7 @@ namespace GNCLib
      Singleton with memeber function Instance() also?
    */
    class MaterialBase
-   {
+   {	   
 	   public:
           static unsigned const n_parameters = 0;      // number material constants
           static unsigned const n_status = 0;          // number status descript needed elastic/plastic e.g.
@@ -50,7 +51,7 @@ namespace GNCLib
 	      std::unordered_map<std::string, std::vector<double> > dictionary;   // temp, when reading?
 	   
 	   public:
-          virtual void ConstitutiveMatrix()=0;
+          virtual Constitutive_type ConstitutiveMatrix()=0;
    };
 	
    /* Material can be constructed by elastic, plastic, visco etc*/
@@ -61,7 +62,7 @@ namespace GNCLib
 	
    class Elastic: public MaterialBase
    {};
- //  REGISTER_SUBCLASS(MaterialBase, Elastic);
+  // REGISTER_SUBCLASS(MaterialBase, Elastic);
    
  
    class IsotropicElastic: public Elastic 
@@ -76,7 +77,7 @@ namespace GNCLib
 	   
 	   public:
 	      IsotropicElastic() {};
-          virtual void ConstitutiveMatrix();
+          Constitutive_type ConstitutiveMatrix();
 		  
 	   private:
 	      material_constants mc;
@@ -94,7 +95,7 @@ namespace GNCLib
           static unsigned const n_status_parameters=0; // no state changs ?
 	   
 	   public:
-          virtual void ConstitutiveMatrix();
+          Constitutive_type ConstitutiveMatrix();
 		  
        private:
 	      material_constants mc;
@@ -112,7 +113,7 @@ namespace GNCLib
           static unsigned const n_status_parameters=0; 
 	   
 	   public:
-          virtual void ConstitutiveMatrix();
+          Constitutive_type ConstitutiveMatrix();
 		  
        private:
 	      material_constants mc;
@@ -191,7 +192,7 @@ namespace GNCLib
           static unsigned const n_status_parameters=7; // equivalent strain 1 + plastic strain 6
 		  
 	   public:
-          virtual void ConstitutiveMatrix();
+          Constitutive_type ConstitutiveMatrix();
 		  
 	   private:
 		  std::shared_ptr<Elastic> Elastic_pt;
