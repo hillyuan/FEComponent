@@ -18,10 +18,12 @@
 #ifndef _materialbase_h_
 #define _materialbase_h_
 
-
+#include <vector>
 #include <array>
 #include <memory>
 #include "misc/registry.h"
+#include <Eigen/Eigen>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 namespace GNCLib
 {
@@ -39,37 +41,38 @@ namespace GNCLib
    class MaterialBase
    {
 	   public:
-          static unsigned n_parameters = 0;      // number material constants
-          static unsigned n_status = 0;          // number status descript needed elastic/plastic e.g.
-          static unsigned n_status_parameters=0; // intermediate variables needed. e.g 6 plastic strain components
+          static unsigned const n_parameters = 0;      // number material constants
+          static unsigned const n_status = 0;          // number status descript needed elastic/plastic e.g.
+          static unsigned const n_status_parameters=0; // intermediate variables needed. e.g 6 plastic strain components
 	   
 	   protected:
-	      std::string :: name;
-	      std::unordered_map<string, vector<double> > dictionary;   // temp, when reading?
+	      std::string  name;
+	      std::unordered_map<std::string, std::vector<double> > dictionary;   // temp, when reading?
 	   
 	   public:
           virtual void ConstitutiveMatrix()=0;
    };
 	
+   /* Material can be constructed by elastic, plastic, visco etc*/
    class CompositeMaterial: public MaterialBase
    {
-	   std::vector<MaterialBase*> :: materials;
-   }
+	   std::vector<MaterialBase*>  materials;
+   };
 	
    class Elastic: public MaterialBase
    {};
-   REGISTER_SUBCLASS(MaterialBase, Elastic);
+ //  REGISTER_SUBCLASS(MaterialBase, Elastic);
    
  
    class IsotropicElastic: public Elastic 
    {
 	   typedef std::array<double, 2>  constants_type;
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   // how to define the fucntion of material_constant, table, function?
 	   public:
-          static unsigned n_parameters = 2;      // Youngs Modulus, Poisson's ratio
-          static unsigned n_status = 0;          // elastic only
-          static unsigned n_status_parameters=0; // no state changs ?
+          static unsigned const n_parameters = 2;      // Youngs Modulus, Poisson's ratio
+          static unsigned const n_status = 0;          // elastic only
+          static unsigned const n_status_parameters=0; // no state changs ?
 	   
 	   public:
 	      IsotropicElastic() {};
@@ -83,12 +86,12 @@ namespace GNCLib
    class OrthotropicElastic: public Elastic
    {
 	   typedef std::array<double, 9>  constants_type;
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   public:
-          static unsigned n_parameters = 2;      // Youngs Modulus, Poisson's ratio
-          static unsigned n_status = 0;          // elastic only
-          static unsigned n_status_parameters=0; // no state changs ?
+          static unsigned const n_parameters = 2;      // Youngs Modulus, Poisson's ratio
+          static unsigned const n_status = 0;          // elastic only
+          static unsigned const n_status_parameters=0; // no state changs ?
 	   
 	   public:
           virtual void ConstitutiveMatrix();
@@ -101,12 +104,12 @@ namespace GNCLib
    class MooneyRivlin: public Elastic
    {
 	   typedef std::array<double, 3>  constants_type;               // C10, C01, D1
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   public:
-          static unsigned n_parameters = 3;      
-          static unsigned n_status = 0;          
-          static unsigned n_status_parameters=0; 
+          static unsigned const n_parameters = 3;      
+          static unsigned const n_status = 0;          
+          static unsigned const n_status_parameters=0; 
 	   
 	   public:
           virtual void ConstitutiveMatrix();
@@ -118,7 +121,7 @@ namespace GNCLib
    
    struct YieldFunction
    {
-	   typedef eigen::TensorFixedSize<double, Size<3,3>> tensor_type;
+	   typedef Eigen::Tensor<double, 2> tensor_type;
        typedef std::array<double,6> array_type;
 	   
 	   virtual array_type NormalDirection(array_type& stress)=0;      // strain for strain type function
@@ -131,7 +134,7 @@ namespace GNCLib
    class Mises: public YieldFunction
    {
 	   typedef double  constants_type;                   // initial yielding stress
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -147,7 +150,7 @@ namespace GNCLib
    class DruckerPrager: public YieldFunction
    {
 	   typedef std::array<double, 2>  constants_type;      // c, fai
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -163,7 +166,7 @@ namespace GNCLib
    class MohrCoulomb: public YieldFunction
    {
 	   typedef std::array<double, 2>  constants_type;      // c, fai
-       typedef std::function< constants_type(std::vetcor<double>)> material_constants;
+       typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -179,13 +182,13 @@ namespace GNCLib
    template<typename CYield>                 // kinematic type?
    class Plastic: public MaterialBase 
    {
-	   typedef std::function< double(std::vetcor<double>)> yield;       //hardening rule here
-	   typedef std::function< double(std::vetcor<double>)> kinematic;   //kinematic hardening rule here
+	   typedef std::function< double (std::vector<double>)> yield;       //hardening rule here
+	   typedef std::function< double (std::vector<double>)> kinematic;   //kinematic hardening rule here
 	   
 	   public:
-          static unsigned n_parameters = 2;      // Youngs Modulus, Poisson's ratio
-          static unsigned n_status = 1;          // 0: elastic/ 1: plastic
-          static unsigned n_status_parameters=7; // equivalent strain 1 + plastic strain 6
+          static unsigned const n_parameters = 2;      // Youngs Modulus, Poisson's ratio
+          static unsigned const n_status = 1;          // 0: elastic/ 1: plastic
+          static unsigned const n_status_parameters=7; // equivalent strain 1 + plastic strain 6
 		  
 	   public:
           virtual void ConstitutiveMatrix();

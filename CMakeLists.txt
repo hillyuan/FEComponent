@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 project(FEComponent)
+add_definitions("-Wall -std=c++11") 
 add_subdirectory(src)
+
+find_package(Eigen3 REQUIRED)
 include_directories("${PROJECT_SOURCE_DIR}/include")
+include_directories(EIGEN3_INCLUDE_DIR)
 add_executable(main main.cpp)
 target_link_libraries(main a)

@@ -1,3 +1,3 @@
 #include "material/MaterialBase.h"
 
-class IsotropicElastic::IsotropicElastic(); 
+//class IsotropicElastic::IsotropicElastic(); 
