@@ -3,7 +3,23 @@
 
 namespace GNCLib
 {
-
+	
+void IsotropicElastic::SetMaterialConstants()
+{
+	std::vector<double> odata(n_parameters);
+//	material_constants.GetValue(odata);
+	E=odata[0]; 
+	nu=odata[1];
+}
+/*
+void IsotropicElastic::SetMaterialConstants(std::vector<double>& idata)
+{
+	std::vector<double> odata(n_parameters);
+	material_constants.GetValue(odata,idata);
+	E=odata[0]; 
+	nu=odata[1];
+}
+*/
 Constitutive_type IsotropicElastic::ConstitutiveMatrix()
 {
 	Constitutive_type matrix;
@@ -24,6 +40,37 @@ Constitutive_type IsotropicElastic::ConstitutiveMatrix()
     matrix(4, 4) =  ( 1. - 2. * nu ) * 0.5;
     matrix(5, 5) =  ( 1. - 2. * nu ) * 0.5;
     matrix(6, 6) =  ( 1. - 2. * nu ) * 0.5;
+}
+
+Constitutive_type OrthotropicElastic::ConstitutiveMatrix()
+{
+	Constitutive_type matrix;
+	double eksi, nxz, nyz, nxy, nzx, nzy, nyx;
+
+  //  nxz = this->give(NYxz, gp);
+  //  nyz = this->give(NYyz, gp);
+  //  nxy = this->give(NYxy, gp);
+  //  nzx = this->give(NYzx, gp);
+  //  nzy = this->give(NYzy, gp);
+  //  nyx = this->give(NYyx, gp);
+
+    eksi = 1. - ( nxy * nyx + nyz * nzy + nzx * nxz ) - ( nxy * nyz * nzx + nyx * nzy * nxz );
+
+
+    // switched letters from original oofem -> now produces same material stiffness matrix as Abaqus method
+//    matrix(1, 1) =  this->give(Ex, gp) * ( 1. - nyz * nzy ) / eksi;
+//    matrix(1, 2) =  this->give(Ey, gp) * ( nxy + nxz * nzy ) / eksi;
+//    matrix(1, 3) =  this->give(Ez, gp) * ( nxz + nyz * nxy ) / eksi;
+//    matrix(2, 2) =  this->give(Ey, gp) * ( 1. - nxz * nzx ) / eksi;
+//    matrix(2, 3) =  this->give(Ez, gp) * ( nyz + nyx * nxz ) / eksi;
+//    matrix(3, 3) =  this->give(Ez, gp) * ( 1. - nyx * nxy ) / eksi;
+
+    // define the lower triangle
+    for ( int i = 1; i < 4; i++ ) {
+        for ( int j = 1; j < i; j++ ) {
+            matrix(i, j) = matrix(j, i);
+        }
+    }
 }
 
 /*

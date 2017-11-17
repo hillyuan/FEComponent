@@ -25,6 +25,8 @@
 #include <Eigen/Eigen>
 #include <unsupported/Eigen/CXX11/Tensor>
 
+#include "misc/VectTree.h"
+
 namespace GNCLib
 {
 	enum StainType {Inifinite=0, GreenLagrangian, Log};
@@ -48,27 +50,34 @@ namespace GNCLib
 	   
 	   protected:
 	      std::string  name;
-	      std::unordered_map<std::string, std::vector<double> > dictionary;   // temp, when reading?
 	   
 	   public:
           virtual Constitutive_type ConstitutiveMatrix()=0;
    };
 	
    /* Material can be constructed by elastic, plastic, visco etc*/
-   class CompositeMaterial: public MaterialBase
+   class Material: public MaterialBase
    {
-	   std::vector<MaterialBase*>  materials;
+		std::vector<MaterialBase*>  materials;
+		void SetMaterialConstants();
+		void SetMaterialConstants(std::vector<double>&);
    };
 	
    class Elastic: public MaterialBase
-   {};
+   {
+ 	    protected:
+			XYLIB::CVectorTree material_constants;
+			
+		public:
+			Elastic() {};
+   };
   // REGISTER_SUBCLASS(MaterialBase, Elastic);
    
  
    class IsotropicElastic: public Elastic 
    {
-	   typedef std::array<double, 2>  constants_type;
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+	   typedef std::array<double, n_parameters>  constants_type;
+    //   typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   // how to define the fucntion of material_constant, table, function?
 	   public:
           static unsigned const n_parameters = 2;      // Youngs Modulus, Poisson's ratio
@@ -77,10 +86,12 @@ namespace GNCLib
 	   
 	   public:
 	      IsotropicElastic() {};
+		  
           Constitutive_type ConstitutiveMatrix();
+		  void SetMaterialConstants();
+		  void SetMaterialConstants(std::vector<double>&);
 		  
 	   private:
-	      material_constants mc;
 		  double E,nu;      // temp var, get from mc in depdends given
    };
    REGISTER_SUBCLASS(Elastic, IsotropicElastic);
@@ -88,7 +99,7 @@ namespace GNCLib
    class OrthotropicElastic: public Elastic
    {
 	   typedef std::array<double, 9>  constants_type;
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+     //  typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   public:
           static unsigned const n_parameters = 2;      // Youngs Modulus, Poisson's ratio
@@ -99,14 +110,14 @@ namespace GNCLib
           Constitutive_type ConstitutiveMatrix();
 		  
        private:
-	      material_constants mc;
+	  //    material_constants mc;
    };
    REGISTER_SUBCLASS(Elastic, OrthotropicElastic);
    
    class MooneyRivlin: public Elastic
    {
 	   typedef std::array<double, 3>  constants_type;               // C10, C01, D1
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+     //  typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   public:
           static unsigned const n_parameters = 3;      
@@ -117,7 +128,7 @@ namespace GNCLib
           Constitutive_type ConstitutiveMatrix();
 		  
        private:
-	      material_constants mc;
+	 //     material_constants mc;
    };
    REGISTER_SUBCLASS(Elastic, MooneyRivlin);
    
@@ -136,7 +147,7 @@ namespace GNCLib
    class Mises: public YieldFunction
    {
 	   typedef double  constants_type;                   // initial yielding stress
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+    //   typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -145,14 +156,14 @@ namespace GNCLib
 	   double FunctionVal(tensor_type& stress);
 	   
 	   private:
-	      material_constants mc;
+	 //     material_constants mc;
    };
    REGISTER_SUBCLASS(YieldFunction, Mises);
    
    class DruckerPrager: public YieldFunction
    {
 	   typedef std::array<double, 2>  constants_type;      // c, fai
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+    //   typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -161,14 +172,14 @@ namespace GNCLib
 	   double FunctionVal(tensor_type& stress);
 	   
 	   private:
-	      material_constants mc;
+	 //     material_constants mc;
    };
    REGISTER_SUBCLASS(YieldFunction, DruckerPrager);
    
    class MohrCoulomb: public YieldFunction
    {
 	   typedef std::array<double, 2>  constants_type;      // c, fai
-       typedef std::function< constants_type (std::vector<double>)> material_constants;
+  //     typedef std::function< constants_type (std::vector<double>)> material_constants;
 	   
 	   array_type NormalDirection(array_type& stress);      // strain for strain type function
 	   tensor_type NormalDirection(tensor_type& stress);
@@ -177,7 +188,7 @@ namespace GNCLib
 	   double FunctionVal(tensor_type& stress);
 	   
 	   private:
-	      material_constants mc;
+	 //     material_constants mc;
    };
    REGISTER_SUBCLASS(YieldFunction, MohrCoulomb);
    

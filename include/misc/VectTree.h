@@ -66,6 +66,11 @@ public:
     typedef typename Node::const_Iterator   ConstIterator;
 
 public:
+	explicit CVectorTree() {
+        m_ncomp = 0;
+        m_root = nullptr;
+    }
+	
     explicit CVectorTree(const ValueType& value) {
         m_ncomp = 1;
         m_root = new Node(value);
