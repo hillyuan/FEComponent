@@ -17,26 +17,25 @@ class vtkPanel(wx.Panel):
         self.isploted = False
 		
         self.filename=""
+        self.reader = vtk.vtkSTLReader()
             
     def renderthis(self):
             # open a window and create a renderer
             ren = vtk.vtkRenderer()
             self.widget.GetRenderWindow().AddRenderer(ren)
    
-            # to generate polygonal data for a cone.
-            cone = vtk.vtkConeSource()
-            cone.SetResolution(25)
- 
             # o take the polygonal data from the vtkConeSource and
             # create a rendering for the renderer.
-            coneMapper = vtk.vtkPolyDataMapper()
-            coneMapper.SetInputConnection(cone.GetOutputPort())
+            mapper = vtk.vtkPolyDataMapper()
+            mapper.SetInputConnection(self.reader.GetOutputPort())
+
+			#SetInputConnection(reader.GetOutputPort())
  
             # create an actor for our scene
-            coneActor = vtk.vtkActor()
-            coneActor.SetMapper(coneMapper)
+            actor = vtk.vtkActor()
+            actor.SetMapper(mapper)
             # Add actor
-            ren.AddActor(coneActor)
+            ren.AddActor(actor)
  
             axes = vtk.vtkAxesActor()
             self.marker = vtk.vtkOrientationMarkerWidget()
@@ -134,8 +133,8 @@ class MainFrame(wx.Frame):
              
         if openFileDialog.ShowModal() == wx.ID_CANCEL:
             return
-        self.p1.filename = openFileDialog.GetPath()
-
+        filename = openFileDialog.GetPath()
+        self.p1.reader.SetFileName(filename)
 
     def OnHello(self, event):
         """Say hello to the user."""
