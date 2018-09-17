@@ -28,7 +28,7 @@ class vtkPanel(wx.Panel):
             # o take the polygonal data from the vtkConeSource and
             # create a rendering for the renderer.
             coneMapper = vtk.vtkPolyDataMapper()
-            coneMapper.SetInput(cone.GetOutput())
+            coneMapper.SetInputData(cone.GetOutput())
  
             # create an actor for our scene
             coneActor = vtk.vtkActor()

@@ -34,12 +34,12 @@ namespace GNCLib
   /*
      Values of shape functions and shape derivatives in some specified points,
      which are generally defined by quadrature strategy, are stored in this table.
-     Those values can be fetched in numerical caculation with no-calling of
+     Those values can be fetched in numerical calculation with no-calling of
      above shape functions to save computation time. It is much a optimized
-     way considering the fact that the memeory used by this table is generally
-     disregardably small.
+     way considering the fact that the memory used by this table is generally
+     ignorably small.
      It is a const singleton. Template classes used to define it is supposed
-     Singleton with memeber function Instance() also?
+     Singleton with member function Instance() also?
    */
    class MaterialBase
    {	   
@@ -48,7 +48,7 @@ namespace GNCLib
           static unsigned const n_status = 0;          // number status descript needed elastic/plastic e.g.
           static unsigned const n_status_parameters=0; // intermediate variables needed. e.g 6 plastic strain components
 	   
-	   protected:
+	   private:
 	      std::string  name;
 	   
 	   public:
