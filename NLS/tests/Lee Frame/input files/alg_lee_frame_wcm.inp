@@ -1,0 +1,4 @@
+0
+3       0      0.004
+300    40    0.0001
+diverges at vertical limit point, larger initial load factor does not work
