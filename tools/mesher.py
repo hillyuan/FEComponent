@@ -22,7 +22,7 @@ class IntermediateRoll :
     offset = 0.0
     Lf = 0.0
     z0 = 0.0
-    nd0 = 0
+    gnd0 = 0
     pxb = 0.0
     pxw = 0.0
     
@@ -31,7 +31,7 @@ class IntermediateRoll :
     
     def generate(self):
         global meshsize, xyz, elements
-        print("Generating mesh")
+        print("Generating mesh begin with:", self.gnd0, self.z0)
         self.px0 = 0.5*self.L1 - self.offset
         self.px1 = 0.5*self.L1 + self.offset
         
@@ -43,7 +43,7 @@ class IntermediateRoll :
         nd3 = int(d0[0])
         if( d0[1]>0.0 ):
             dd3 = self.D3/nd3
-        print(nd3, dd3, nd3*dd3)
+        print("nd3",nd3, dd3, nd3*dd3)
         
         # division along load edge
         ddf = meshsize
@@ -59,6 +59,67 @@ class IntermediateRoll :
         if( d0[1]>0.0 ):
             dds = (self.L3-self.Lf)/nds
         print(nds, dds, nds*dds)
+        
+        cnt_xyz = self.gnd0
+        for i in range(0,ndf+1):
+            x = x0 +i*ddf
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+        for i in range(1,nds):
+            x = x0 +self.Lf+i*dds
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+        cnt_temp = cnt_xyz
+                
+        for i in range(0,ndf+nds-1):
+            nd0 = self.gnd0 + i*(nd3+1)
+            nd1 = nd0 + nd3+1
+            for j in range(0,nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        # division along radius direction of linker
+        dd21 = meshsize
+        d0 = divmod( 0.5*(self.D2-self.D3), dd21 )
+        nd21 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd21 = 0.5*(self.D2-self.D3)/nd21
+        print("p21",nd21, dd21, nd21*dd21)
+        
+        # division along horizontal direction of linker
+        ddlf = meshsize
+        d0 = divmod( self.L21, ddlf )
+        ndlf = int(d0[0])
+        if( d0[1]>0.0 ):
+            ddlf = self.L21/ndlf
+        print("ndlf",ndlf, ddlf, ndlf*ddlf)
+        
+         # L3 to L21
+        nd0 = cnt_temp - nd3 -1
+        nd1 = cnt_temp + nd21
+        print(nd0,nd1)
+        for j in range(0,nd3):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        
+        for i in range(0,ndlf+1):
+            x = x0 +self.L3+i*ddlf
+            for j in range(0,nd21+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-dd21*j])
+                cnt_xyz += 1
+            for j in range(1,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+            for j in range(1,nd21+1):
+                xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
+                cnt_xyz += 1
+        
+        print(2*nd21+nd3,nd21,nd3)
+        for i in range(0,ndlf):
+            nd0 = cnt_temp + i*(2*nd21+nd3+1) 
+            nd1 = nd0 + 2*nd21+nd3 + 1
+            for j in range(0,2*nd21+nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
 ### 入出力定義 ###
@@ -136,13 +197,13 @@ xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
 zw = 0.0
-iRoll.z0 = zw + 0.5*workDw + 0.5*interDi
-zb = iRoll.z0 + 0.5*interDi + 0.5*backupDb
+iRoll.z0 = zw + 0.5*workDw + 0.5*iRoll.D1
+zb = iRoll.z0 + 0.5*iRoll.D1 + 0.5*backupDb
 print(zw,iRoll.z0,zb)
 xw = -0.5*workLw - worklw
-xi = -0.5*interLi + offset - interli
+#xi = -0.5*interLi + offset - interli
 xb = -0.5*backupLb - backuplb
-print(xw,xi,xb)
+#print(xw,xi,xb)
 
 ## Backup roll ##
 msl = meshsize
@@ -240,7 +301,8 @@ for i in range(0,nd):
     print( "nd", nd0, nd1)
     for j in range(0,2*nc+n0):
         elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
-        
+
+iRoll.gnd0 = 1227     
 iRoll.generate()
 
 ## Output ##
