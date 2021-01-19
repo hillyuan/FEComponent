@@ -114,11 +114,14 @@ for i in range(1,n2):
     for j in range(0,n0+1):
         xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
         
-for i in range(0,n1+n2):
+for i in range(0,n1+n2-1):
     nd0 = i*(n0+1)
     nd1 = nd0 + n0+1
     for j in range(0,n0):
         elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+minnd = nd0+n0+1
+maxnd = nd1+n0
+print("maxnd", maxnd, minnd)
         
 ## Intermediate Roll ##
 z0 = zb + 0.5*backupDb
@@ -140,6 +143,12 @@ if( dd[1]>0.0 ):
 dz = chamfer[1]/chamfer[0]*msd
 print("Dc", nc, msc, nc*msc, dz)
 
+# element link Db and dd
+nd0 = minnd
+nd1 = maxnd+nc+1
+for j in range(0,n0):
+    elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+
 for i in range(0,nd+1):
     x = x0 +i*msd
     xyz = np.append(xyz, [x, z0-(chamfer[1]-dz*i)])
@@ -150,6 +159,13 @@ for i in range(0,nd+1):
     for j in range(1,nc):
         xyz = np.append(xyz, [x, zb-0.5*backupdb-msc*j])
     xyz = np.append(xyz, [x, zb-0.5*backupDb-dz*(i-nd)])
+    
+for i in range(0,nd):
+    nd0 = maxnd + 1 + (2*nc+n0+1)*i
+    nd1 = nd0 + 2*nc+n0 + 1
+    print( "nd", nd0, nd1)
+    for j in range(0,2*nc+n0):
+        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
