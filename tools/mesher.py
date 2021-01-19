@@ -11,6 +11,55 @@ import numpy as np
 import math
 import matplotlib.pyplot   as plt
 
+class IntermediateRoll :
+    D1 = 0.0
+    D2 = 0.0
+    D3 = 0.0
+    L1 = 0.0
+    L21 = 0.0
+    L22 = 0.0
+    L3 = 0.0
+    offset = 0.0
+    Lf = 0.0
+    z0 = 0.0
+    nd0 = 0
+    pxb = 0.0
+    pxw = 0.0
+    
+    px0 = 0.0
+    px1 = 0.0
+    
+    def generate(self):
+        global meshsize, xyz, elements
+        print("Generating mesh")
+        self.px0 = 0.5*self.L1 - self.offset
+        self.px1 = 0.5*self.L1 + self.offset
+        
+        x0 = -0.5*self.L1 + self.offset - self.L21 -self.L3
+        
+        # division along radius direction
+        dd3 = meshsize
+        d0 = divmod( self.D3, dd3 )
+        nd3 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd3 = self.D3/nd3
+        print(nd3, dd3, nd3*dd3)
+        
+        # division along load edge
+        ddf = meshsize
+        d0 = divmod( self.Lf, ddf )
+        ndf = int(d0[0])
+        if( d0[1]>0.0 ):
+            ddf = self.Lf/ndf
+        print(ndf, ddf, ndf*ddf)
+        # division along no-load edge
+        dds = meshsize
+        d0 = divmod( self.L3-self.Lf, dds )
+        nds = int(d0[0])
+        if( d0[1]>0.0 ):
+            dds = (self.L3-self.Lf)/nds
+        print(nds, dds, nds*dds)
+
 
 ### 入出力定義 ###
 
@@ -24,6 +73,8 @@ f=open(FILEIN, 'r')
 data = yaml.safe_load(f)
 f.close()
 print(data)
+
+iRoll = IntermediateRoll()
 
 for key, value in data.items():
     if key == "MeshSize":
@@ -45,16 +96,24 @@ for key, value in data.items():
             print (key,k2,v2)
     elif key == "Intermediate Roll":
         for k2, v2 in value.items():
-            if k2 == "Di":
-                interDi = v2
-            elif k2 == "Li":
-                interLi = v2
-            elif k2 == "di":
-                interdi = v2
-            elif k2 == "li":
-                interli = v2
+            if k2 == "D1":
+                iRoll.D1 = v2
+            elif k2 == "D2":
+                iRoll.D2 = v2
+            elif k2 == "D3":
+                iRoll.D3 = v2
+            elif k2 == "L1":
+                iRoll.L1 = v2
+            elif k2 == "L21":
+                iRoll.L21 = v2
+            elif k2 == "L22":
+                iRoll.L22 = v2
+            elif k2 == "L3":
+                iRoll.L3 = v2
+            elif k2 == "Lf":
+                iRoll.Lf = v2
             elif k2 == "offset":
-                offset = v2
+                iRoll.offset = v2
             print (key,k2,v2)
     elif key == "Work Roll":
         for k2, v2 in value.items():
@@ -68,6 +127,8 @@ for key, value in data.items():
                 worklw = v2
             print (key,k2,v2)
             
+iRoll.pxb = 0.5*backupLb
+iRoll.pxw = 0.5*workLw
 
 ## initial ##
 n_node = 0
@@ -75,9 +136,9 @@ xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
 zw = 0.0
-zi = zw + 0.5*workDw + 0.5*interDi
-zb = zi + 0.5*interDi + 0.5*backupDb
-print(zw,zi,zb)
+iRoll.z0 = zw + 0.5*workDw + 0.5*interDi
+zb = iRoll.z0 + 0.5*interDi + 0.5*backupDb
+print(zw,iRoll.z0,zb)
 xw = -0.5*workLw - worklw
 xi = -0.5*interLi + offset - interli
 xb = -0.5*backupLb - backuplb
@@ -160,12 +221,27 @@ for i in range(0,nd+1):
         xyz = np.append(xyz, [x, zb-0.5*backupdb-msc*j])
     xyz = np.append(xyz, [x, zb-0.5*backupDb-dz*(i-nd)])
     
+## main part
+msl = meshsize
+dd = divmod( backupLb-2.0*chamfer[0], msl )
+nl = int(dd[0])
+if( dd[1]>0.0 ):
+    msl = ( backupLb-2.0*chamfer[0] )/nc
+print("Dl", nl, msl, nl*msl)
+
+for i in range(0,nd+1):
+    x = x0 +backuplb +i*msl
+    for j in range(1,nc+1):
+        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
+    
 for i in range(0,nd):
     nd0 = maxnd + 1 + (2*nc+n0+1)*i
     nd1 = nd0 + 2*nc+n0 + 1
     print( "nd", nd0, nd1)
     for j in range(0,2*nc+n0):
         elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        
+iRoll.generate()
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
