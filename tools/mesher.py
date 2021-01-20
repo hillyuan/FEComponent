@@ -95,14 +95,14 @@ class IntermediateRoll :
             ddlf = self.L21/ndlf
         print("ndlf",ndlf, ddlf, ndlf*ddlf)
         
-         # L3 to L21
+        # L3 to L21
         nd0 = cnt_temp - nd3 -1
         nd1 = cnt_temp + nd21
         print(nd0,nd1)
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
         
-        for i in range(0,ndlf+1):
+        for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
             for j in range(0,nd21+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-dd21*j])
@@ -114,11 +114,62 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
         
-        print(2*nd21+nd3,nd21,nd3)
-        for i in range(0,ndlf):
+        # save above z-volue        
+        z_value = np.array([])
+        for j in range(0,nd21+1):
+            z_value = np.append(z_value, self.z0+0.5*self.D2-dd21*j)
+        for j in range(1,nd3+1):
+            z_value = np.append(z_value, self.z0+0.5*self.D3-dd3*j)
+        for j in range(1,nd21+1):
+            z_value = np.append(z_value, self.z0-0.5*self.D3-dd21*j)
+        
+        for i in range(0,ndlf-1):
             nd0 = cnt_temp + i*(2*nd21+nd3+1) 
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,2*nd21+nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
+                
+        # division along radius direction of L1
+        dd1 = meshsize
+        d0 = divmod( 0.5*(self.D1-self.D2), dd1 )
+        ndd1 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd1 = 0.5*(self.D1-self.D2)/ndd1
+        print("p1",ndd1, dd1, ndd1*dd1)
+        
+        # division along horizontal direction of L1
+        dl1 = meshsize
+        d0 = divmod( self.L1, dl1 )
+        ndl1 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl1 = self.L1/ndl1
+        print("dl1",ndl1, dl1, ndl1*dl1)
+        
+        # L21 to L1
+        nd0 = cnt_temp - 2*nd21 -nd3 -1
+        nd1 = cnt_temp + ndd1
+        for j in range(0,nd3+2*nd21):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+
+        nz = len(z_value)
+        for i in range(0,ndl1+1):
+            x = x0 +self.L3 +self.L21 +i*ddlf
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
+            
+        for i in range(0,ndl1):
+            nd0 =  cnt_temp + i*(2*ndd1+nz)
+            nd1 = nd0 + 2*ndd1+nz
+            for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
