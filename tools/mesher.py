@@ -22,12 +22,12 @@ class IntermediateRoll :
     offset = 0.0
     Lf = 0.0
     z0 = 0.0
-    gnd0 = 0
-    pxb = 0.0
-    pxw = 0.0
+    gnd0 = 0    # start node number
+    pxb = 0.0   # x position of L1 - chamfer of backup roll 
+    pxw = 0.0   # x position of L1 of working roll
     
-    px0 = 0.0
-    px1 = 0.0
+    px0 = 0.0   # left hand x position of L1
+    px1 = 0.0   # right hand x position of L1  
     
     def generate(self):
         global meshsize, xyz, elements
@@ -139,23 +139,45 @@ class IntermediateRoll :
             dd1 = 0.5*(self.D1-self.D2)/ndd1
         print("p1",ndd1, dd1, ndd1*dd1)
         
-        # division along horizontal direction of L1
-        dl1 = meshsize
-        d0 = divmod( self.L1, dl1 )
-        ndl1 = int(d0[0])
-        if( d0[1]>0.0 ):
-            dl1 = self.L1/ndl1
-        print("dl1",ndl1, dl1, ndl1*dl1)
         
-        # L21 to L1
+        # Elements of L21 to L1
         nd0 = cnt_temp - 2*nd21 -nd3 -1
         nd1 = cnt_temp + ndd1
         for j in range(0,nd3+2*nd21):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            
+        # division along horizontal direction to chamfer point
+        dl1 = meshsize
+        d0 = divmod( 0.5*self.L1 - self.offset -self.pxb, dl1 )
+        ndl1 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl1 = (0.5*self.L1- self.offset -self.pxb)/ndl1
+        print("to chamfer point",ndl1, dl1, ndl1*dl1, 0.5*self.L1, self.pxb)
 
         nz = len(z_value)
         for i in range(0,ndl1+1):
-            x = x0 +self.L3 +self.L21 +i*ddlf
+            x = x0 +self.L3 +self.L21 +i*dl1
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
+                
+        # division along horizontal direction from chamfer point to center
+        dl2 = meshsize
+        d0 = divmod(self.pxb, dl2 )
+        ndl2 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl2 = self.pxb/ndl2
+        print("chamfer to point",ndl2, dl2, ndl2*dl2)
+
+        nz = len(z_value)
+        for i in range(1,ndl2+1):
+            x = -self.pxb +i*dl2
             for j in range(0,ndd1+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
@@ -166,7 +188,7 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
             
-        for i in range(0,ndl1):
+        for i in range(0,ndl1+ndl2):
             nd0 =  cnt_temp + i*(2*ndd1+nz)
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
@@ -239,7 +261,7 @@ for key, value in data.items():
                 worklw = v2
             print (key,k2,v2)
             
-iRoll.pxb = 0.5*backupLb
+iRoll.pxb = 0.5*backupLb - chamfer[0]
 iRoll.pxw = 0.5*workLw
 
 ## initial ##
