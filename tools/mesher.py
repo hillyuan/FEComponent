@@ -37,7 +37,7 @@ class IntermediateRoll :
         
         x0 = -0.5*self.L1 + self.offset - self.L21 -self.L3
         
-        # division along radius direction
+        # division along D3 radius direction
         dd3 = meshsize
         d0 = divmod( self.D3, dd3 )
         nd3 = int(d0[0])
@@ -45,7 +45,7 @@ class IntermediateRoll :
             dd3 = self.D3/nd3
         print("nd3",nd3, dd3, nd3*dd3)
         
-        # division along load edge
+        # division along L31 load edge
         ddf = meshsize
         d0 = divmod( self.Lf, ddf )
         ndf = int(d0[0])
@@ -243,15 +243,59 @@ class IntermediateRoll :
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
-        print(cnt_temp, cnt_xyz)
+        cxpos = x  # current x position
         
         # first row of L22
         nd0 = cnt_temp - nd3 -2*nd21 -ndd1-1
         nd1 = cnt_temp
-        print(cnt_temp,nd0,nd1,nd3)
         for j in range(0,nz-1):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
+        #other L22
+        for i in range(1,ndl4):
+            nd0 = cnt_temp 
+            nd1 = nd0 + 2*nd21+nd3 + 1
+            for j in range(0,nz-1):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
+        
+        # division along L32 no load edge
+        for i in range(1,nds+1):
+            x = cxpos + i*dds
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+                
+        cxpos = x  # current x position
+                
+        # first row of L32
+        nd0 = cnt_temp - nd3 - nd21-1
+        nd1 = cnt_temp
+        for j in range(0,nd3):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            
+        # other row of L32
+        for i in range(1,nds):
+            nd0 = cnt_temp + i*(nd3+1)
+            nd1 = nd0 + nd3+1
+            for j in range(0,nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
+                
+        # division along L32 load edge
+        for i in range(1,ndf+1):
+            x = cxpos +i*ddf
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+                
+        for i in range(0,ndf):
+            nd0 = cnt_temp + (i-1)*(nd3+1)
+            nd1 = nd0 + nd3+1
+            for j in range(0,nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 ### 入出力定義 ###
 
