@@ -79,26 +79,25 @@ class IntermediateRoll :
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
                 
-        # division along radius direction of linker
+        # division along radius direction of L21
         dd21 = meshsize
         d0 = divmod( 0.5*(self.D2-self.D3), dd21 )
         nd21 = int(d0[0])
         if( d0[1]>0.0 ):
             dd21 = 0.5*(self.D2-self.D3)/nd21
-        print("p21",nd21, dd21, nd21*dd21)
+        print("radius of D2:",nd21, dd21, nd21*dd21)
         
-        # division along horizontal direction of linker
+        # division along horizontal direction of L21
         ddlf = meshsize
         d0 = divmod( self.L21, ddlf )
         ndlf = int(d0[0])
         if( d0[1]>0.0 ):
             ddlf = self.L21/ndlf
-        print("ndlf",ndlf, ddlf, ndlf*ddlf)
+        print("L21",ndlf, ddlf, ndlf*ddlf)
         
         # L3 to L21
         nd0 = cnt_temp - nd3 -1
         nd1 = cnt_temp + nd21
-        print(nd0,nd1)
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
         
@@ -146,7 +145,7 @@ class IntermediateRoll :
         for j in range(0,nd3+2*nd21):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
             
-        # division along horizontal direction to chamfer point
+        # division to chamfer point
         dl1 = meshsize
         d0 = divmod( 0.5*self.L1 - self.offset -self.pxb, dl1 )
         ndl1 = int(d0[0])
@@ -167,7 +166,7 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
                 
-        # division along horizontal direction from chamfer point to center
+        # division from chamfer point to center
         dl2 = meshsize
         d0 = divmod(self.pxb, dl2 )
         ndl2 = int(d0[0])
@@ -187,12 +186,71 @@ class IntermediateRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+                
+        # division from center to chamfer point
+        nz = len(z_value)
+        for i in range(1,ndl2+1):
+            x = i*dl2
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
+                
+        # division from chamfer point to L22
+        dl3 = meshsize
+        d0 = divmod(0.5*self.L1 + self.offset - self.pxb, dl3 )
+        ndl3 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl3 = (0.5*self.L1 + self.offset - self.pxb)/ndl2
+        print("chamfer to edge point",ndl3, dl3, ndl3*dl3)
+        
+        nz = len(z_value)
+        for i in range(1,ndl3+1):
+            x = self.pxb + i*dl3
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
             
-        for i in range(0,ndl1+ndl2):
+        for i in range(0,ndl1+2*ndl2+ndl3):
             nd0 =  cnt_temp + i*(2*ndd1+nz)
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
+                
+        # division along L22
+        dl4 = meshsize
+        d0 = divmod(self.L22, dl4 )
+        ndl4 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl4 = self.L22/ndl4
+        print("L22",ndl4, dl4, ndl4*dl4)
+        
+        for i in range(1,ndl4+1):
+            x = 0.5*self.L1 + self.offset + i*dl4
+            for j in range(0,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+        print(cnt_temp, cnt_xyz)
+        
+        # first row of L22
+        nd0 = cnt_temp - nd3 -2*nd21 -ndd1-1
+        nd1 = cnt_temp
+        print(cnt_temp,nd0,nd1,nd3)
+        for j in range(0,nz-1):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
 ### 入出力定義 ###
