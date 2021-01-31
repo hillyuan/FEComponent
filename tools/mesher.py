@@ -29,6 +29,9 @@ class IntermediateRoll :
     px0 = 0.0   # left hand x position of L1
     px1 = 0.0   # right hand x position of L1  
     
+    xwr = np.array([])   # output: x coordinates of work roll
+    xbr = np.array([])   # output: x coordinates of support roll
+    
     def generate(self):
         global meshsize, xyz, elements
         print("Generating mesh begin with:", self.gnd0, self.z0)
@@ -145,73 +148,36 @@ class IntermediateRoll :
         for j in range(0,nd3+2*nd21):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
             
-        # division to chamfer point
-        dl1 = meshsize
-        d0 = divmod( 0.5*self.L1 - self.offset -self.pxb, dl1 )
-        ndl1 = int(d0[0])
-        if( d0[1]>0.0 ):
-            dl1 = (0.5*self.L1- self.offset -self.pxb)/ndl1
-        print("to chamfer point",ndl1, dl1, ndl1*dl1, 0.5*self.L1, self.pxb)
-
-        nz = len(z_value)
-        for i in range(0,ndl1+1):
-            x = x0 +self.L3 +self.L21 +i*dl1
-            for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
-                cnt_xyz += 1
-            for j in range(1,nz):
-                xyz = np.append(xyz, [x, z_value[j]])
-                cnt_xyz += 1
-            for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
-                cnt_xyz += 1
-                
-        # division from chamfer point to center
-        dl2 = meshsize
-        d0 = divmod(self.pxb, dl2 )
-        ndl2 = int(d0[0])
-        if( d0[1]>0.0 ):
-            dl2 = self.pxb/ndl2
-        print("chamfer to point",ndl2, dl2, ndl2*dl2)
-
-        nz = len(z_value)
-        for i in range(1,ndl2+1):
-            x = -self.pxb +i*dl2
-            for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
-                cnt_xyz += 1
-            for j in range(1,nz):
-                xyz = np.append(xyz, [x, z_value[j]])
-                cnt_xyz += 1
-            for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
-                cnt_xyz += 1
-                
-        # division from center to chamfer point
-        nz = len(z_value)
-        for i in range(1,ndl2+1):
-            x = i*dl2
-            for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
-                cnt_xyz += 1
-            for j in range(1,nz):
-                xyz = np.append(xyz, [x, z_value[j]])
-                cnt_xyz += 1
-            for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
-                cnt_xyz += 1
-                
-        # division from chamfer point to L22
-        dl3 = meshsize
-        d0 = divmod(0.5*self.L1 + self.offset - self.pxb, dl3 )
-        ndl3 = int(d0[0])
-        if( d0[1]>0.0 ):
-            dl3 = (0.5*self.L1 + self.offset - self.pxb)/ndl2
-        print("chamfer to edge point",ndl3, dl3, ndl3*dl3)
+        # x coordinates of L1 division
+        xmr = np.array([])
+        xmr = np.append(xmr, -0.5*self.L1 + self.offset)  # start point
+        xmr = np.append(xmr,-self.pxb)                    # chamfer
+        xmr = np.append(xmr,0.0)                          # center
+        xmr = np.append(xmr,self.pxb)                     # chamfer
+        xmr = np.append(xmr,self.pxw)                     # end point of woring roll
+        xmr = np.append(xmr, 0.5*self.L1 + self.offset)   # end point
+        print("points along L1 of inter roll:",xmr)
+        
+        # save x-volue 
+        x_value = np.array([])
+        xs = -0.5*self.L1 + self.offset
+        for i in range(0,len(xmr)-1):
+            ms = meshsize
+            d0 = divmod( xmr[i+1] - xmr[i], ms )
+            nm = int(d0[0])
+            if( d0[1]>0.0 ):
+                ms = (xmr[i+1] - xmr[i])/nm
+            print("division:",i, nm, ms, nm*ms)
+            for j in range(0,nm):
+                cx = xs+j*ms
+                print("x=:", cx)
+                x_value = np.append(x_value, cx)
+            xs = cx + ms
+        x_value = np.append(x_value, xs)
         
         nz = len(z_value)
-        for i in range(1,ndl3+1):
-            x = self.pxb + i*dl3
+        for i in range(0,len(x_value)):
+            x = x_value[i]
             for j in range(0,ndd1+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
@@ -221,8 +187,8 @@ class IntermediateRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
-            
-        for i in range(0,ndl1+2*ndl2+ndl3):
+
+        for i in range(0,len(x_value)-1):
             nd0 =  cnt_temp + i*(2*ndd1+nz)
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
