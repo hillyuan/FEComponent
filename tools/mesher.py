@@ -554,6 +554,57 @@ class WorkingRoll :
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        # division along radius direction of L21
+        dd21 = meshsize
+        d0 = divmod( 0.5*(self.D2-self.D3), dd21 )
+        nd21 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd21 = 0.5*(self.D2-self.D3)/nd21
+        print("radius of D2:",nd21, dd21, nd21*dd21)
+        
+        # division along horizontal direction of L2
+        ddlf = meshsize
+        d0 = divmod( self.L2, ddlf )
+        ndlf = int(d0[0])
+        if( d0[1]>0.0 ):
+            ddlf = self.L2/ndlf
+        print("L2",ndlf, ddlf, ndlf*ddlf)
+        
+        # L3 to L2
+        nd0 = cnt_temp - nd3 -1
+        nd1 = cnt_temp + nd21
+        for j in range(0,nd3):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        
+        for i in range(0,ndlf):
+            x = x0 +self.L3+i*ddlf
+            for j in range(0,nd21+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-dd21*j])
+                cnt_xyz += 1
+            for j in range(1,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+            for j in range(1,nd21+1):
+                xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
+                cnt_xyz += 1
+                
+        # save above z-volue        
+        z_value = np.array([])
+        for j in range(0,nd21+1):
+            z_value = np.append(z_value, self.z0+0.5*self.D2-dd21*j)
+        for j in range(1,nd3+1):
+            z_value = np.append(z_value, self.z0+0.5*self.D3-dd3*j)
+        for j in range(1,nd21+1):
+            z_value = np.append(z_value, self.z0-0.5*self.D3-dd21*j)
+        
+        for i in range(0,ndlf-1):
+            nd0 = cnt_temp + i*(2*nd21+nd3+1) 
+            nd1 = nd0 + 2*nd21+nd3 + 1
+            for j in range(0,2*nd21+nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
 
 
 ### 入出力定義 ###
