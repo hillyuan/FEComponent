@@ -306,24 +306,82 @@ class BackupRoll :
         nd = int(d0[0])
         if( d0[1]>0.0 ):
             msd = self.D2/nd
+        print("D2:", nd, msd, nd*msd)
 
+        cnt_xyz = self.gnd0
+        
         x0 = -0.5*self.L1 - self.L2
         for i in range(0,nlf+1):
             x = x0 +i*mslf
-            print(x)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
-        for i in range(1,nl+1):
+                cnt_xyz += 1
+        for i in range(1,nl):
             x = x0 + self.Lf + i*msl
-            print (x)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                cnt_xyz += 1
                 
-        for i in range(0,nlf+nl):
+        cnt_temp = cnt_xyz
+                
+        for i in range(0,nlf+nl-1):
             nd0 = self.gnd0 + i*(nd+1)
             nd1 = nd0 + nd+1
             for j in range(0,nd):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+              
+        # D1-D2
+        msc = meshsize
+        d0 = divmod( 0.5*(self.D1-self.D2), msl )
+        nc = int(d0[0])
+        if( d0[1]>0.0 ):
+            msc = 0.5*(self.D1-self.D2)/nc
+        print("D2 to D1", nc, msc, nc*msc)
+
+        # L chamfer        
+        mscf = meshsize
+        d0 = divmod( self.chamfer[0], mscf )
+        ncf = int(d0[0])
+        if( d0[1]>0.0 ):
+            mscf = self.chamfer[0]/ncf
+        dz = self.chamfer[1]/self.chamfer[0]*mscf
+        print("L chamfer", ncf, mscf, ncf*mscf,dz)
+        
+        cx = x0 + self.L2
+        for i in range(0,ncf+1):
+            x = cx +i*mscf
+            zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*i
+            zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*i
+            print(x,zt,zt1)
+            xyz = np.append(xyz, [x, zt])
+            cnt_xyz += 1
+            for j in range(1,nc+1):
+                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
+                cnt_xyz += 1
+            for j in range(1,nd+1):
+                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
+                cnt_xyz += 1
+            for j in range(1,nc):
+                xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
+                cnt_xyz += 1
+            xyz = np.append(xyz, [x, zt1])
+            cnt_xyz += 1
+            
+        # Element E2->D1
+        nd0 = cnt_temp -nd -1
+        nd1 = cnt_temp + nc
+        print(nd0,nd1)
+        for j in range(0,nd):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            
+        # Element D1 to first chamfer
+        for i in range(0,ncf):
+            nd0 = cnt_temp + i*(2*nc+nd+1)
+            nd1 = nd0 + 2*nc+nd+1
+            print(nd0,nd1)
+            for j in range(0,2*nc+nd):
+               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+
 
 ### 入出力定義 ###
 
@@ -416,38 +474,10 @@ elements = np.array([], dtype=int)
 #z0 = zb + 0.5*backupDb
 #x0 = xb + backuplb
 
-#msd = meshsize
-#dd = divmod( chamfer[0], msd )
-#nd = int(dd[0])
-#if( dd[1]>0.0 ):
-#    msd = chamfer[0]/n1
-#print("Lw_offset", nd, msd, nd*msd)
+
 
 # chamfer
-#msc = meshsize
-#dd = divmod( 0.5*(backupDb-backupdb)-chamfer[1], msl )
-#nc = int(dd[0])
-#if( dd[1]>0.0 ):
-#    msc = ( 0.5*(backupDb-backupdb) -chamfer[1] )/nc
-#dz = chamfer[1]/chamfer[0]*msd
-#print("Dc", nc, msc, nc*msc, dz)
 
-# element link Db and dd
-#nd0 = minnd
-#nd1 = maxnd+nc+1
-#for j in range(0,n0):
-#    elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
-
-#for i in range(0,nd+1):
-#    x = x0 +i*msd
-#    xyz = np.append(xyz, [x, z0-(chamfer[1]-dz*i)])
-#    for j in range(1,nc+1):
-#        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
-#    for j in range(1,n0+1):
-#        xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
-#    for j in range(1,nc):
-#        xyz = np.append(xyz, [x, zb-0.5*backupdb-msc*j])
-#    xyz = np.append(xyz, [x, zb-0.5*backupDb-dz*(i-nd)])
     
 ## main part
 #msl = meshsize
@@ -457,10 +487,6 @@ elements = np.array([], dtype=int)
 #    msl = ( backupLb-2.0*chamfer[0] )/nc
 #print("Dl", nl, msl, nl*msl)
 
-#for i in range(0,nd+1):
-#    x = x0 +backuplb +i*msl
-#    for j in range(1,nc+1):
-#        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
     
 #for i in range(0,nd):
 #    nd0 = maxnd + 1 + (2*nc+n0+1)*i
