@@ -285,7 +285,7 @@ class BackupRoll :
     
     def generate(self):
         global meshsize, xyz, elements
-        print("Generating mesh of backup roll begin with:", self.gnd0)
+        print("Generating mesh of backup roll begin with:", self.gnd0, self.z0)
         
         ## L2 ##
         mslf = meshsize
@@ -310,15 +310,17 @@ class BackupRoll :
         x0 = -0.5*self.L1 - self.L2
         for i in range(0,nlf+1):
             x = x0 +i*mslf
+            print(x)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
-        for i in range(1,nl):
+        for i in range(1,nl+1):
             x = x0 + self.Lf + i*msl
-            for j in range(0,nl+1):
-                xyz = np.append(xyz, [x, self.zb+0.5*self.D2-msd*j])
+            print (x)
+            for j in range(0,nd+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 
-        for i in range(0,nlf+nl-1):
-            nd0 = i*(nd+1)
+        for i in range(0,nlf+nl):
+            nd0 = self.gnd0 + i*(nd+1)
             nd1 = nd0 + nd+1
             for j in range(0,nd):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
@@ -477,8 +479,8 @@ iRoll.generate()
 
 bRoll.gnd0 = iRoll.n_nd
 bRoll.xbr = iRoll.xbr
-print(bRoll.gnd0)
-#bRoll.generate()
+bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
+bRoll.generate()
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
