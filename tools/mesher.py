@@ -27,7 +27,9 @@ class IntermediateRoll :
     pxw = 0.0   # x position of L1 of working roll 
     
     xwr = np.array([])   # output: x coordinates of work roll
+    nwr = np.array([],dtype=int)   # output: node number of work roll
     xbr = np.array([])   # output: x coordinates of support roll
+    nbr = np.array([],dtype=int)   # output: node number of support roll
     
     n_nd = 0    # ouput: number of nodes 
     
@@ -183,6 +185,8 @@ class IntermediateRoll :
         nz = len(z_value)
         for i in range(0,len(x_value)):
             x = x_value[i]
+            if( x>=xmr[1] and x<=xmr[3] ):
+                self.nbr = np.append(self.nbr, cnt_xyz)
             for j in range(0,ndd1+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
@@ -192,6 +196,8 @@ class IntermediateRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+                
+        print( "nbr", self.nbr )
 
         for i in range(0,len(x_value)-1):
             nd0 =  cnt_temp + i*(2*ndd1+nz)
@@ -275,13 +281,14 @@ class BackupRoll :
     D2 = 0.0
     L1 = 0.0
     L2 = 0.0
-    Lf = 0.0    # Length of constrained edge
+    Lf = 0.0                       # Length of constrained edge
     chamfer = np.array([])
-    z0 = 0.0    # z-coordiante of center
-    gnd0 = 0    # start node number 
-    n_nd = 0    # ouput: number of nodes 
+    z0 = 0.0                       # z-coordiante of center
+    gnd0 = 0                       # start node number 
+    n_nd = 0                       # ouput: number of nodes 
     
-    xbr = np.array([])   # input: x coordinates of support roll
+    xbr = np.array([])             # input: x coordinates of support roll
+    nbr = np.array([],dtype=int)   # input: node number of support roll
     
     def generate(self):
         global meshsize, xyz, elements
@@ -370,7 +377,6 @@ class BackupRoll :
         # Element E2->D1
         nd0 = cnt_temp -nd -1
         nd1 = cnt_temp + nc
-        print(nd0,nd1)
         for j in range(0,nd):
             elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
             
@@ -378,9 +384,31 @@ class BackupRoll :
         for i in range(0,ncf):
             nd0 = cnt_temp + i*(2*nc+nd+1)
             nd1 = nd0 + 2*nc+nd+1
-            print(nd0,nd1)
             for j in range(0,2*nc+nd):
                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        ce = len(elements)
+        elements[ce-2] = self.nbr[0]
+        xyz = np.delete(xyz, [2*cnt_xyz - 1, 2*cnt_xyz-2])
+        cnt_xyz -= 1
+        cnt_temp = cnt_xyz
+               
+        # left chamfer to right chamfer
+        nx = len(self.xbr)
+        print("nx",nx)
+        print(self.nbr)
+        for i in range(1,2):
+            for j in range(0,nc+1):
+                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D1 - msc*j])
+                cnt_xyz += 1
+                #print(self.xbr[i], self.z0 + 0.5*self.D1 - msc*j)
+            for j in range(1,nd+1):
+                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D2 - msd*j])
+                #print(self.xbr[i], self.z0 + 0.5*self.D2 - msd*j)
+                cnt_xyz += 1
+            for j in range(1,nc+1):
+                xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
+                cnt_xyz += 1
+                #print(self.xbr[i], self.z0 - 0.5*self.D2 - msc*j)
 
 
 ### 入出力定義 ###
@@ -451,51 +479,13 @@ for key, value in data.items():
             print (key,k2,v2)
             
 
-
 ## initial ##
 n_node = 0
 xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
 
-#zb = iRoll.z0 + 0.5*iRoll.D1 + 0.5*backupDb
-#print(zw,iRoll.z0,zb)
-#xw = -0.5*workLw - worklw
-#xi = -0.5*interLi + offset - interli
-#xb = -0.5*backupLb - backuplb
-#print(xw,xi,xb)
-
-
-#minnd = nd0+n0+1
-#maxnd = nd1+n0
-#print("maxnd", maxnd, minnd)
-        
-## Intermediate Roll ##
-#z0 = zb + 0.5*backupDb
-#x0 = xb + backuplb
-
-
-
-# chamfer
-
-    
-## main part
-#msl = meshsize
-#dd = divmod( backupLb-2.0*chamfer[0], msl )
-#nl = int(dd[0])
-#if( dd[1]>0.0 ):
-#    msl = ( backupLb-2.0*chamfer[0] )/nc
-#print("Dl", nl, msl, nl*msl)
-
-    
-#for i in range(0,nd):
-#    nd0 = maxnd + 1 + (2*nc+n0+1)*i
-#    nd1 = nd0 + 2*nc+n0 + 1
-#    print( "nd", nd0, nd1)
-#    for j in range(0,2*nc+n0):
-#        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
-
-zw = 0.0
+zw = 0.0   # z-coordinate of working roll
 
 iRoll.gnd0 = 0  
 iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
@@ -505,6 +495,7 @@ iRoll.generate()
 
 bRoll.gnd0 = iRoll.n_nd
 bRoll.xbr = iRoll.xbr
+bRoll.nbr = iRoll.nbr
 bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
 bRoll.generate()
 
