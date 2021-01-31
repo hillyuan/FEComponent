@@ -339,7 +339,7 @@ class BackupRoll :
               
         # D1-D2
         msc = meshsize
-        d0 = divmod( 0.5*(self.D1-self.D2), msl )
+        d0 = divmod( 0.5*(self.D1-self.D2), msc )
         nc = int(d0[0])
         if( d0[1]>0.0 ):
             msc = 0.5*(self.D1-self.D2)/nc
@@ -454,8 +454,36 @@ class BackupRoll :
         for i in range(0,ncf-1):
             nd0 = cnt_temp + i*(2*nc+nd+1)
             nd1 = nd0 + 2*nc+nd+1
-            print(nd0,nd1)
             for j in range(0,2*nc+nd):
+               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               
+        cnt_temp = cnt_xyz
+        
+        # Nodes along left Lf
+        for i in range(1,nl+1):
+            x = 0.5*self.L1 + i*msl
+            for j in range(0,nd+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                cnt_xyz += 1
+                
+        # Nodes to left End
+        for i in range(1,nlf+1):
+            x = 0.5*self.L1 + (self.L2-self.Lf) +i*mslf
+            for j in range(0,nd+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                cnt_xyz += 1
+               
+        # Element: L1 to left L2
+        nd0 = cnt_temp - (nc+nd+1)
+        nd1 = cnt_temp
+        for j in range(0,nd):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            
+        # Element to left end
+        for i in range(0,nlf+nl-1):
+            nd0 = cnt_temp +i*(nd+1)
+            nd1 = nd0 + nd+1
+            for j in range(0,nd):
                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
