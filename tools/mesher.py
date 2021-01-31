@@ -485,6 +485,27 @@ class BackupRoll :
             nd1 = nd0 + nd+1
             for j in range(0,nd):
                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               
+        self.n_nd = cnt_xyz - self.gnd0
+               
+class WorkingRoll :
+    D1 = 0.0
+    D2 = 0.0
+    D3 = 0.0
+    L1 = 0.0
+    L2 = 0.0
+    L3 = 0.0
+    Lf = 0.0                       # Length of constrained edge
+    z0 = 0.0                       # z-coordiante of center
+    gnd0 = 0                       # start node number 
+    n_nd = 0                       # ouput: number of nodes 
+    
+    xbw = np.array([])             # input: x coordinates with inter roll
+    nbw = np.array([],dtype=int)   # input: node number with inter roll
+    
+    def generate(self):
+        global meshsize, xyz, elements
+        print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
 
 
 ### 入出力定義 ###
@@ -502,6 +523,7 @@ print(data)
 
 iRoll = IntermediateRoll()
 bRoll = BackupRoll()
+wRoll = WorkingRoll()
 
 for key, value in data.items():
     if key == "MeshSize":
@@ -544,14 +566,20 @@ for key, value in data.items():
             print (key,k2,v2)
     elif key == "Work Roll":
         for k2, v2 in value.items():
-            if k2 == "Dw":
-                workDw = v2
-            elif k2 == "Lw":
-                workLw = v2
-            elif k2 == "dw":
-                workdw = v2
-            elif k2 == "lw":
-                worklw = v2
+            if k2 == "D1":
+                wRoll.D1 = v2
+            elif k2 == "L1":
+                wRoll.L1 = v2
+            elif k2 == "D2":
+                wRoll.D2 = v2
+            elif k2 == "L2":
+                wRoll.L2 = v2
+            elif k2 == "D3":
+                wRoll.D3 = v2
+            elif k2 == "L3":
+                wRoll.L3 = v2
+            elif k2 == "Lf":
+                wRoll.Lf = v2
             print (key,k2,v2)
             
 
@@ -565,8 +593,8 @@ zw = 0.0   # z-coordinate of working roll
 
 iRoll.gnd0 = 0  
 iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
-iRoll.pxw = 0.5*workLw
-iRoll.z0 = zw + 0.5*workDw + 0.5*iRoll.D1
+iRoll.pxw = 0.5*wRoll.L1
+iRoll.z0 = zw + 0.5*wRoll.D1 + 0.5*iRoll.D1
 iRoll.generate()
 
 bRoll.gnd0 = iRoll.n_nd
@@ -574,6 +602,12 @@ bRoll.xbr = iRoll.xbr
 bRoll.nbr = iRoll.nbr
 bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
 bRoll.generate()
+
+wRoll.gnd0 = iRoll.n_nd + bRoll.n_nd
+wRoll.z0 = zw
+wRoll.xwr = iRoll.xwr
+wRoll.nwr = iRoll.nwr
+wRoll.generate()
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
