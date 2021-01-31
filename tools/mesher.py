@@ -196,8 +196,11 @@ class IntermediateRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+            if( x<=xmr[4] ):
+                self.nwr = np.append(self.nwr, cnt_xyz-1)
                 
         print( "nbr", self.nbr )
+        print( "nwr", self.nwr )
 
         for i in range(0,len(x_value)-1):
             nd0 =  cnt_temp + i*(2*ndd1+nz)
@@ -499,6 +502,7 @@ class WorkingRoll :
     z0 = 0.0                       # z-coordiante of center
     gnd0 = 0                       # start node number 
     n_nd = 0                       # ouput: number of nodes 
+    xb = 0.0                       # strat position og inter roll
     
     xbw = np.array([])             # input: x coordinates with inter roll
     nbw = np.array([],dtype=int)   # input: node number with inter roll
@@ -506,6 +510,50 @@ class WorkingRoll :
     def generate(self):
         global meshsize, xyz, elements
         print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
+        
+        x0 = -0.5*self.L1 - self.L2 -self.L3
+        
+        # division along D3 radius direction
+        dd3 = meshsize
+        d0 = divmod( self.D3, dd3 )
+        nd3 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd3 = self.D3/nd3
+        print("nd3",nd3, dd3, nd3*dd3)
+        
+        # division along L31 load edge
+        ddf = meshsize
+        d0 = divmod( self.Lf, ddf )
+        ndf = int(d0[0])
+        if( d0[1]>0.0 ):
+            ddf = self.Lf/ndf
+        print(ndf, ddf, ndf*ddf)
+        # division along no-load edge
+        dds = meshsize
+        d0 = divmod( self.L3-self.Lf, dds )
+        nds = int(d0[0])
+        if( d0[1]>0.0 ):
+            dds = (self.L3-self.Lf)/nds
+        print(nds, dds, nds*dds)
+        
+        cnt_xyz = self.gnd0
+        for i in range(0,ndf+1):
+            x = x0 +i*ddf
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+        for i in range(1,nds):
+            x = x0 +self.Lf+i*dds
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                cnt_xyz += 1
+        cnt_temp = cnt_xyz
+                
+        for i in range(0,ndf+nds-1):
+            nd0 = self.gnd0 + i*(nd3+1)
+            nd1 = nd0 + nd3+1
+            for j in range(0,nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
 ### 入出力定義 ###
