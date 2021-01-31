@@ -276,6 +276,7 @@ class BackupRoll :
     L1 = 0.0
     L2 = 0.0
     Lf = 0.0    # Length of constrained edge
+    chamfer = np.array([])
     z0 = 0.0    # z-coordiante of center
     gnd0 = 0    # start node number 
     n_nd = 0    # ouput: number of nodes 
@@ -343,18 +344,18 @@ for key, value in data.items():
         meshsize = value
     elif key == "Backup Roll":
         for k2, v2 in value.items():
-            if k2 == "Db":
-                backupDb = v2
-            elif k2 == "Lb":
-                backupLb = v2
-            elif k2 == "db":
-                backupdb = v2
-            elif k2 == "lb":
-                backuplb = v2
-            elif k2 == "lf":
-                backuplf = v2
+            if k2 == "D1":
+                bRoll.D1 = v2
+            elif k2 == "L1":
+                bRoll.L1 = v2
+            elif k2 == "D2":
+                bRoll.D2 = v2
+            elif k2 == "L2":
+                bRoll.L2 = v2
+            elif k2 == "Lf":
+                bRoll.Lf = v2
             elif k2 == "chamfer":
-                chamfer = v2
+                bRoll.chamfer = v2
             print (key,k2,v2)
     elif key == "Intermediate Roll":
         for k2, v2 in value.items():
@@ -389,21 +390,19 @@ for key, value in data.items():
                 worklw = v2
             print (key,k2,v2)
             
-iRoll.pxb = 0.5*backupLb - chamfer[0]
-iRoll.pxw = 0.5*workLw
+
 
 ## initial ##
 n_node = 0
 xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
-zw = 0.0
-iRoll.z0 = zw + 0.5*workDw + 0.5*iRoll.D1
-zb = iRoll.z0 + 0.5*iRoll.D1 + 0.5*backupDb
-print(zw,iRoll.z0,zb)
-xw = -0.5*workLw - worklw
+
+#zb = iRoll.z0 + 0.5*iRoll.D1 + 0.5*backupDb
+#print(zw,iRoll.z0,zb)
+#xw = -0.5*workLw - worklw
 #xi = -0.5*interLi + offset - interli
-xb = -0.5*backupLb - backuplb
+#xb = -0.5*backupLb - backuplb
 #print(xw,xi,xb)
 
 
@@ -468,7 +467,12 @@ xb = -0.5*backupLb - backuplb
 #    for j in range(0,2*nc+n0):
 #        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
+zw = 0.0
+
 iRoll.gnd0 = 0  
+iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
+iRoll.pxw = 0.5*workLw
+iRoll.z0 = zw + 0.5*workDw + 0.5*iRoll.D1
 iRoll.generate()
 
 bRoll.gnd0 = iRoll.n_nd
