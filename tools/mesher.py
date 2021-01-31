@@ -21,22 +21,19 @@ class IntermediateRoll :
     L3 = 0.0
     offset = 0.0
     Lf = 0.0
-    z0 = 0.0
+    z0 = 0.0    # z-coordiante of center
     gnd0 = 0    # start node number
     pxb = 0.0   # x position of L1 - chamfer of backup roll 
-    pxw = 0.0   # x position of L1 of working roll
-    
-    px0 = 0.0   # left hand x position of L1
-    px1 = 0.0   # right hand x position of L1  
+    pxw = 0.0   # x position of L1 of working roll 
     
     xwr = np.array([])   # output: x coordinates of work roll
     xbr = np.array([])   # output: x coordinates of support roll
     
+    n_nd = 0    # ouput: number of nodes 
+    
     def generate(self):
         global meshsize, xyz, elements
-        print("Generating mesh begin with:", self.gnd0, self.z0)
-        self.px0 = 0.5*self.L1 - self.offset
-        self.px1 = 0.5*self.L1 + self.offset
+        print("Generating mesh Intermediate Roll begin with:", self.gnd0, self.z0)
         
         x0 = -0.5*self.L1 + self.offset - self.L21 -self.L3
         
@@ -270,6 +267,60 @@ class IntermediateRoll :
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        self.n_nd = cnt_xyz - self.gnd0
+                
+class BackupRoll :
+    D1 = 0.0
+    D2 = 0.0
+    L1 = 0.0
+    L2 = 0.0
+    Lf = 0.0    # Length of constrained edge
+    z0 = 0.0    # z-coordiante of center
+    gnd0 = 0    # start node number 
+    n_nd = 0    # ouput: number of nodes 
+    
+    xbr = np.array([])   # input: x coordinates of support roll
+    
+    def generate(self):
+        global meshsize, xyz, elements
+        print("Generating mesh of backup roll begin with:", self.gnd0)
+        
+        ## L2 ##
+        mslf = meshsize
+        d0 = divmod( self.Lf, mslf )
+        nlf = int(d0[0])
+        if( d0[1]>0.0 ):
+            mslf = self.Lf/nlf
+            
+        msl = meshsize
+        d0 = divmod( self.L2-self.Lf, msl )
+        nl = int(d0[0])
+        if( d0[1]>0.0 ):
+            msl = (self.L2-self.Lf)/nl
+        
+        ## D2 ##
+        msd = meshsize
+        d0 = divmod( self.D2, msd )
+        nd = int(d0[0])
+        if( d0[1]>0.0 ):
+            msd = self.D2/nd
+
+        x0 = -0.5*self.L1 - self.L2
+        for i in range(0,nlf+1):
+            x = x0 +i*mslf
+            for j in range(0,nd+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+        for i in range(1,nl):
+            x = x0 + self.Lf + i*msl
+            for j in range(0,nl+1):
+                xyz = np.append(xyz, [x, self.zb+0.5*self.D2-msd*j])
+                
+        for i in range(0,nlf+nl-1):
+            nd0 = i*(nd+1)
+            nd1 = nd0 + nd+1
+            for j in range(0,nd):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 ### 入出力定義 ###
 
@@ -285,6 +336,7 @@ f.close()
 print(data)
 
 iRoll = IntermediateRoll()
+bRoll = BackupRoll()
 
 for key, value in data.items():
     if key == "MeshSize":
@@ -354,105 +406,75 @@ xw = -0.5*workLw - worklw
 xb = -0.5*backupLb - backuplb
 #print(xw,xi,xb)
 
-## Backup roll ##
-msl = meshsize
-d0 = divmod( backupdb, msl )
-n0 = int(d0[0])
-print( d0 )
-if( d0[1]>0.0 ):
-    msl = backupdb/n0
 
-msd = meshsize
-d1 = divmod( backuplf, msd )
-n1 = int(d1[0])
-print(d1)
-if( d1[1]>0.0 ):
-    msd = backuplf/n1
-    
-msf = meshsize
-d2 = divmod( backuplb-backuplf, msf )
-n2 = int(d2[0])
-print(d2)
-if( d2[1]>0.0 ):
-    msf = (backuplb-backuplf)/n2
-    
-for i in range(0,n1+1):
-    x = xb +i*msd
-    for j in range(0,n0+1):
-        xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
-for i in range(1,n2):
-    x = xb+backuplf +i*msf
-    for j in range(0,n0+1):
-        xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
-        
-for i in range(0,n1+n2-1):
-    nd0 = i*(n0+1)
-    nd1 = nd0 + n0+1
-    for j in range(0,n0):
-        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
-minnd = nd0+n0+1
-maxnd = nd1+n0
-print("maxnd", maxnd, minnd)
+#minnd = nd0+n0+1
+#maxnd = nd1+n0
+#print("maxnd", maxnd, minnd)
         
 ## Intermediate Roll ##
-z0 = zb + 0.5*backupDb
-x0 = xb + backuplb
+#z0 = zb + 0.5*backupDb
+#x0 = xb + backuplb
 
-msd = meshsize
-dd = divmod( chamfer[0], msd )
-nd = int(dd[0])
-if( dd[1]>0.0 ):
-    msd = chamfer[0]/n1
-print("Lw_offset", nd, msd, nd*msd)
+#msd = meshsize
+#dd = divmod( chamfer[0], msd )
+#nd = int(dd[0])
+#if( dd[1]>0.0 ):
+#    msd = chamfer[0]/n1
+#print("Lw_offset", nd, msd, nd*msd)
 
 # chamfer
-msc = meshsize
-dd = divmod( 0.5*(backupDb-backupdb)-chamfer[1], msl )
-nc = int(dd[0])
-if( dd[1]>0.0 ):
-    msc = ( 0.5*(backupDb-backupdb) -chamfer[1] )/nc
-dz = chamfer[1]/chamfer[0]*msd
-print("Dc", nc, msc, nc*msc, dz)
+#msc = meshsize
+#dd = divmod( 0.5*(backupDb-backupdb)-chamfer[1], msl )
+#nc = int(dd[0])
+#if( dd[1]>0.0 ):
+#    msc = ( 0.5*(backupDb-backupdb) -chamfer[1] )/nc
+#dz = chamfer[1]/chamfer[0]*msd
+#print("Dc", nc, msc, nc*msc, dz)
 
 # element link Db and dd
-nd0 = minnd
-nd1 = maxnd+nc+1
-for j in range(0,n0):
-    elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+#nd0 = minnd
+#nd1 = maxnd+nc+1
+#for j in range(0,n0):
+#    elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
-for i in range(0,nd+1):
-    x = x0 +i*msd
-    xyz = np.append(xyz, [x, z0-(chamfer[1]-dz*i)])
-    for j in range(1,nc+1):
-        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
-    for j in range(1,n0+1):
-        xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
-    for j in range(1,nc):
-        xyz = np.append(xyz, [x, zb-0.5*backupdb-msc*j])
-    xyz = np.append(xyz, [x, zb-0.5*backupDb-dz*(i-nd)])
+#for i in range(0,nd+1):
+#    x = x0 +i*msd
+#    xyz = np.append(xyz, [x, z0-(chamfer[1]-dz*i)])
+#    for j in range(1,nc+1):
+#        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
+#    for j in range(1,n0+1):
+#        xyz = np.append(xyz, [x, zb+0.5*backupdb-msl*j])
+#    for j in range(1,nc):
+#        xyz = np.append(xyz, [x, zb-0.5*backupdb-msc*j])
+#    xyz = np.append(xyz, [x, zb-0.5*backupDb-dz*(i-nd)])
     
 ## main part
-msl = meshsize
-dd = divmod( backupLb-2.0*chamfer[0], msl )
-nl = int(dd[0])
-if( dd[1]>0.0 ):
-    msl = ( backupLb-2.0*chamfer[0] )/nc
-print("Dl", nl, msl, nl*msl)
+#msl = meshsize
+#dd = divmod( backupLb-2.0*chamfer[0], msl )
+#nl = int(dd[0])
+#if( dd[1]>0.0 ):
+#    msl = ( backupLb-2.0*chamfer[0] )/nc
+#print("Dl", nl, msl, nl*msl)
 
-for i in range(0,nd+1):
-    x = x0 +backuplb +i*msl
-    for j in range(1,nc+1):
-        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
+#for i in range(0,nd+1):
+#    x = x0 +backuplb +i*msl
+#    for j in range(1,nc+1):
+#        xyz = np.append(xyz, [x, z0-msc*j-chamfer[1]])
     
-for i in range(0,nd):
-    nd0 = maxnd + 1 + (2*nc+n0+1)*i
-    nd1 = nd0 + 2*nc+n0 + 1
-    print( "nd", nd0, nd1)
-    for j in range(0,2*nc+n0):
-        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+#for i in range(0,nd):
+#    nd0 = maxnd + 1 + (2*nc+n0+1)*i
+#    nd1 = nd0 + 2*nc+n0 + 1
+#    print( "nd", nd0, nd1)
+#    for j in range(0,2*nc+n0):
+#        elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
-iRoll.gnd0 = 1227     
+iRoll.gnd0 = 0  
 iRoll.generate()
+
+bRoll.gnd0 = iRoll.n_nd
+bRoll.xbr = iRoll.xbr
+print(bRoll.gnd0)
+#bRoll.generate()
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
