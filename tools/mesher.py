@@ -392,11 +392,10 @@ class BackupRoll :
         cnt_xyz -= 1
         cnt_temp = cnt_xyz
                
-        # left chamfer to right chamfer
+        # Node: left chamfer to right chamfer
         nx = len(self.xbr)
-        print("nx",nx)
         print(self.nbr)
-        for i in range(1,2):
+        for i in range(1,nx):
             for j in range(0,nc+1):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D1 - msc*j])
                 cnt_xyz += 1
@@ -405,10 +404,21 @@ class BackupRoll :
                 xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D2 - msd*j])
                 #print(self.xbr[i], self.z0 + 0.5*self.D2 - msd*j)
                 cnt_xyz += 1
-            for j in range(1,nc+1):
+            for j in range(1,nc):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
                 cnt_xyz += 1
                 #print(self.xbr[i], self.z0 - 0.5*self.D2 - msc*j)
+                
+        # Element: left chamfer to right chamfer
+        for i in range(0,nx-1):
+            nd0 = cnt_temp + (i-1)*(2*nc+nd)
+            nd1 = nd0 + 2*nc+nd
+            print(cnt_temp, nd0,nd1)
+            for j in range(0,2*nc+nd-1):
+               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            nd0 = nd0 + 2*nc+nd-2
+            nd1 = nd1 + 2*nc+nd-2
+            elements = np.append(elements, [nd0,nd1,self.nbr[i+1],self.nbr[i]])
 
 
 ### 入出力定義 ###
