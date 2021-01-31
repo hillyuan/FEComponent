@@ -374,7 +374,7 @@ class BackupRoll :
             xyz = np.append(xyz, [x, zt1])
             cnt_xyz += 1
             
-        # Element E2->D1
+        # Element D2->D1
         nd0 = cnt_temp -nd -1
         nd1 = cnt_temp + nc
         for j in range(0,nd):
@@ -407,18 +407,56 @@ class BackupRoll :
             for j in range(1,nc):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
                 cnt_xyz += 1
-                #print(self.xbr[i], self.z0 - 0.5*self.D2 - msc*j)
                 
         # Element: left chamfer to right chamfer
         for i in range(0,nx-1):
             nd0 = cnt_temp + (i-1)*(2*nc+nd)
             nd1 = nd0 + 2*nc+nd
-            print(cnt_temp, nd0,nd1)
             for j in range(0,2*nc+nd-1):
                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
             nd0 = nd0 + 2*nc+nd-2
             nd1 = nd1 + 2*nc+nd-2
             elements = np.append(elements, [nd0,nd1,self.nbr[i+1],self.nbr[i]])
+            
+        cnt_temp = cnt_xyz
+            
+        # right chamfer to right edge
+        cx = 0.5*self.L1- self.chamfer[0]
+        for i in range(1,ncf+1):
+            x = cx +i*mscf
+            zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*(ncf-i)
+            zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*(ncf-i)
+            print(x,zt,zt1)
+            xyz = np.append(xyz, [x, zt])
+            cnt_xyz += 1
+            for j in range(1,nc+1):
+                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
+                cnt_xyz += 1
+            for j in range(1,nd+1):
+                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
+                cnt_xyz += 1
+            for j in range(1,nc):
+                xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
+                cnt_xyz += 1
+            xyz = np.append(xyz, [x, zt1])
+            cnt_xyz += 1
+            
+        # Element::right chamfer to right edge
+        nd0 = cnt_temp - (2*nc+nd)
+        nd1 = nd0 + 2*nc+nd
+        print(nd0,nd1)
+        for j in range(0,2*nc+nd-1):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        nd0 = nd0 + 2*nc+nd-1
+        nd1 = nd1 + 2*nc+nd-1
+        elements = np.append(elements, [nd0,nd1,nd1+1,self.nbr[nx-1]])
+
+        for i in range(0,ncf-1):
+            nd0 = cnt_temp + i*(2*nc+nd+1)
+            nd1 = nd0 + 2*nc+nd+1
+            print(nd0,nd1)
+            for j in range(0,2*nc+nd):
+               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
 ### 入出力定義 ###
