@@ -170,10 +170,18 @@ class IntermediateRoll :
             print("division:",i, nm, ms, nm*ms)
             for j in range(0,nm):
                 cx = xs+j*ms
-                print("x=:", cx)
                 x_value = np.append(x_value, cx)
+                if( i>0 and i<3 ):
+                    self.xbr = np.append(self.xbr, cx)
+                if( i<4 ):
+                    self.xwr = np.append(self.xwr, cx)
             xs = cx + ms
         x_value = np.append(x_value, xs)
+        self.xbr = np.append(self.xbr, self.pxb)
+        self.xwr = np.append(self.xwr, self.pxw)
+        print( "x_value", x_value )
+        print( "xbr", self.xbr )
+        print( "xwr", self.xwr )
         
         nz = len(z_value)
         for i in range(0,len(x_value)):
