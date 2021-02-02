@@ -9,7 +9,6 @@ import os
 import yaml
 import numpy as np
 import math
-import matplotlib.pyplot   as plt
 
 class IntermediateRoll :
     D1 = 0.0
@@ -502,7 +501,7 @@ class WorkingRoll :
     z0 = 0.0                       # z-coordiante of center
     gnd0 = 0                       # start node number 
     n_nd = 0                       # ouput: number of nodes 
-    xb = 0.0                       # strat position og inter roll
+    xb = 0.0                       # start position of inter roll
     
     xbw = np.array([])             # input: x coordinates with inter roll
     nbw = np.array([],dtype=int)   # input: node number with inter roll
@@ -605,6 +604,42 @@ class WorkingRoll :
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
                 
         cnt_temp = cnt_xyz
+        
+        # division along radius direction of L1
+        dd1 = meshsize
+        d0 = divmod( 0.5*(self.D1-self.D2), dd1 )
+        ndd1 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dd1 = 0.5*(self.D1-self.D2)/ndd1
+        print("D1-D2",ndd1, dd1, ndd1*dd1)
+        
+        # division to edge of Intermediate roll
+        dl11 = meshsize
+        d0 = divmod( 0.5*self.L1-self.xb, dl11 )
+        ndl11 = int(d0[0])
+        if( d0[1]>0.0 ):
+            dl11 = (0.5*self.L1-self.xb)/ndl11
+        print("L11",ndl11, dl11, ndl11*dl11)
+        print("z_value:",z_value)     
+        nz = len(z_value)
+        for i in range(0,ndl11):
+            x = -0.5*self.L1 + i*dl11
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
+        
+        # Elements of L21 to L1
+        nd0 = cnt_temp - 2*nd21 -nd3 -1
+        nd1 = cnt_temp + ndd1
+        print(nd0,nd1)
+        for j in range(0,nd3+2*nd21):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 
 ### 入出力定義 ###
@@ -704,6 +739,7 @@ bRoll.generate()
 
 wRoll.gnd0 = iRoll.n_nd + bRoll.n_nd
 wRoll.z0 = zw
+wRoll.xb = 0.5*iRoll.L1 - iRoll.offset
 wRoll.xwr = iRoll.xwr
 wRoll.nwr = iRoll.nwr
 wRoll.generate()
