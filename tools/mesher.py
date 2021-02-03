@@ -701,6 +701,38 @@ class WorkingRoll :
             nd1 = nd0 + nz
             for j in range(0,nz-1):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
+                
+        #L32
+        for i in range(1,nds):
+            x = 0.5*self.L1 + self.L2 + i*dds
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                print(x, self.z0+0.5*self.D3-dd3*j)
+                cnt_xyz += 1
+        for i in range(0,ndf+1):
+            x = 0.5*self.L1 + self.L2 + self.L3- self.Lf +i*ddf
+            for j in range(0,nd3+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                print(x, self.z0+0.5*self.D3-dd3*j)
+                cnt_xyz += 1
+                
+        # Element: L32-L32f
+        nd0 = cnt_temp - (nd3+nd21+1)
+        nd1 = cnt_temp
+        print( cnt_temp, nd0,nd1)
+        for j in range(0,nd3):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            
+        # Element: L32f
+        for i in range(1,ndf+nds):
+            nd0 = cnt_temp + (i-1)*(nd3+1)
+            nd1 = nd0 + nd3+1
+            print(nd0,nd1)
+            for j in range(0,nd3):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        
 
 ### 入出力定義 ###
 
