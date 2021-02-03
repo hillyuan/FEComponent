@@ -681,7 +681,26 @@ class WorkingRoll :
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
                 
         cnt_temp = cnt_xyz
-
+        
+        # L22
+        for i in range(1,ndlf+1):
+            x = 0.5*self.L1 + i*ddlf
+            for j in range(0,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+                
+        # Element: L1 to L22
+        nd0 = cnt_temp - (2*ndd1+nz-1)
+        nd1 = cnt_temp
+        for j in range(0,nz-1):
+            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+        
+        #Element: L22
+        for i in range(1,ndlf):
+            nd0 = cnt_temp + (i-1)*nz 
+            nd1 = nd0 + nz
+            for j in range(0,nz-1):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
 
 ### 入出力定義 ###
 
