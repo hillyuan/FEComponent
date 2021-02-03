@@ -647,32 +647,40 @@ class WorkingRoll :
             for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
                 
+        cnt_temp = cnt_xyz
+                
         # Nodes to left edge
+        print(cnt_xyz)
         print(self.nbr)
         print(self.xbr)
         for i in range(0,len(self.nbr)):
             for j in range(1,ndd1):
                 xyz = np.append(xyz, [self.xbr[i], self.z0+0.5*self.D1-dd1*j])
-            #    print(self.xbr[i], self.z0+0.5*self.D1-dd1*j)
                 cnt_xyz += 1
             for j in range(0,nz):
                 xyz = np.append(xyz, [self.xbr[i], z_value[j]])
-            #    print(self.xbr[i], z_value[j])
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [self.xbr[i], z_value[nz-1]-dd1*j])
-            #    print(self.xbr[i], z_value[nz-1]-dd1*j)
                 cnt_xyz += 1
          
         # first row of L12
-        nd0 = cnt_temp + (ndl11-1)*(2*ndd1+nz)
+        nd0 = cnt_temp - (2*ndd1+nz)
         nd1 = nd0 + 2*ndd1+nz
         elements = np.append(elements, [nd0,self.nbr[0],nd1,nd0+1])
         for i in range(0,len(self.nbr)-1):
-            nd0 = cnt_temp + ndl11*(2*ndd1+nz) + i*(2*ndd1+nz-1) 
+            nd0 = cnt_temp + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
-            print(nd0,nd1,self.nbr[i],self.nbr[i+1])
             elements = np.append(elements, [self.nbr[i],self.nbr[i+1],nd1,nd0])
+        
+        # ramins row of L12
+        for i in range(0,len(self.nbr)):
+            nd0 = cnt_temp - (2*ndd1+nz) + 1 + i*(2*ndd1+nz-1) 
+            nd1 = nd0 + (2*ndd1+nz-1)
+            for j in range(0,2*ndd1+nz-2):
+                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                
+        cnt_temp = cnt_xyz
 
 
 ### 入出力定義 ###
