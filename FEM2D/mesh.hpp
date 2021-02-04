@@ -4,6 +4,7 @@
 #include <iostream>
 #include <valarray>
 #include <string>
+#include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {

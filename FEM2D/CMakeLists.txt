@@ -21,9 +21,15 @@ if(Yaml-cpp_FOUND)
   include_directories(${YAML_CPP_INCLUDE_PATH})
 endif()
 
+find_package(Eigen REQUIRED)
+if(EIGEN_FOUND)
+  message(STATUS "Eigen ${EIGEN_VERSION} Found. ${EIGEN_INCLUDE_DIR}")
+  include_directories(${EIGEN_INCLUDE_DIR})
+endif()
+
 file(GLOB SOURCE src/*.cpp src/*/*.cpp)
 file(GLOB HEADER src/*.hpp src/*/*.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/include/*.hpp)
 
-add_executable(rollfem2d main.cpp mesh.cpp)
+add_executable(rollfem2d main.cpp mesh.cpp material.cpp)
 
