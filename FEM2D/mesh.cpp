@@ -17,9 +17,7 @@ namespace ROLLFEM2D
 		std::string dummy, name, dtype;
 		std::istringstream tokenizer;
 
-		std::size_t nd = -1, ne = -1;
 		double dummyz;
-		int n0, n1, n2, n3;
 
 		while (!input.eof()) {
 			if (line.find("DATASET") == 0) {
@@ -35,10 +33,9 @@ namespace ROLLFEM2D
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
 				tokenizer >> dummy >> num_nodes;
-				this->coords.resize(2* num_nodes);
+				this->nodes.resize(num_nodes);
 				for (int i = 0; i < num_nodes; ++i) {
-					input >> coords[++nd];
-					input >> coords[++nd] >> dummyz;
+					input >> nodes[i].x >> nodes[i].y >> dummyz;
 				}
 				std::getline(input, line);
 			}
@@ -47,15 +44,13 @@ namespace ROLLFEM2D
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
 				tokenizer >> dummy >> num_elements >> dummy;
-				this->elements.resize(4* num_elements);
+				this->elements.resize(num_elements);
 				for (size_t i = 0; i < num_elements; ++i) {
 					std::getline(input, line);
 					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 					tokenizer.clear();
-					tokenizer >> dummy >> elements[++ne];
-					tokenizer >> elements[++ne];
-					tokenizer >> elements[++ne];
-					tokenizer >> elements[++ne];
+					tokenizer >> dummy >> elements[i].n0 >> elements[i].n1
+					          >> elements[i].n2 >> elements[i].n3;
 				}
 				std::getline(input, line);
 			}
@@ -65,7 +60,7 @@ namespace ROLLFEM2D
 		}
 		input.close();
 
-		//print_nodes(std::cout);
+		print_elements(std::cout);
 
 		return 0;
 	}
@@ -75,12 +70,10 @@ namespace ROLLFEM2D
 		os << "Number of elements = " << num_elements << std::endl;
 		os << "Element ID:    Nodes List\n";
 		std::size_t ne = -1;
-		for (std::size_t e = 0; e < num_elements; e++)
+		for ( auto ele: elements )
 		{
-			os << e << "  " << elements[++ne];
-			os << "  " << elements[++ne];
-			os << "  " << elements[++ne];
-			os << "  " << elements[++ne] << std::endl;
+			os << ++ne << "  " << ele.n0 << "  " << ele.n1
+			   << "  " << ele.n2  << "  " << ele.n3 << std::endl; 
 		}
 	}
 
@@ -88,11 +81,10 @@ namespace ROLLFEM2D
 	{
 		os << "Number of nodes = " << num_nodes << std::endl;
 		os << "Node ID:    Coordinate\n";
-		std::size_t nd = -1;
-		for (std::size_t e = 0; e < num_nodes; e++)
+		std::size_t cnt = -1;
+		for ( auto nd: nodes)
 		{
-			os << e << "  " << coords[++nd];
-			os << "  " << coords[++nd] << std::endl;
+			os << ++cnt << "  " << nd.x  <<  "  " << nd.y << std::endl;
 		}
 	}
 }
