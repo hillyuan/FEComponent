@@ -21,10 +21,9 @@ if(Yaml-cpp_FOUND)
   include_directories(${YAML_CPP_INCLUDE_PATH})
 endif()
 
-
 file(GLOB SOURCE src/*.cpp src/*/*.cpp)
 file(GLOB HEADER src/*.hpp src/*/*.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/include/*.hpp)
 
-add_executable(rollfem2d main.cpp)
+add_executable(rollfem2d main.cpp mesh.cpp)
 
