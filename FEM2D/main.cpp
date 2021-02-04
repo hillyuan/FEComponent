@@ -5,7 +5,6 @@
 #include <iostream>
 #include <iomanip>
 
-
 #include "mesh.hpp"
 
 int main(int argc, char *argv[])

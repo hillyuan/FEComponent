@@ -22,7 +22,7 @@ namespace ROLLFEM2D
 		ElasticMatrix[2][2] = lame_mu;
 	}
 
-	void CMaterial::StressUpdate(std::valarray<double>& strain, std::valarray<double>& stress) const
+	void CMaterial::StressUpdate(double strain[3], double stress[3]) const
 	{
 		stress[0] = 2.0 * lame_mu * strain[0] + lame_lambda * (strain[0] + strain[1]);
 		stress[1] = 2.0 * lame_mu * strain[1] + lame_lambda * (strain[0] + strain[1]);

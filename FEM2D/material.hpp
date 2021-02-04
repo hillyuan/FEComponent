@@ -4,7 +4,6 @@
 #include <iostream>
 #include <valarray>
 #include <string>
-#include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {
@@ -20,7 +19,7 @@ namespace ROLLFEM2D
 		CMaterial(double&, double&);
 
 		double ElasticMatrix[3][3];
-		void StressUpdate(std::valarray<double>&, std::valarray<double>&) const;
+		void StressUpdate(double strain[3], double stress[3]) const;
 	};
 }
 

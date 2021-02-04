@@ -3,20 +3,17 @@
 
 #include <iostream>
 #include <vector>
-#include <valarray>
 #include <string>
 #include <Eigen\Eigen>
+
+#include "material.hpp"
+#include "element.hpp"
 
 namespace ROLLFEM2D
 {
 	struct CNode
 	{
 		double x, y;
-	};
-
-	struct CElement
-	{
-		std::size_t n0, n1, n2, n3;
 	};
 
 	struct CMesh
