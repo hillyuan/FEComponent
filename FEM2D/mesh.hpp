@@ -15,6 +15,8 @@ namespace ROLLFEM2D
 		std::valarray<std::size_t> elements;
 
 		int readin(char *);
+		void print_elements(std::ostream& os) const;
+		void print_nodes(std::ostream& os) const;
 	};
 }
 

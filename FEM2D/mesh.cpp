@@ -37,7 +37,8 @@ namespace ROLLFEM2D
 				tokenizer >> dummy >> num_nodes;
 				this->coords.resize(2* num_nodes);
 				for (int i = 0; i < num_nodes; ++i) {
-					input >> coords[++nd] >> coords[++nd] >> dummyz;
+					input >> coords[++nd];
+					input >> coords[++nd] >> dummyz;
 				}
 				std::getline(input, line);
 			}
@@ -51,7 +52,10 @@ namespace ROLLFEM2D
 					std::getline(input, line);
 					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 					tokenizer.clear();
-					tokenizer >> dummy >> elements[++ne] >> elements[++ne] >> elements[++ne] >> elements[++ne];
+					tokenizer >> dummy >> elements[++ne];
+					tokenizer >> elements[++ne];
+					tokenizer >> elements[++ne];
+					tokenizer >> elements[++ne];
 				}
 				std::getline(input, line);
 			}
@@ -59,11 +63,37 @@ namespace ROLLFEM2D
 				std::getline(input, line);
 			}
 		}
-		std::cout << "num of nodes " << coords.size()/2 << std::endl;
-		std::cout << "num of cells " << elements.size()/4 << std::endl;
 		input.close();
 
+		//print_nodes(std::cout);
+
 		return 0;
+	}
+
+	void CMesh::print_elements(std::ostream& os) const
+	{
+		os << "Number of elements = " << num_elements << std::endl;
+		os << "Element ID:    Nodes List\n";
+		std::size_t ne = -1;
+		for (std::size_t e = 0; e < num_elements; e++)
+		{
+			os << e << "  " << elements[++ne];
+			os << "  " << elements[++ne];
+			os << "  " << elements[++ne];
+			os << "  " << elements[++ne] << std::endl;
+		}
+	}
+
+	void CMesh::print_nodes(std::ostream& os) const
+	{
+		os << "Number of nodes = " << num_nodes << std::endl;
+		os << "Node ID:    Coordinate\n";
+		std::size_t nd = -1;
+		for (std::size_t e = 0; e < num_nodes; e++)
+		{
+			os << e << "  " << coords[++nd];
+			os << "  " << coords[++nd] << std::endl;
+		}
 	}
 }
 
