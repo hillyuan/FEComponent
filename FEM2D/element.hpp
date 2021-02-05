@@ -4,13 +4,21 @@
 #include <iostream>
 #include <valarray>
 #include <string>
-//#include <Eigen\Eigen>
+#include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {
 	void ShapeFunc(double lcoord[2], double sfunc[4]);
+	void ShapeDeriv(double lcoord[2], Eigen::Matrix<double, 3, 3>& spderiv);
 
-	void ShapeDeriv(double lcoord[2], double sfunc[4][2]);
+	Eigen::Matrix<double, 4, 2> make_quadrature();
+	Eigen::Vector4d make_weights();
+
+	struct CQuadrature
+	{
+		const static Eigen::Vector4d weights;
+		const static Eigen::Matrix<double, 4, 2> qp_coords;
+	};
 
 	class CElement
 	{

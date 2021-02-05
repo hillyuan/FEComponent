@@ -26,6 +26,8 @@ namespace ROLLFEM2D
 		int readin(char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
+
+		void calJacobian(std::size_t&, std::size_t, Eigen::Matrix<double,4,2>&, double&) const;
 	};
 }
 

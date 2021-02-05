@@ -18,6 +18,9 @@ int main(int argc, char *argv[])
 
 	ROLLFEM2D::CMesh mesh;
 	mesh.readin(argv[1]);
+
+	std::cout << ROLLFEM2D::CQuadrature::qp_coords << std::endl;
+	std::cout << ROLLFEM2D::CQuadrature::weights << std::endl;
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();

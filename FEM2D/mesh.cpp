@@ -60,7 +60,7 @@ namespace ROLLFEM2D
 		}
 		input.close();
 
-		print_elements(std::cout);
+		//print_elements(std::cout);
 
 		return 0;
 	}
@@ -85,6 +85,17 @@ namespace ROLLFEM2D
 		for ( auto nd: nodes)
 		{
 			os << ++cnt << "  " << nd.x  <<  "  " << nd.y << std::endl;
+		}
+	}
+
+	void CMesh::calJacobian(std::size_t& ele, std::size_t pg, Eigen::Matrix<double, 4, 2>& Jac, double& det) const
+	{
+		Eigen::Matrix<double, 4, 2> ecoord;
+		for (std::size_t i = 0; i < 4; i++)
+		{
+			std::size_t nd = elements[ele].n0;
+			ecoord(i, 0) = nodes[nd].x;
+			ecoord(i, 1) = nodes[nd].y;
 		}
 	}
 }
