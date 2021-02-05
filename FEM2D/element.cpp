@@ -11,8 +11,9 @@ namespace ROLLFEM2D
 		sfunc[3] = 0.25 * (1.0 - lcoord[0]) * (1.0 + lcoord[1]);
 	}
 
-	void ShapeDeriv(double lcoord[2], Eigen::Matrix<double, 3, 3>& spderiv)
+	Eigen::Matrix<double, 4, 2> ShapeDeriv(Eigen::Vector2d& lcoord)
 	{
+		Eigen::Matrix<double, 4, 2> spderiv;
 		spderiv(0,0) = -0.25 * (1.0 - lcoord[1]);
 		spderiv(1,0) = 0.25 * (1.0 - lcoord[1]);
 		spderiv(2,0) = 0.25 * (1.0 + lcoord[1]);
@@ -22,6 +23,7 @@ namespace ROLLFEM2D
 		spderiv(1,1) = 0.25 * (1.0 - lcoord[0]);
 		spderiv(2,1) = 0.25 * (1.0 + lcoord[0]);
 		spderiv(3,1) = -0.25 * (1.0 + lcoord[0]);
+		return spderiv;
 	}
 
 	Eigen::Matrix<double, 4, 2> make_quadrature()

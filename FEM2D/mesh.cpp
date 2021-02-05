@@ -49,8 +49,8 @@ namespace ROLLFEM2D
 					std::getline(input, line);
 					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 					tokenizer.clear();
-					tokenizer >> dummy >> elements[i].n0 >> elements[i].n1
-					          >> elements[i].n2 >> elements[i].n3;
+					tokenizer >> dummy >> elements[i].index_nd[0] >> elements[i].index_nd[1]
+					          >> elements[i].index_nd[2] >> elements[i].index_nd[3];
 				}
 				std::getline(input, line);
 			}
@@ -72,8 +72,8 @@ namespace ROLLFEM2D
 		std::size_t ne = -1;
 		for ( auto ele: elements )
 		{
-			os << ++ne << "  " << ele.n0 << "  " << ele.n1
-			   << "  " << ele.n2  << "  " << ele.n3 << std::endl; 
+			os << ++ne << "  " << ele.index_nd[0] << "  " << ele.index_nd[1]
+			   << "  " << ele.index_nd[2] << "  " << ele.index_nd[3] << std::endl;
 		}
 	}
 
@@ -88,15 +88,26 @@ namespace ROLLFEM2D
 		}
 	}
 
-	void CMesh::calJacobian(std::size_t& ele, std::size_t pg, Eigen::Matrix<double, 4, 2>& Jac, double& det) const
+	void CMesh::calJacobian(const std::size_t& ele, const std::size_t pg, Eigen::Matrix<double, 2, 2>& Jac, double& det)
 	{
-		Eigen::Matrix<double, 4, 2> ecoord;
+		Eigen::Matrix<double, 2, 4> ecoord;
 		for (std::size_t i = 0; i < 4; i++)
 		{
-			std::size_t nd = elements[ele].n0;
-			ecoord(i, 0) = nodes[nd].x;
-			ecoord(i, 1) = nodes[nd].y;
+			auto nd = elements[ele].index_nd[i];
+			ecoord(0,i) = nodes[nd].x;
+			ecoord(1,i) = nodes[nd].y;
 		}
+		std::cout << ecoord << std::endl;
+		Eigen::Vector2d lcoord;
+		lcoord[0] = CQuadrature::qp_coords(pg,0);
+		lcoord[1] = CQuadrature::qp_coords(pg, 1);
+		Eigen::Matrix<double, 4, 2> spderiv = ShapeDeriv(lcoord);
+		std::cout << lcoord << std::endl;
+		std::cout << spderiv << std::endl;
+		Jac = ecoord * spderiv;
+		std::cout << "Jac=" << Jac << std::endl;
+		auto inv = Jac.inverse();
+		det = Jac.determinant();
 	}
 }
 

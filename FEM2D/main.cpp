@@ -21,6 +21,10 @@ int main(int argc, char *argv[])
 
 	std::cout << ROLLFEM2D::CQuadrature::qp_coords << std::endl;
 	std::cout << ROLLFEM2D::CQuadrature::weights << std::endl;
+
+	Eigen::Matrix<double, 2, 2> Jac;
+	double det;
+	mesh.calJacobian(0, 0, Jac, det);
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
