@@ -22,9 +22,9 @@ namespace ROLLFEM2D
 		spderiv(3,0) = -0.25 * (1.0 + lcoord[1]);
 
 		spderiv(0,1) = -0.25 * (1.0 - lcoord[0]);
-		spderiv(1,1) = 0.25 * (1.0 - lcoord[0]);
+		spderiv(1,1) = -0.25 * (1.0 + lcoord[0]);
 		spderiv(2,1) = 0.25 * (1.0 + lcoord[0]);
-		spderiv(3,1) = -0.25 * (1.0 + lcoord[0]);
+		spderiv(3,1) = 0.25 * (1.0 - lcoord[0]);
 		return spderiv;
 	}
 

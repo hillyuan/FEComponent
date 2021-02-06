@@ -95,23 +95,23 @@ namespace ROLLFEM2D
 		Eigen::Matrix<double, 3, 8> B;
 		int imatl = elements[ele].matl_id;
 
-		for (std::size_t i = 0; i < 4; i++)
+		std::size_t n=3;
+		for (std::size_t i = 0; i<4; i++ )
 		{
 			auto nd = elements[ele].index_nd[i];
-			ecoord(0,i) = nodes[nd].x;
-			ecoord(1,i) = nodes[nd].y;
+			ecoord(0,n) = nodes[nd].x;
+			ecoord(1,n) = nodes[nd].y;
+			n--;
 		}
-		std::cout << "ecood:" << ecoord << std::endl;
+	//	std::cout << "ecood:" << ecoord << std::endl;
 
 		Eigen::Vector2d lcoord;
 		K = Eigen::Matrix<double, 8, 8>::Zero();
 		for (std::size_t npg = 0; npg < 4; npg++)
 		{
 			Eigen::Matrix<double, 4, 2> spderiv = CQuadrature::ShapeDerivs[npg];
-			std::cout << "spedriv:" << spderiv << std::endl;
 			Jac = ecoord * spderiv;
 			auto inv = Jac.inverse();
-			std::cout << "Jac:" << inv << std::endl;
 			double wg = CQuadrature::weights[npg] * Jac.determinant();
 			auto gderiv = spderiv * inv;
 			for (std::size_t i = 0; i < 4; i++)
@@ -126,8 +126,7 @@ namespace ROLLFEM2D
 			K += wg * B.transpose() * materials[imatl].ElasticMatrix * B;
 		}
 
-		std::cout << K << std::endl;
-		
+	//	std::cout << K << std::endl;
 	}
 }
 
