@@ -2,8 +2,8 @@
 #define ROLLFEM2D_MATERIAL_HPP
 
 #include <iostream>
-#include <valarray>
 #include <string>
+#include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {
@@ -18,7 +18,7 @@ namespace ROLLFEM2D
 	public:
 		CMaterial(double&, double&);
 
-		double ElasticMatrix[3][3];
+		Eigen::Matrix<double, 3, 3> ElasticMatrix;
 		void StressUpdate(double strain[3], double stress[3]) const;
 	};
 }

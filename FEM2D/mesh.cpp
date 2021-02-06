@@ -88,26 +88,46 @@ namespace ROLLFEM2D
 		}
 	}
 
-	void CMesh::calJacobian(const std::size_t& ele, const std::size_t pg, Eigen::Matrix<double, 2, 2>& Jac, double& det)
+	void CMesh::calElementalStiffMatrix(const std::size_t& ele, Eigen::Matrix<double, 8, 8>& K)
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
+		Eigen::Matrix<double, 2, 2> Jac;
+		Eigen::Matrix<double, 3, 8> B;
+		int imatl = elements[ele].matl_id;
+
 		for (std::size_t i = 0; i < 4; i++)
 		{
 			auto nd = elements[ele].index_nd[i];
 			ecoord(0,i) = nodes[nd].x;
 			ecoord(1,i) = nodes[nd].y;
 		}
-		std::cout << ecoord << std::endl;
+		std::cout << "ecood:" << ecoord << std::endl;
+
 		Eigen::Vector2d lcoord;
-		lcoord[0] = CQuadrature::qp_coords(pg,0);
-		lcoord[1] = CQuadrature::qp_coords(pg, 1);
-		Eigen::Matrix<double, 4, 2> spderiv = ShapeDeriv(lcoord);
-		std::cout << lcoord << std::endl;
-		std::cout << spderiv << std::endl;
-		Jac = ecoord * spderiv;
-		std::cout << "Jac=" << Jac << std::endl;
-		auto inv = Jac.inverse();
-		det = Jac.determinant();
+		K = Eigen::Matrix<double, 8, 8>::Zero();
+		for (std::size_t npg = 0; npg < 4; npg++)
+		{
+			Eigen::Matrix<double, 4, 2> spderiv = CQuadrature::ShapeDerivs[npg];
+			std::cout << "spedriv:" << spderiv << std::endl;
+			Jac = ecoord * spderiv;
+			auto inv = Jac.inverse();
+			std::cout << "Jac:" << inv << std::endl;
+			double wg = CQuadrature::weights[npg] * Jac.determinant();
+			auto gderiv = spderiv * inv;
+			for (std::size_t i = 0; i < 4; i++)
+			{
+				B(0, 2 * i) = gderiv(i, 0);
+				B(0, 2 * i + 1) = 0.0;
+				B(1, 2 * i) = 0.0;
+				B(1, 2 * i + 1) = gderiv(i, 1);
+				B(2, 2 * i) = gderiv(i, 1);
+				B(2, 2 * i + 1) = gderiv(i, 0);
+			}
+			K += wg * B.transpose() * materials[imatl].ElasticMatrix * B;
+		}
+
+		std::cout << K << std::endl;
+		
 	}
 }
 

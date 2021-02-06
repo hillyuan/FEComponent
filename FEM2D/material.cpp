@@ -11,15 +11,15 @@ namespace ROLLFEM2D
 		lame_lambda = y*p/(1+p)/(1-2.0*p);
 		lame_mu = 0.5*y/(1+p);
 
-		ElasticMatrix[0][0] = lame_lambda + 2.0 * lame_mu;
-		ElasticMatrix[0][1] = lame_lambda;
-		ElasticMatrix[0][2] = 0.0;
-		ElasticMatrix[1][0] = lame_lambda;
-		ElasticMatrix[1][1] = ElasticMatrix[0][0];
-		ElasticMatrix[1][2] = 0.0;
-		ElasticMatrix[2][0] = 0.0;
-		ElasticMatrix[2][1] = 0.0;
-		ElasticMatrix[2][2] = lame_mu;
+		ElasticMatrix(0,0) = lame_lambda + 2.0 * lame_mu;
+		ElasticMatrix(0,1) = lame_lambda;
+		ElasticMatrix(0,2) = 0.0;
+		ElasticMatrix(1,0) = lame_lambda;
+		ElasticMatrix(1,1) = ElasticMatrix(0,0);
+		ElasticMatrix(1,2) = 0.0;
+		ElasticMatrix(2,0) = 0.0;
+		ElasticMatrix(2,1) = 0.0;
+		ElasticMatrix(2,2) = lame_mu;
 	}
 
 	void CMaterial::StressUpdate(double strain[3], double stress[3]) const

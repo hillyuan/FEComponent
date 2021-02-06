@@ -22,12 +22,13 @@ namespace ROLLFEM2D
 		std::size_t num_elements;
 		std::vector<CNode>         nodes;
 		std::vector<CElement>      elements;
+		std::vector<CMaterial>     materials;
 
 		int readin(char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 
-		void calJacobian(const std::size_t&, const std::size_t, Eigen::Matrix<double,2,2>&, double&);
+		void calElementalStiffMatrix (const std::size_t&, Eigen::Matrix<double, 8, 8>&);
 	};
 }
 

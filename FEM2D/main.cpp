@@ -19,12 +19,11 @@ int main(int argc, char *argv[])
 	ROLLFEM2D::CMesh mesh;
 	mesh.readin(argv[1]);
 
-	std::cout << ROLLFEM2D::CQuadrature::qp_coords << std::endl;
-	std::cout << ROLLFEM2D::CQuadrature::weights << std::endl;
-
-	Eigen::Matrix<double, 2, 2> Jac;
-	double det;
-	mesh.calJacobian(0, 0, Jac, det);
+	double youngs=1.0, pp=0.3;
+	ROLLFEM2D::CMaterial matl(youngs, pp);
+	mesh.materials.emplace_back(matl);
+	Eigen::Matrix<double, 8, 8> K;
+	mesh.calElementalStiffMatrix(0, K);
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
