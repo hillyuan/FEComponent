@@ -128,5 +128,27 @@ namespace ROLLFEM2D
 
 	//	std::cout << K << std::endl;
 	}
+
+	void CMesh::calGlobalStiffMatrix()
+	{
+		typedef Eigen::Triplet<double> T;
+		std::vector<T> tripletList;
+		tripletList.reserve(num_elements*2*10);
+
+		std::size_t num_dofs = 2 * num_elements;
+		StiffMatrix = Eigen::SparseMatrix<double>(num_dofs, num_dofs);
+
+		Eigen::Matrix<double, 8, 8> eleK;
+		for( std::size_t i=0; i< num_elements; i++ )
+		{ 
+			this->calElementalStiffMatrix(i, eleK);
+			for (std::size_t n = 0; n < 4; n++) {
+				std::size_t ndn = elements[i].index_nd[n];
+				for (std::size_t m = 0; m < 4; m++) {
+					std::size_t ndm = elements[i].index_nd[m];
+				}
+			}
+		}
+	}
 }
 

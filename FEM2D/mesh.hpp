@@ -24,11 +24,14 @@ namespace ROLLFEM2D
 		std::vector<CElement>      elements;
 		std::vector<CMaterial>     materials;
 
+		Eigen::SparseMatrix<double> StiffMatrix;
+
 		int readin(char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 
 		void calElementalStiffMatrix (const std::size_t&, Eigen::Matrix<double, 8, 8>&);
+		void calGlobalStiffMatrix();
 	};
 }
 
