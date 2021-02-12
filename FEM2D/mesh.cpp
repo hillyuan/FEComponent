@@ -88,7 +88,8 @@ namespace ROLLFEM2D
 		}
 	}
 
-	void CMesh::calElementalStiffMatrix(const std::size_t& ele, Eigen::Matrix<double, 8, 8>& K)
+	void CMesh::calElementalStiffMatrix(const std::size_t& ele, Eigen::Matrix<double, 8, 8>& K
+		, std::vector<T>& triplets)
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
 		Eigen::Matrix<double, 2, 2> Jac;
@@ -127,11 +128,25 @@ namespace ROLLFEM2D
 		}
 
 	//	std::cout << K << std::endl;
+		for (std::size_t i = 0; i < 4; i++)
+		{
+			for (std::size_t j = 0; j < 4; j++)
+			{
+				T trplt11(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 0, 2 * j + 0));
+				T trplt12(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 0, 2 * j + 1));
+				T trplt21(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 1, 2 * j + 0));
+				T trplt22(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 1, 2 * j + 1));
+
+				triplets.push_back(trplt11);
+				triplets.push_back(trplt12);
+				triplets.push_back(trplt21);
+				triplets.push_back(trplt22);
+			}
+		}
 	}
 
 	void CMesh::calGlobalStiffMatrix()
 	{
-		typedef Eigen::Triplet<double> T;
 		std::vector<T> tripletList;
 		tripletList.reserve(num_elements*2*10);
 
@@ -141,14 +156,9 @@ namespace ROLLFEM2D
 		Eigen::Matrix<double, 8, 8> eleK;
 		for( std::size_t i=0; i< num_elements; i++ )
 		{ 
-			this->calElementalStiffMatrix(i, eleK);
-			for (std::size_t n = 0; n < 4; n++) {
-				std::size_t ndn = elements[i].index_nd[n];
-				for (std::size_t m = 0; m < 4; m++) {
-					std::size_t ndm = elements[i].index_nd[m];
-				}
-			}
+			this->calElementalStiffMatrix(i, eleK, tripletList);
 		}
+		StiffMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
 	}
 }
 

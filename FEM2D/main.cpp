@@ -23,7 +23,8 @@ int main(int argc, char *argv[])
 	ROLLFEM2D::CMaterial matl(youngs, pp);
 	mesh.materials.emplace_back(matl);
 	Eigen::Matrix<double, 8, 8> K;
-	mesh.calElementalStiffMatrix(0, K);
+	std::vector< Eigen::Triplet<double> > trip;
+	mesh.calElementalStiffMatrix(0, K, trip);
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();

@@ -18,6 +18,8 @@ namespace ROLLFEM2D
 
 	struct CMesh
 	{
+		typedef Eigen::Triplet<double> T;
+
 		std::size_t num_nodes;
 		std::size_t num_elements;
 		std::vector<CNode>         nodes;
@@ -30,7 +32,8 @@ namespace ROLLFEM2D
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 
-		void calElementalStiffMatrix (const std::size_t&, Eigen::Matrix<double, 8, 8>&);
+		void calElementalStiffMatrix (const std::size_t&, Eigen::Matrix<double, 8, 8>& ,
+			std::vector<T> & triplets);
 		void calGlobalStiffMatrix();
 	};
 }
