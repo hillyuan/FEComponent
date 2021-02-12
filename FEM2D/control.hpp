@@ -13,7 +13,7 @@ namespace ROLLFEM2D
 		std::vector<CMaterial> materials;
 		
 	public:
-		CControl::CControl(std::string& file);
+		CControl::CControl(char* file);
 
 	};
 }

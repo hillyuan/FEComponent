@@ -6,10 +6,11 @@
 #include <iomanip>
 
 #include "mesh.hpp"
+#include "control.hpp"
 
 int main(int argc, char *argv[])
 {
-	if (argc < 2) {
+	if (argc < 3) {
 		std::cout << "Usage: rollfem2d filename(vtk file)";
 		return -1; 
 	}
@@ -19,8 +20,11 @@ int main(int argc, char *argv[])
 	ROLLFEM2D::CMesh mesh;
 	mesh.readin(argv[1]);
 
+	ROLLFEM2D::CControl control(argv[2]);
+
 	double youngs=1.0, pp=0.3;
-	ROLLFEM2D::CMaterial matl(youngs, pp);
+	std::string name = "aa";
+	ROLLFEM2D::CMaterial matl(name, youngs, pp);
 	mesh.materials.emplace_back(matl);
 	mesh.calGlobalStiffMatrix();
 	
