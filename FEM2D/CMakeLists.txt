@@ -31,5 +31,5 @@ file(GLOB SOURCE src/*.cpp src/*/*.cpp)
 file(GLOB HEADER src/*.hpp src/*/*.hpp
      ${CMAKE_CURRENT_BINARY_DIR}/include/*.hpp)
 
-add_executable(rollfem2d main.cpp mesh.cpp material.cpp element.cpp)
+add_executable(rollfem2d main.cpp control.cpp mesh.cpp material.cpp element.cpp)
 
