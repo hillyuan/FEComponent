@@ -2,7 +2,7 @@
 #define ROLLFEM2D_CONTROL_HPP
 
 #include "mesh.hpp"
-#inxlude "material.hpp"
+#include "material.hpp"
 
 namespace ROLLFEM2D
 {
@@ -13,6 +13,7 @@ namespace ROLLFEM2D
 		std::vector<CMaterial> materials;
 		
 	public:
+		CControl::CControl(std::string& file);
 
 	};
 }
