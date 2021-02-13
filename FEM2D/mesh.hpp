@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <array>
 #include <Eigen\Eigen>
 
 #include "material.hpp"
@@ -30,8 +31,7 @@ namespace ROLLFEM2D
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 
-		void calElementalStiffMatrix (const std::size_t&, Eigen::Matrix<double, 8, 8>& ,
-			std::vector<T> & triplets);
+		void calElementalStiffMatrix (const std::size_t&, std::array<T,64> & triplets);
 		void calGlobalStiffMatrix(Eigen::SparseMatrix<double>&);
 	};
 }

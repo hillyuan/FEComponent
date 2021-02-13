@@ -88,8 +88,7 @@ namespace ROLLFEM2D
 		}
 	}
 
-	void CMesh::calElementalStiffMatrix(const std::size_t& ele, Eigen::Matrix<double, 8, 8>& K
-		, std::vector<T>& triplets)
+	void CMesh::calElementalStiffMatrix(const std::size_t& ele, std::array<T,64>& triplets)
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
 		Eigen::Matrix<double, 2, 2> Jac;
@@ -107,7 +106,7 @@ namespace ROLLFEM2D
 	//	std::cout << "ecood:" << ecoord << std::endl;
 
 		Eigen::Vector2d lcoord;
-		K = Eigen::Matrix<double, 8, 8>::Zero();
+		Eigen::Matrix<double, 8, 8> K = Eigen::Matrix<double, 8, 8>::Zero();
 		for (std::size_t npg = 0; npg < 4; npg++)
 		{
 			Eigen::Matrix<double, 4, 2> spderiv = CQuadrature::ShapeDerivs[npg];
@@ -128,37 +127,41 @@ namespace ROLLFEM2D
 		}
 
 	//	std::cout << K << std::endl;
-		triplets.clear();
+	//	triplets.clear();
 		for (std::size_t i = 0; i < 4; i++)
 		{
 			for (std::size_t j = 0; j < 4; j++)
 			{
-				T trplt11(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 0, 2 * j + 0));
-				T trplt12(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 0, 2 * j + 1));
-				T trplt21(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 1, 2 * j + 0));
-				T trplt22(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 1, 2 * j + 1));
+				triplets[16*j+4*i] =
+				  T(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 0, 2 * j + 0));
+				triplets[16*j+4*i+1] =
+				  T(2 * elements[ele].index_nd[i] + 0, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 0, 2 * j + 1));
+				triplets[16*j+4*i+2] =
+				  T(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 1, 2 * j + 0));
+				triplets[16*j+4*i+3] =
+				  T(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 1, 2 * j + 1));
 
-				triplets.push_back(trplt11);
-				triplets.push_back(trplt12);
-				triplets.push_back(trplt21);
-				triplets.push_back(trplt22);
+			//	triplets.emplace_back(trplt11);
+			//	triplets.emplace_back(trplt12);
+			//	triplets.emplace_back(trplt21);
+			//	triplets.emplace_back(trplt22);
 			}
 		}
 	}
 
 	void CMesh::calGlobalStiffMatrix(Eigen::SparseMatrix<double>& StiffMatrix)
 	{
-		std::vector<T> LTriplet, GTriplet;
+		std::vector<T> GTriplet;
+		std::array<T, 64> LTriplet;
 
 		std::size_t num_dofs = 2 * num_nodes;
 		StiffMatrix = Eigen::SparseMatrix<double>(num_dofs, num_dofs);
 
-		Eigen::Matrix<double, 8, 8> eleK;
 		GTriplet.clear();
-#pragma omp parallel for private(eleK, LTriplet)
+#pragma omp parallel for private(LTriplet)
 		for( int i=0; i< num_elements; i++ )
 		{ 
-			this->calElementalStiffMatrix(i, eleK, LTriplet);
+			this->calElementalStiffMatrix(i, LTriplet);
 			for (auto t : LTriplet)
 			{
 #pragma omp critical
