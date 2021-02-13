@@ -128,6 +128,7 @@ namespace ROLLFEM2D
 		}
 
 	//	std::cout << K << std::endl;
+		triplets.clear();
 		for (std::size_t i = 0; i < 4; i++)
 		{
 			for (std::size_t j = 0; j < 4; j++)
@@ -145,21 +146,26 @@ namespace ROLLFEM2D
 		}
 	}
 
-	void CMesh::calGlobalStiffMatrix()
+	void CMesh::calGlobalStiffMatrix(Eigen::SparseMatrix<double>& StiffMatrix)
 	{
-		std::vector<T> tripletList;
+		std::vector<T> LTriplet, GTriplet;
 
 		std::size_t num_dofs = 2 * num_nodes;
 		StiffMatrix = Eigen::SparseMatrix<double>(num_dofs, num_dofs);
 
 		Eigen::Matrix<double, 8, 8> eleK;
-		for( std::size_t i=0; i< num_elements; i++ )
+		GTriplet.clear();
+#pragma omp parallel for private(eleK, LTriplet)
+		for( int i=0; i< num_elements; i++ )
 		{ 
-			this->calElementalStiffMatrix(i, eleK, tripletList);
-		//	std::cout << "element:" << i << std::endl;
-		//	std::cout << eleK << std::endl;
+			this->calElementalStiffMatrix(i, eleK, LTriplet);
+			for (auto t : LTriplet)
+			{
+#pragma omp critical
+				GTriplet.emplace_back(t);
+			}
 		}
-		StiffMatrix.setFromTriplets(tripletList.begin(), tripletList.end());
+		StiffMatrix.setFromTriplets(GTriplet.begin(), GTriplet.end());
 		StiffMatrix.makeCompressed();
 	}
 }

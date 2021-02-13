@@ -10,13 +10,14 @@ namespace ROLLFEM2D
 	{
 	private:
 		CMesh mesh;
+		Eigen::SparseMatrix<double> StiffMatrix;
 		
 	public:
 		CControl::CControl(char* file);
 
 		void calGlobalStiffMatrix()
 		{
-			mesh.calGlobalStiffMatrix();
+			mesh.calGlobalStiffMatrix(StiffMatrix);
 		}
 
 	};
