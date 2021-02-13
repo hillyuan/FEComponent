@@ -22,15 +22,39 @@ namespace ROLLFEM2D
 			throw std::runtime_error("Mesh file not defined!");
 		}
 
-		const YAML::Node& matls = config["Material"];
-		for (YAML::const_iterator it = matls.begin(); it != matls.end(); ++it) {
-			const YAML::Node& matls = *it;
-			double youngs = matls["Youngs Modulus"].as<double>();
-			double poisson = matls["Poisson Ratio"].as<double>();
-			std::string mname = matls["Name"].as<std::string>();
-			CMaterial matl(mname, youngs, poisson);
-			mesh.materials.emplace_back(matl);
-			matl.print(std::cout);
+		if (YAML::Node matls = config["Material"]) {
+			for (YAML::const_iterator it = matls.begin(); it != matls.end(); ++it) {
+				const YAML::Node& matls = *it;
+				double youngs = matls["Youngs Modulus"].as<double>();
+				double poisson = matls["Poisson Ratio"].as<double>();
+				std::string mname = matls["Name"].as<std::string>();
+				CMaterial matl(mname, youngs, poisson);
+				mesh.materials.emplace_back(matl);
+				matl.print(std::cout);
+			}
+		}
+		else {
+			throw std::runtime_error("Material properties not defined!");
+		}
+
+		if (YAML::Node bnd = config["Constraint"]) {
+			for (YAML::const_iterator it = bnd.begin(); it != bnd.end(); ++it) {
+				const YAML::Node& bnd = *it;
+				int uxy = bnd["Type"].as<int>();
+				double val = bnd["Value"].as<double>();
+				std::string mname = bnd["NSET"].as<std::string>();
+				if (mesh.NodeSets.find(mname) == mesh.NodeSets.end())
+				{
+					std::cout << "NodeSet:" << mname << " not found. Constraint ignored!\n";
+				}
+				else {
+					Constraint cst(mname, uxy, val);
+					constraints.emplace_back(cst);
+				}
+			}
+		}
+		else {
+			throw std::runtime_error("Constraint condition not defined!");
 		}
 	};
 
@@ -66,6 +90,8 @@ namespace ROLLFEM2D
 				}
 			}
 		}
+
+		std::cout << StiffMatrix << std::endl;
 	}
 
 }

@@ -15,6 +15,12 @@ namespace ROLLFEM2D
 		std::string NSetName;
 		Type type;
 		double val;
+
+		Constraint(std::string& name, int& t, double& v)
+			: NSetName(name), val(v)
+		{
+			type = static_cast<Type>(t);
+		};
 	};
 }
 
