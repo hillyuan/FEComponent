@@ -27,6 +27,10 @@ namespace ROLLFEM2D
 		std::vector<CElement>      elements;
 		std::vector<CMaterial>     materials;
 
+		std::map< std::string, std::vector<std::size_t> > NodeSets;
+		std::map< std::string, std::vector<std::size_t> > ElementSets;
+		std::map< std::string, std::pair<std::size_t, std::size_t> > SideSets;
+
 		int readin(const char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;

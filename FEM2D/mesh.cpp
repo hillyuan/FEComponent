@@ -18,6 +18,8 @@ namespace ROLLFEM2D
 		std::istringstream tokenizer;
 
 		double dummyz;
+		int ng, nn, mm, n1, n2;
+		std::vector<std::size_t> index;
 
 		while (!input.eof()) {
 			if (line.find("DATASET") == 0) {
@@ -51,6 +53,32 @@ namespace ROLLFEM2D
 					tokenizer.clear();
 					tokenizer >> dummy >> elements[i].index_nd[0] >> elements[i].index_nd[1]
 					          >> elements[i].index_nd[2] >> elements[i].index_nd[3];
+				}
+				std::getline(input, line);
+			}
+			else if (line.find("FIELD") == 0) {
+				std::cout << line << std::endl;
+				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
+				tokenizer.clear();
+				tokenizer >> name >> dtype >> ng;
+				for (unsigned int i = 0; i < ng; ++i) {
+					std::getline(input, line);
+					std::cout << line << std::endl;
+					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
+					tokenizer.clear();
+					tokenizer >> name >> mm >> nn >> dummy;
+					index.clear();
+					for (unsigned int j = 0; j < nn; ++j) {
+						std::getline(input, line);
+						tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
+						tokenizer.clear();
+						tokenizer >>  n1;
+						index.emplace_back(n1);
+					}
+					if( dtype=="NODESET")
+						NodeSets.insert(std::make_pair(name, index));
+					else if (dtype == "ELEMENTSET")
+						ElementSets.insert(std::make_pair(name, index));
 				}
 				std::getline(input, line);
 			}
@@ -140,11 +168,6 @@ namespace ROLLFEM2D
 				  T(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 0, K(2 * i + 1, 2 * j + 0));
 				triplets[16*j+4*i+3] =
 				  T(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 1, 2 * j + 1));
-
-			//	triplets.emplace_back(trplt11);
-			//	triplets.emplace_back(trplt12);
-			//	triplets.emplace_back(trplt21);
-			//	triplets.emplace_back(trplt22);
 			}
 		}
 	}
@@ -159,7 +182,7 @@ namespace ROLLFEM2D
 
 		GTriplet.clear();
 #pragma omp parallel for private(LTriplet)
-		for( int i=0; i< num_elements; i++ )
+		for( int i=0; i< num_elements; ++i )
 		{ 
 			this->calElementalStiffMatrix(i, LTriplet);
 			for (auto t : LTriplet)

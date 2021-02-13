@@ -34,5 +34,39 @@ namespace ROLLFEM2D
 		}
 	};
 
+	void CControl::ApplyConstraints()
+	{
+		std::vector<std::size_t> indicesToConstraint;
+
+		for (auto cst : constraints)
+		{
+			auto nodes = mesh.NodeSets[cst.NSetName];
+			if (cst.type & Constraint::UX)
+			{
+				for (int j = 0; j < nodes.size(); ++j)
+					indicesToConstraint.push_back(2 * nodes[j]);
+			}
+			if (cst.type & Constraint::UY)
+			{
+				for (int j = 0; j < nodes.size(); ++j)
+					indicesToConstraint.push_back(2 * nodes[j] + 1);
+			}
+		}
+
+		for (int k = 0; k < StiffMatrix.outerSize(); ++k)
+		{
+			for (Eigen::SparseMatrix<double>::InnerIterator it(StiffMatrix, k); it; ++it)
+			{
+				for (auto idit : indicesToConstraint)
+				{
+					if (it.row() == idit || it.col() == idit)
+					{
+						it.valueRef() = it.row() == it.col() ? 1.0f : 0.0f;
+					}
+				}
+			}
+		}
+	}
+
 }
 
