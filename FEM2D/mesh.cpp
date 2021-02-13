@@ -5,7 +5,7 @@
 
 namespace ROLLFEM2D
 {
-	int CMesh::readin(char* meshfile)
+	int CMesh::readin(const char* meshfile)
 	{
 		std::ifstream input(meshfile, std::ios_base::in);
 		if (input.fail()) {

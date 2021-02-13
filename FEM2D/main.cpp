@@ -10,23 +10,15 @@
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3) {
-		std::cout << "Usage: rollfem2d filename(vtk file)";
+	if (argc < 2) {
+		std::cout << "Usage: rollfem2d filename(control file)";
 		return -1; 
 	}
 	std::clock_t c_start = std::clock();
 	auto t_start = std::chrono::high_resolution_clock::now();
 
-	ROLLFEM2D::CMesh mesh;
-	mesh.readin(argv[1]);
-
-	ROLLFEM2D::CControl control(argv[2]);
-
-	double youngs=1.0, pp=0.3;
-	std::string name = "aa";
-	ROLLFEM2D::CMaterial matl(name, youngs, pp);
-	mesh.materials.emplace_back(matl);
-	mesh.calGlobalStiffMatrix();
+	ROLLFEM2D::CControl control(argv[1]);
+	control.calGlobalStiffMatrix();
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();

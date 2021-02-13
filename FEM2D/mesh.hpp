@@ -28,7 +28,7 @@ namespace ROLLFEM2D
 
 		Eigen::SparseMatrix<double> StiffMatrix;
 
-		int readin(char *);
+		int readin(const char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 

@@ -10,10 +10,14 @@ namespace ROLLFEM2D
 	{
 	private:
 		CMesh mesh;
-		std::vector<CMaterial> materials;
 		
 	public:
 		CControl::CControl(char* file);
+
+		void calGlobalStiffMatrix()
+		{
+			mesh.calGlobalStiffMatrix();
+		}
 
 	};
 }
