@@ -18,8 +18,10 @@ namespace ROLLFEM2D
 		std::istringstream tokenizer;
 
 		double dummyz;
-		int ng, nn, mm, n1, n2;
+		int ng, nn, mm;
+		std::size_t n1, n2;
 		std::vector<std::size_t> index;
+		std::vector<CEdge> edges;
 
 		while (!input.eof()) {
 			if (line.find("DATASET") == 0) {
@@ -72,13 +74,22 @@ namespace ROLLFEM2D
 						std::getline(input, line);
 						tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 						tokenizer.clear();
-						tokenizer >>  n1;
-						index.emplace_back(n1);
+						if (mm == 2) {   // surface set
+							tokenizer >> n1 >> n2;
+							CEdge edge(n1, n2);
+							edges.emplace_back(edge);
+						}
+						else {
+							tokenizer >> n1;
+							index.emplace_back(n1);
+						}
 					}
 					if( dtype=="NODESET")
 						NodeSets.insert(std::make_pair(name, index));
 					else if (dtype == "ELEMENTSET")
 						ElementSets.insert(std::make_pair(name, index));
+					else if(dtype=="EDGESET")
+						SideSets.insert(std::make_pair(name, edges));
 				}
 				std::getline(input, line);
 			}

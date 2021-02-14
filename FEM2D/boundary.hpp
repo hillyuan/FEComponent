@@ -24,11 +24,23 @@ namespace ROLLFEM2D
 		};
 	};
 
+	// Concerntrated loads
+	struct CLoad
+	{
+		std::string NSetName;   // node set name
+		double fx,fy;           // force value
+	};
+
 	// Distributed loads
 	struct DLoad
 	{
-		std::string SSetName;   // edge sets name
-		double val;             // surface pressure
+		std::string SetName;   // edge/element sets name
+		int type;              // 0: volume force; 1: surface pressuure
+		double val;            // surface pressure; maybe a table
+
+		DLoad(std::string& name, double& v)
+			: SetName(name), val(v), type(0)
+		{};
 	};
 }
 

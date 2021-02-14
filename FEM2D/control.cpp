@@ -57,6 +57,25 @@ namespace ROLLFEM2D
 			throw std::runtime_error("Constraint condition not defined!");
 		}
 
+		if (YAML::Node dload = config["DLoad"]) {
+			for (YAML::const_iterator it = dload.begin(); it != dload.end(); ++it) {
+				const YAML::Node& dl = *it;
+				double val = dl["Value"].as<double>();
+				std::string mname = dl["SSET"].as<std::string>();
+				if (mesh.SideSets.find(mname) == mesh.SideSets.end())
+				{
+					std::cout << "SideSet:" << mname << " not found. DLoad ignored!\n";
+				}
+				else {
+					DLoad cst(mname, val);
+					dloads.emplace_back(cst);
+				}
+			}
+		}
+		else {
+			throw std::runtime_error("Constraint condition not defined!");
+		}
+
 		loads.resize(2 * mesh.num_nodes);
 		loads.setZero();
 	};
@@ -95,6 +114,33 @@ namespace ROLLFEM2D
 		}
 
 		std::cout << StiffMatrix << std::endl;
+	}
+
+	void CControl::ApplyDistributedLoads()
+	{
+		std::size_t nd0, nd1, ie;
+		double normal[2];
+		for( auto load: dloads)
+		{
+			// consider edge pressure only
+			auto edges = mesh.SideSets[load.SetName];
+			for (int i = 0; i < edges.size(); ++i)
+			{
+				nd0 = edges[i].n_edge;
+				nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
+				ie = edges[i].id_element;
+				nd0 = mesh.elements[ie].index_nd[nd0];
+				nd1 = mesh.elements[ie].index_nd[nd1];
+				normal[0] = mesh.nodes[nd0].y - mesh.nodes[nd1].y;
+				normal[1] = mesh.nodes[nd1].x - mesh.nodes[nd0].x;
+				loads(2 * nd0) += load.val * normal[0];
+				loads(2 * nd0 + 1) += load.val * normal[1];
+				loads(2 * nd1) += load.val * normal[0];
+				loads(2 * nd1 + 1) += load.val * normal[1];
+			}
+		}
+
+		std::cout << loads << std::endl;
 	}
 
 }

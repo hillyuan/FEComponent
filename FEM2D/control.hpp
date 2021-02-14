@@ -18,6 +18,7 @@ namespace ROLLFEM2D
 		Eigen::VectorXd				loads;
 
 		std::vector< Constraint > constraints;
+		std::vector< CLoad > cloads;
 		std::vector< DLoad > dloads;
 		
 	public:
@@ -28,6 +29,7 @@ namespace ROLLFEM2D
 			mesh.calGlobalStiffMatrix(StiffMatrix);
 		}
 		void ApplyConstraints();
+		void ApplyDistributedLoads();
 
 	};
 }

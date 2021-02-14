@@ -17,6 +17,16 @@ namespace ROLLFEM2D
 		double x, y;
 	};
 
+	struct CEdge
+	{
+		std::size_t id_element;   // index of element
+		std::size_t n_edge;       // edge number of the element
+
+		CEdge(std::size_t& ie, std::size_t& nd)
+			: id_element(ie), n_edge(nd)
+		{};
+	};
+
 	struct CMesh
 	{
 		typedef Eigen::Triplet<double> T;
@@ -29,7 +39,7 @@ namespace ROLLFEM2D
 
 		std::map< std::string, std::vector<std::size_t> > NodeSets;
 		std::map< std::string, std::vector<std::size_t> > ElementSets;
-		std::map< std::string, std::pair<std::size_t, std::size_t> > SideSets;
+		std::map< std::string, std::vector<CEdge> >       SideSets;
 
 		int readin(const char *);
 		void print_elements(std::ostream& os) const;
