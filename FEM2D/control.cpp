@@ -143,5 +143,14 @@ namespace ROLLFEM2D
 		std::cout << loads << std::endl;
 	}
 
+	void CControl::solve()
+	{
+		Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver;
+		solver.compute(StiffMatrix);
+		Eigen::VectorXd displacements = solver.solve(loads);
+
+		std::cout << displacements << std::endl;
+	}
+
 }
 

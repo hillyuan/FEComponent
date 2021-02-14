@@ -30,6 +30,7 @@ namespace ROLLFEM2D
 		}
 		void ApplyConstraints();
 		void ApplyDistributedLoads();
+		void solve();
 
 	};
 }

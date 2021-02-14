@@ -21,6 +21,7 @@ int main(int argc, char *argv[])
 	control.calGlobalStiffMatrix();
 	control.ApplyConstraints();
 	control.ApplyDistributedLoads();
+	control.solve();
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
