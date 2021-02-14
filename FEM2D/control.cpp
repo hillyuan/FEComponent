@@ -56,6 +56,9 @@ namespace ROLLFEM2D
 		else {
 			throw std::runtime_error("Constraint condition not defined!");
 		}
+
+		loads.resize(2 * mesh.num_nodes);
+		loads.setZero();
 	};
 
 	void CControl::ApplyConstraints()

@@ -15,8 +15,10 @@ namespace ROLLFEM2D
 	private:
 		CMesh mesh;
 		Eigen::SparseMatrix<double> StiffMatrix;
+		Eigen::VectorXd				loads;
 
 		std::vector< Constraint > constraints;
+		std::vector< DLoad > dloads;
 		
 	public:
 		CControl::CControl(char* file);

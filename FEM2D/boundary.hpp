@@ -4,6 +4,7 @@
 
 namespace ROLLFEM2D
 {
+	// Displacement constraint
 	struct Constraint
 	{
 		enum Type
@@ -21,6 +22,13 @@ namespace ROLLFEM2D
 		{
 			type = static_cast<Type>(t);
 		};
+	};
+
+	// Distributed loads
+	struct DLoad
+	{
+		std::string SSetName;   // edge sets name
+		double val;             // surface pressure
 	};
 }
 
