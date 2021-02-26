@@ -147,9 +147,46 @@ namespace ROLLFEM2D
 	{
 		Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver;
 		solver.compute(StiffMatrix);
-		Eigen::VectorXd displacements = solver.solve(loads);
+		displacements = solver.solve(loads);
 
 		std::cout << displacements << std::endl;
+	}
+
+	int CControl::VTKOutput(std::string filename) const
+	{
+		std::ofstream output(filename.c_str(), std::ios_base::out);
+		if (output.fail()) {
+			return -2;
+		}
+		output << "# vtk DataFile Version 3.0" << std::endl;
+		output << "Result of 3-Roller FEM" << std::endl;
+		output << "ASCII" << std::endl;
+		output << "DATASET UNSTRUCTURED_GRID" << std::endl;
+
+		output << "POINTS " << mesh.num_nodes << " double" << std::endl;
+		for (auto p: mesh.nodes) {
+			output << std::setprecision(12) << p.x << " " << p.y << " 0.0" << std::endl;
+		}
+
+		output << "CELLS " << mesh.num_elements << " " << mesh.num_elements * 5 << std::endl;
+		for (auto ele: mesh.elements) {
+			output << 4 << " " << ele.index_nd[0] << " " << ele.index_nd[1] <<
+				" " << ele.index_nd[2] << " " << ele.index_nd[3] << std::endl;
+		}
+		output << "CELL_TYPES " << mesh.num_elements << std::endl;
+		for (int i = 0; i < mesh.num_elements; ++i) {
+			output << 9 << std::endl;
+		}
+
+		output << "POINT_DATA " << mesh.num_nodes << std::endl;
+		output << "VECTORS Displacement double" << std::endl;
+		std::size_t cnt = -1;
+		for (int i = 0; i < mesh.num_nodes; i++) {
+			output << displacements[++cnt] << " " << displacements[++cnt] << " 0.0" << std::endl;
+		}
+
+		output.close();
+		return 0;
 	}
 
 }

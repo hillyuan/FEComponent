@@ -1,7 +1,7 @@
 #ifndef ROLLFEM2D_CONTROL_HPP
 #define ROLLFEM2D_CONTROL_HPP
 
-#include <map>
+#include <fstream>
 
 #include "mesh.hpp"
 #include "material.hpp"
@@ -20,6 +20,8 @@ namespace ROLLFEM2D
 		std::vector< Constraint > constraints;
 		std::vector< CLoad > cloads;
 		std::vector< DLoad > dloads;
+
+		Eigen::VectorXd displacements;
 		
 	public:
 		CControl::CControl(char* file);
@@ -31,6 +33,8 @@ namespace ROLLFEM2D
 		void ApplyConstraints();
 		void ApplyDistributedLoads();
 		void solve();
+
+		int VTKOutput(std::string filename) const;
 
 	};
 }

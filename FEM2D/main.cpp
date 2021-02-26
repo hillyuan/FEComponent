@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
 	control.ApplyConstraints();
 	control.ApplyDistributedLoads();
 	control.solve();
+	int c = control.VTKOutput("result.vtk");
 	
 	std::clock_t c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
