@@ -131,7 +131,6 @@ namespace ROLLFEM2D
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
 		Eigen::Matrix<double, 2, 2> Jac;
-		Eigen::Matrix<double, 3, 8> B;
 		int imatl = elements[ele].matl_id;
 
 		std::size_t n=3;
@@ -155,14 +154,14 @@ namespace ROLLFEM2D
 			auto gderiv = spderiv * inv;
 			for (std::size_t i = 0; i < 4; i++)
 			{
-				B(0, 2 * i) = gderiv(i, 0);
-				B(0, 2 * i + 1) = 0.0;
-				B(1, 2 * i) = 0.0;
-				B(1, 2 * i + 1) = gderiv(i, 1);
-				B(2, 2 * i) = gderiv(i, 1);
-				B(2, 2 * i + 1) = gderiv(i, 0);
+				elements[ele].B(0, 2 * i) = gderiv(i, 0);
+				elements[ele].B(0, 2 * i + 1) = 0.0;
+				elements[ele].B(1, 2 * i) = 0.0;
+				elements[ele].B(1, 2 * i + 1) = gderiv(i, 1);
+				elements[ele].B(2, 2 * i) = gderiv(i, 1);
+				elements[ele].B(2, 2 * i + 1) = gderiv(i, 0);
 			}
-			K += wg * B.transpose() * materials[imatl].ElasticMatrix * B;
+			K += wg * (elements[ele].B).transpose() * materials[imatl].ElasticMatrix * elements[ele].B;
 		}
 
 	//	std::cout << K << std::endl;
@@ -204,6 +203,31 @@ namespace ROLLFEM2D
 		}
 		StiffMatrix.setFromTriplets(GTriplet.begin(), GTriplet.end());
 		StiffMatrix.makeCompressed();
+	}
+
+	void CMesh::updateElements(Eigen::VectorXd& displacements)
+	{
+		Eigen::Matrix<double,8,1> disp;
+
+		for (int ele = 0; ele < num_elements; ++ele)
+		{
+			int imatl = elements[ele].matl_id;
+
+			std::size_t n = 3;
+			for (std::size_t i = 0; i < 4; i++)
+			{
+				auto nd = elements[ele].index_nd[i];
+				disp[n * 2] = displacements[2 * nd];
+				disp[n * 2+1] = displacements[2 * nd+1];
+				n--;
+			}
+
+			for (std::size_t npg = 0; npg < 4; npg++)
+			{
+				elements[ele].strain[npg] = elements[ele].B * disp;
+				elements[ele].stress[npg] = materials[imatl].StressUpdate(elements[ele].strain[npg]);
+			}
+		}
 	}
 }
 

@@ -47,6 +47,7 @@ namespace ROLLFEM2D
 
 		void calElementalStiffMatrix (const std::size_t&, std::array<T,64> & triplets);
 		void calGlobalStiffMatrix(Eigen::SparseMatrix<double>&);
+		void updateElements(Eigen::VectorXd&);
 	};
 }
 

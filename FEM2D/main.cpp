@@ -21,7 +21,8 @@ int main(int argc, char *argv[])
 	control.calGlobalStiffMatrix();
 	control.ApplyConstraints();
 	control.ApplyDistributedLoads();
-	control.solve();
+	control.Solve();
+	control.Update();
 	int c = control.VTKOutput("result.vtk");
 	
 	std::clock_t c_end = std::clock();

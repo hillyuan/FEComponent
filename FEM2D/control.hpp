@@ -32,7 +32,11 @@ namespace ROLLFEM2D
 		}
 		void ApplyConstraints();
 		void ApplyDistributedLoads();
-		void solve();
+		void Solve();
+		void Update()
+		{
+			mesh.updateElements(displacements);
+		}
 
 		int VTKOutput(std::string filename) const;
 

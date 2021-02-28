@@ -143,7 +143,7 @@ namespace ROLLFEM2D
 		std::cout << loads << std::endl;
 	}
 
-	void CControl::solve()
+	void CControl::Solve()
 	{
 		Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver;
 		solver.compute(StiffMatrix);
@@ -158,7 +158,7 @@ namespace ROLLFEM2D
 		if (output.fail()) {
 			return -2;
 		}
-		output << "# vtk DataFile Version 3.0" << std::endl;
+		output << "# vtk DataFile Version 4.0" << std::endl;
 		output << "Result of 3-Roller FEM" << std::endl;
 		output << "ASCII" << std::endl;
 		output << "DATASET UNSTRUCTURED_GRID" << std::endl;
@@ -183,6 +183,20 @@ namespace ROLLFEM2D
 		std::size_t cnt = -1;
 		for (int i = 0; i < mesh.num_nodes; i++) {
 			output << displacements[++cnt] << " " << displacements[++cnt] << " 0.0" << std::endl;
+		}
+
+		output << "CELL_DATA " << mesh.num_elements << std::endl;
+		output << "SCALARS Strain double 3" << std::endl;
+		output << "LOOKUP_TABLE default" << std::endl;
+		for (int i = 0; i < mesh.num_elements; ++i) {
+			output << mesh.elements[i].strain[0][0] << " " << mesh.elements[i].strain[0][1] 
+				<< " " << mesh.elements[i].strain[0][2] << std::endl;
+		}
+		output << "SCALARS Stress double 3" << std::endl;
+		output << "LOOKUP_TABLE default" << std::endl;
+		for (int i = 0; i < mesh.num_elements; ++i) {
+			output << mesh.elements[i].stress[0][0] << " " << mesh.elements[i].stress[0][1]
+				<< " " << mesh.elements[i].stress[0][2] << std::endl;
 		}
 
 		output.close();

@@ -21,6 +21,7 @@ namespace ROLLFEM2D
 
 		Eigen::Matrix<double, 3, 3> ElasticMatrix;
 		void StressUpdate(double strain[3], double stress[3]) const;
+		Eigen::Vector3d StressUpdate(Eigen::Vector3d&) const;
 
 		void print(std::ostream& os) const;
 	};
