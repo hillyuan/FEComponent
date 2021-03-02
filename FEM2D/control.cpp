@@ -76,6 +76,11 @@ namespace ROLLFEM2D
 			throw std::runtime_error("Constraint condition not defined!");
 		}
 
+		outfile = "out.vtk";
+		if (YAML::Node doc = config["Output File"]) {
+			outfile = doc.as<std::string>();
+		}
+
 		loads.resize(2 * mesh.num_nodes);
 		loads.setZero();
 	};
@@ -113,7 +118,12 @@ namespace ROLLFEM2D
 			}
 		}
 
-		std::cout << StiffMatrix << std::endl;
+		for (auto idit : indicesToConstraint)
+		{
+			loads(idit) = 0.0;
+		}
+
+	//	std::cout << StiffMatrix << std::endl;
 	}
 
 	void CControl::ApplyDistributedLoads()
@@ -131,8 +141,8 @@ namespace ROLLFEM2D
 				ie = edges[i].id_element;
 				nd0 = mesh.elements[ie].index_nd[nd0];
 				nd1 = mesh.elements[ie].index_nd[nd1];
-				normal[0] = mesh.nodes[nd0].y - mesh.nodes[nd1].y;
-				normal[1] = mesh.nodes[nd1].x - mesh.nodes[nd0].x;
+				normal[0] = 0.5*(mesh.nodes[nd1].y - mesh.nodes[nd0].y);
+				normal[1] = 0.5*(mesh.nodes[nd0].x - mesh.nodes[nd1].x);
 				loads(2 * nd0) += load.val * normal[0];
 				loads(2 * nd0 + 1) += load.val * normal[1];
 				loads(2 * nd1) += load.val * normal[0];
@@ -140,7 +150,7 @@ namespace ROLLFEM2D
 			}
 		}
 
-		std::cout << loads << std::endl;
+	//	std::cout << loads << std::endl;
 	}
 
 	void CControl::Solve()
@@ -149,12 +159,12 @@ namespace ROLLFEM2D
 		solver.compute(StiffMatrix);
 		displacements = solver.solve(loads);
 
-		std::cout << displacements << std::endl;
+		std::cout << "displacament:=" << displacements << std::endl;
 	}
 
-	int CControl::VTKOutput(std::string filename) const
+	int CControl::VTKOutput() const
 	{
-		std::ofstream output(filename.c_str(), std::ios_base::out);
+		std::ofstream output(outfile.c_str(), std::ios_base::out);
 		if (output.fail()) {
 			return -2;
 		}

@@ -22,6 +22,8 @@ namespace ROLLFEM2D
 		std::vector< DLoad > dloads;
 
 		Eigen::VectorXd displacements;
+
+		std::string outfile;
 		
 	public:
 		CControl::CControl(char* file);
@@ -38,7 +40,7 @@ namespace ROLLFEM2D
 			mesh.updateElements(displacements);
 		}
 
-		int VTKOutput(std::string filename) const;
+		int VTKOutput() const;
 
 	};
 }

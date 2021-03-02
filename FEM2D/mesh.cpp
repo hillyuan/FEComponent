@@ -70,6 +70,7 @@ namespace ROLLFEM2D
 					tokenizer.clear();
 					tokenizer >> name >> mm >> nn >> dummy;
 					index.clear();
+					edges.clear();
 					for (unsigned int j = 0; j < nn; ++j) {
 						std::getline(input, line);
 						tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
@@ -133,13 +134,11 @@ namespace ROLLFEM2D
 		Eigen::Matrix<double, 2, 2> Jac;
 		int imatl = elements[ele].matl_id;
 
-		std::size_t n=3;
 		for (std::size_t i = 0; i<4; i++ )
 		{
 			auto nd = elements[ele].index_nd[i];
-			ecoord(0,n) = nodes[nd].x;
-			ecoord(1,n) = nodes[nd].y;
-			n--;
+			ecoord(0,i) = nodes[nd].x;
+			ecoord(1,i) = nodes[nd].y;
 		}
 	//	std::cout << "ecood:" << ecoord << std::endl;
 
@@ -213,13 +212,11 @@ namespace ROLLFEM2D
 		{
 			int imatl = elements[ele].matl_id;
 
-			std::size_t n = 3;
 			for (std::size_t i = 0; i < 4; i++)
 			{
 				auto nd = elements[ele].index_nd[i];
-				disp[n * 2] = displacements[2 * nd];
-				disp[n * 2+1] = displacements[2 * nd+1];
-				n--;
+				disp[i * 2] = displacements[2 * nd];
+				disp[i * 2+1] = displacements[2 * nd+1];
 			}
 
 			for (std::size_t npg = 0; npg < 4; npg++)
