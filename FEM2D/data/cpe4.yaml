@@ -14,12 +14,12 @@ Constraint:
     Value : 0.0
 DLoad:
   - SSET : EG1
-    Value : -10.0
+    Value : [-10.0]
   - SSET : EG2
-    Value : -10.0
+    Value : [-10.0]
   - SSET : EG3
-    Value : -10.0
+    Value : [-10.0]
   - SSET : EG4
-    Value : -10.0
+    Value : [-10.0]
 Output File: "out.vtk"
 ---

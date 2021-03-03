@@ -35,12 +35,22 @@ namespace ROLLFEM2D
 	struct DLoad
 	{
 		std::string SetName;   // edge/element sets name
-		int type;              // 0: volume force; 1: surface pressuure
+		int type;              // 0: volume force; 1: surface pressuure 2: surface load in direction[2]
 		double val;            // surface pressure; maybe a table
+		double direction[2];
 
-		DLoad(std::string& name, double& v)
-			: SetName(name), val(v), type(0)
-		{};
+		DLoad(std::string& name, std::vector<double>& v)
+			: SetName(name)
+		{
+			if (v.size() == 1) {
+				val = v[0]; type = 1;
+			}
+			else {
+				direction[0] = v[0]; direction[1] = v[1];
+				val = 1.0;
+				type = 2;
+			}
+		};
 	};
 }
 

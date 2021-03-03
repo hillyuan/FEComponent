@@ -60,7 +60,7 @@ namespace ROLLFEM2D
 		if (YAML::Node dload = config["DLoad"]) {
 			for (YAML::const_iterator it = dload.begin(); it != dload.end(); ++it) {
 				const YAML::Node& dl = *it;
-				double val = dl["Value"].as<double>();
+				std::vector<double> val = dl["Value"].as<std::vector<double>>();
 				std::string mname = dl["SSET"].as<std::string>();
 				if (mesh.SideSets.find(mname) == mesh.SideSets.end())
 				{
@@ -141,16 +141,22 @@ namespace ROLLFEM2D
 				ie = edges[i].id_element;
 				nd0 = mesh.elements[ie].index_nd[nd0];
 				nd1 = mesh.elements[ie].index_nd[nd1];
-				normal[0] = 0.5*(mesh.nodes[nd1].y - mesh.nodes[nd0].y);
-				normal[1] = 0.5*(mesh.nodes[nd0].x - mesh.nodes[nd1].x);
+				normal[0] = 0.5 * (mesh.nodes[nd1].y - mesh.nodes[nd0].y);
+				normal[1] = 0.5 * (mesh.nodes[nd0].x - mesh.nodes[nd1].x);
+				if (load.type == 2) {   // surface presuure
+					double area = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
+					normal[0] = area * load.direction[0];
+					normal[1] = area * load.direction[1];
+				}
 				loads(2 * nd0) += load.val * normal[0];
 				loads(2 * nd0 + 1) += load.val * normal[1];
 				loads(2 * nd1) += load.val * normal[0];
 				loads(2 * nd1 + 1) += load.val * normal[1];
+				
 			}
 		}
 
-	//	std::cout << loads << std::endl;
+		std::cout << loads << std::endl;
 	}
 
 	void CControl::Solve()
