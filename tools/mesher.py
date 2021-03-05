@@ -83,8 +83,8 @@ class IntermediateRoll :
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
-        #print("edload",self.edload)
+            if( i<ndf ):
+                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
                 
         # division along radius direction of L21
         dd21 = meshsize
@@ -106,7 +106,7 @@ class IntermediateRoll :
         nd0 = cnt_temp - nd3 -1
         nd1 = cnt_temp + nd21
         for j in range(0,nd3):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         
         for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
@@ -133,7 +133,7 @@ class IntermediateRoll :
             nd0 = cnt_temp + i*(2*nd21+nd3+1) 
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,2*nd21+nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
                 
@@ -150,7 +150,7 @@ class IntermediateRoll :
         nd0 = cnt_temp - 2*nd21 -nd3 -1
         nd1 = cnt_temp + ndd1
         for j in range(0,nd3+2*nd21):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # x coordinates of L1 division
         xmr = np.array([])
@@ -211,7 +211,7 @@ class IntermediateRoll :
             nd0 =  cnt_temp + i*(2*ndd1+nz)
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
                 
@@ -234,14 +234,14 @@ class IntermediateRoll :
         nd0 = cnt_temp - nd3 -2*nd21 -ndd1-1
         nd1 = cnt_temp
         for j in range(0,nz-1):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
 
         #other L22
         for i in range(1,ndl4):
             nd0 = cnt_temp 
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,nz-1):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
         
@@ -258,15 +258,14 @@ class IntermediateRoll :
         nd0 = cnt_temp - nd3 - nd21-1
         nd1 = cnt_temp
         for j in range(0,nd3):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # other row of L32
         for i in range(1,nds):
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
-            print( "d3", i, nd0,nd1 )
             for j in range(0,nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
                 
@@ -281,7 +280,9 @@ class IntermediateRoll :
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+        print("edload", self.edload)
                 
         self.n_nd = cnt_xyz - self.gnd0
                 
