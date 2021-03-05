@@ -30,6 +30,8 @@ class IntermediateRoll :
     xbr = np.array([])   # output: x coordinates of support roll
     nbr = np.array([],dtype=int)   # output: node number of support roll
     
+    edload = np.array([],dtype=int) # output: loading edge group
+    
     n_nd = 0    # ouput: number of nodes 
     
     def generate(self):
@@ -44,7 +46,7 @@ class IntermediateRoll :
         nd3 = int(d0[0])
         if( d0[1]>0.0 ):
             dd3 = self.D3/nd3
-        print("nd3",nd3, dd3, nd3*dd3)
+        #print("nd3",nd3, dd3, nd3*dd3)
         
         # division along L31 load edge
         ddf = meshsize
@@ -52,14 +54,16 @@ class IntermediateRoll :
         ndf = int(d0[0])
         if( d0[1]>0.0 ):
             ddf = self.Lf/ndf
-        print(ndf, ddf, ndf*ddf)
+        #print(ndf, ddf, ndf*ddf)
         # division along no-load edge
         dds = meshsize
         d0 = divmod( self.L3-self.Lf, dds )
         nds = int(d0[0])
+        if( d0[1]>0.5*dds ):
+            nds = nds+1
         if( d0[1]>0.0 ):
             dds = (self.L3-self.Lf)/nds
-        print(nds, dds, nds*dds)
+        #print(nds, dds, nds*dds)
         
         cnt_xyz = self.gnd0
         for i in range(0,ndf+1):
@@ -78,7 +82,9 @@ class IntermediateRoll :
             nd0 = self.gnd0 + i*(nd3+1)
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+        #print("edload",self.edload)
                 
         # division along radius direction of L21
         dd21 = meshsize
@@ -86,7 +92,7 @@ class IntermediateRoll :
         nd21 = int(d0[0])
         if( d0[1]>0.0 ):
             dd21 = 0.5*(self.D2-self.D3)/nd21
-        print("radius of D2:",nd21, dd21, nd21*dd21)
+        #print("radius of D2:",nd21, dd21, nd21*dd21)
         
         # division along horizontal direction of L21
         ddlf = meshsize
@@ -94,7 +100,7 @@ class IntermediateRoll :
         ndlf = int(d0[0])
         if( d0[1]>0.0 ):
             ddlf = self.L21/ndlf
-        print("L21",ndlf, ddlf, ndlf*ddlf)
+        #print("L21",ndlf, ddlf, ndlf*ddlf)
         
         # L3 to L21
         nd0 = cnt_temp - nd3 -1
@@ -256,8 +262,9 @@ class IntermediateRoll :
             
         # other row of L32
         for i in range(1,nds):
-            nd0 = cnt_temp + i*(nd3+1)
+            nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
+            print( "d3", i, nd0,nd1 )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
                 
