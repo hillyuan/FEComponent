@@ -156,7 +156,7 @@ namespace ROLLFEM2D
 			}
 		}
 
-		std::cout << loads << std::endl;
+//		std::cout << loads << std::endl;
 	}
 
 	void CControl::Solve()
@@ -165,7 +165,7 @@ namespace ROLLFEM2D
 		solver.compute(StiffMatrix);
 		displacements = solver.solve(loads);
 
-		std::cout << "displacament:=" << displacements << std::endl;
+	//	std::cout << "displacament:=" << displacements << std::endl;
 	}
 
 	int CControl::VTKOutput() const

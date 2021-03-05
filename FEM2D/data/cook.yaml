@@ -1,10 +1,10 @@
 %YAML 1.2
 ---
-Mesh File: cook4.vtk
+Mesh File: cook64.vtk
 Material:
   - Name : steel
-    Youngs Modulus: 240.565
-    Poisson Ratio: 0.4999
+    Youngs Modulus: 250
+    Poisson Ratio: 0.3
 Constraint:
   - NSET : N1
     Type : 3
