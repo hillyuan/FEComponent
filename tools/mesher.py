@@ -323,7 +323,7 @@ class BackupRoll :
         nd = int(d0[0])
         if( d0[1]>0.0 ):
             msd = self.D2/nd
-        print("D2:", nd, msd, nd*msd)
+       # print("D2:", nd, msd, nd*msd)
 
         cnt_xyz = self.gnd0
         
@@ -345,7 +345,7 @@ class BackupRoll :
             nd0 = self.gnd0 + i*(nd+1)
             nd1 = nd0 + nd+1
             for j in range(0,nd):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
               
         # D1-D2
         msc = meshsize
@@ -353,7 +353,7 @@ class BackupRoll :
         nc = int(d0[0])
         if( d0[1]>0.0 ):
             msc = 0.5*(self.D1-self.D2)/nc
-        print("D2 to D1", nc, msc, nc*msc)
+       # print("D2 to D1", nc, msc, nc*msc)
 
         # L chamfer        
         mscf = meshsize
@@ -362,7 +362,7 @@ class BackupRoll :
         if( d0[1]>0.0 ):
             mscf = self.chamfer[0]/ncf
         dz = self.chamfer[1]/self.chamfer[0]*mscf
-        print("L chamfer", ncf, mscf, ncf*mscf,dz)
+       # print("L chamfer", ncf, mscf, ncf*mscf,dz)
         
         cx = x0 + self.L2
         for i in range(0,ncf+1):
@@ -388,14 +388,14 @@ class BackupRoll :
         nd0 = cnt_temp -nd -1
         nd1 = cnt_temp + nc
         for j in range(0,nd):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # Element D1 to first chamfer
         for i in range(0,ncf):
             nd0 = cnt_temp + i*(2*nc+nd+1)
             nd1 = nd0 + 2*nc+nd+1
             for j in range(0,2*nc+nd):
-               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         ce = len(elements)
         elements[ce-2] = self.nbr[0]
         xyz = np.delete(xyz, [2*cnt_xyz - 1, 2*cnt_xyz-2])
@@ -423,10 +423,10 @@ class BackupRoll :
             nd0 = cnt_temp + (i-1)*(2*nc+nd)
             nd1 = nd0 + 2*nc+nd
             for j in range(0,2*nc+nd-1):
-               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             nd0 = nd0 + 2*nc+nd-2
             nd1 = nd1 + 2*nc+nd-2
-            elements = np.append(elements, [nd0,nd1,self.nbr[i+1],self.nbr[i]])
+            elements = np.append(elements, [nd0,self.nbr[i],self.nbr[i+1],nd1])
             
         cnt_temp = cnt_xyz
             
@@ -456,16 +456,16 @@ class BackupRoll :
         nd1 = nd0 + 2*nc+nd
         print(nd0,nd1)
         for j in range(0,2*nc+nd-1):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         nd0 = nd0 + 2*nc+nd-1
         nd1 = nd1 + 2*nc+nd-1
-        elements = np.append(elements, [nd0,nd1,nd1+1,self.nbr[nx-1]])
+        elements = np.append(elements, [nd0,self.nbr[nx-1],nd1+1,nd1])
 
         for i in range(0,ncf-1):
             nd0 = cnt_temp + i*(2*nc+nd+1)
             nd1 = nd0 + 2*nc+nd+1
             for j in range(0,2*nc+nd):
-               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                
         cnt_temp = cnt_xyz
         
@@ -487,14 +487,14 @@ class BackupRoll :
         nd0 = cnt_temp - (nc+nd+1)
         nd1 = cnt_temp
         for j in range(0,nd):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # Element to left end
         for i in range(0,nlf+nl-1):
             nd0 = cnt_temp +i*(nd+1)
             nd1 = nd0 + nd+1
             for j in range(0,nd):
-               elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                
         self.n_nd = cnt_xyz - self.gnd0
                
