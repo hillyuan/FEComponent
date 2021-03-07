@@ -530,7 +530,7 @@ class WorkingRoll :
         nd3 = int(d0[0])
         if( d0[1]>0.0 ):
             dd3 = self.D3/nd3
-        print("nd3",nd3, dd3, nd3*dd3)
+        #print("nd3",nd3, dd3, nd3*dd3)
         
         # division along L31 load edge
         ddf = meshsize
@@ -538,14 +538,14 @@ class WorkingRoll :
         ndf = int(d0[0])
         if( d0[1]>0.0 ):
             ddf = self.Lf/ndf
-        print(ndf, ddf, ndf*ddf)
+        #print(ndf, ddf, ndf*ddf)
         # division along no-load edge
         dds = meshsize
         d0 = divmod( self.L3-self.Lf, dds )
         nds = int(d0[0])
         if( d0[1]>0.0 ):
             dds = (self.L3-self.Lf)/nds
-        print(nds, dds, nds*dds)
+        #print(nds, dds, nds*dds)
         
         cnt_xyz = self.gnd0
         for i in range(0,ndf+1):
@@ -564,7 +564,7 @@ class WorkingRoll :
             nd0 = self.gnd0 + i*(nd3+1)
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         # division along radius direction of L21
         dd21 = meshsize
@@ -586,7 +586,7 @@ class WorkingRoll :
         nd0 = cnt_temp - nd3 -1
         nd1 = cnt_temp + nd21
         for j in range(0,nd3):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         
         for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
@@ -613,7 +613,7 @@ class WorkingRoll :
             nd0 = cnt_temp + i*(2*nd21+nd3+1) 
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,2*nd21+nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
         
@@ -623,7 +623,7 @@ class WorkingRoll :
         ndd1 = int(d0[0])
         if( d0[1]>0.0 ):
             dd1 = 0.5*(self.D1-self.D2)/ndd1
-        print("D1-D2",ndd1, dd1, ndd1*dd1)
+        #print("D1-D2",ndd1, dd1, ndd1*dd1)
         
         # division to edge of Intermediate roll
         dl11 = meshsize
@@ -631,8 +631,8 @@ class WorkingRoll :
         ndl11 = int(d0[0])
         if( d0[1]>0.0 ):
             dl11 = (0.5*self.L1-self.xb)/ndl11
-        print("L11",ndl11, dl11, ndl11*dl11)
-        print("z_value:",z_value)     
+        #print("L11",ndl11, dl11, ndl11*dl11)
+        #print("z_value:",z_value)     
         nz = len(z_value)
         for i in range(0,ndl11):
             x = -0.5*self.L1 + i*dl11
@@ -650,21 +650,18 @@ class WorkingRoll :
         nd0 = cnt_temp - 2*nd21 -nd3 -1
         nd1 = cnt_temp + ndd1
         for j in range(0,nd3+2*nd21):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # Element in L11
         for i in range(0,ndl11-1):
             nd0 = cnt_temp + i*(2*ndd1+nz) 
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
                 
         # Nodes to left edge
-        print(cnt_xyz)
-        print(self.nbr)
-        print(self.xbr)
         for i in range(0,len(self.nbr)):
             for j in range(1,ndd1):
                 xyz = np.append(xyz, [self.xbr[i], self.z0+0.5*self.D1-dd1*j])
@@ -679,18 +676,18 @@ class WorkingRoll :
         # first row of L12
         nd0 = cnt_temp - (2*ndd1+nz)
         nd1 = nd0 + 2*ndd1+nz
-        elements = np.append(elements, [nd0,self.nbr[0],nd1,nd0+1])
+        elements = np.append(elements, [nd0,nd0+1,nd1,self.nbr[0]])
         for i in range(0,len(self.nbr)-1):
             nd0 = cnt_temp + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
-            elements = np.append(elements, [self.nbr[i],self.nbr[i+1],nd1,nd0])
+            elements = np.append(elements, [self.nbr[i],nd0,nd1,self.nbr[i+1]])
         
         # ramins row of L12
         for i in range(0,len(self.nbr)):
             nd0 = cnt_temp - (2*ndd1+nz) + 1 + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
             for j in range(0,2*ndd1+nz-2):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
         
@@ -705,14 +702,14 @@ class WorkingRoll :
         nd0 = cnt_temp - (2*ndd1+nz-1)
         nd1 = cnt_temp
         for j in range(0,nz-1):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         
         #Element: L22
         for i in range(1,ndlf):
             nd0 = cnt_temp + (i-1)*nz 
             nd1 = nd0 + nz
             for j in range(0,nz-1):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 
         cnt_temp = cnt_xyz
                 
@@ -721,29 +718,27 @@ class WorkingRoll :
             x = 0.5*self.L1 + self.L2 + i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
-                print(x, self.z0+0.5*self.D3-dd3*j)
+                #print(x, self.z0+0.5*self.D3-dd3*j)
                 cnt_xyz += 1
         for i in range(0,ndf+1):
             x = 0.5*self.L1 + self.L2 + self.L3- self.Lf +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
-                print(x, self.z0+0.5*self.D3-dd3*j)
+                #print(x, self.z0+0.5*self.D3-dd3*j)
                 cnt_xyz += 1
                 
         # Element: L32-L32f
         nd0 = cnt_temp - (nd3+nd21+1)
         nd1 = cnt_temp
-        print( cnt_temp, nd0,nd1)
         for j in range(0,nd3):
-            elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
         # Element: L32f
         for i in range(1,ndf+nds):
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
-            print(nd0,nd1)
             for j in range(0,nd3):
-                elements = np.append(elements, [nd0+j,nd1+j,nd1+1+j,nd0+1+j])
+                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
         
 
 ### 入出力定義 ###
