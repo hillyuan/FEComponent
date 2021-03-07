@@ -300,6 +300,8 @@ class BackupRoll :
     xbr = np.array([])             # input: x coordinates of support roll
     nbr = np.array([],dtype=int)   # input: node number of support roll
     
+    ndfix = np.array([],dtype=int) # output: fixed node group
+    
     def generate(self):
         global meshsize, xyz, elements
         print("Generating mesh of backup roll begin with:", self.gnd0, self.z0)
@@ -330,9 +332,11 @@ class BackupRoll :
         x0 = -0.5*self.L1 - self.L2
         for i in range(0,nlf+1):
             x = x0 +i*mslf
+            self.ndfix = np.append(self.ndfix, cnt_xyz)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         for i in range(1,nl):
             x = x0 + self.Lf + i*msl
             for j in range(0,nd+1):
@@ -369,7 +373,6 @@ class BackupRoll :
             x = cx +i*mscf
             zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*i
             zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*i
-            print(x,zt,zt1)
             xyz = np.append(xyz, [x, zt])
             cnt_xyz += 1
             for j in range(1,nc+1):
@@ -404,7 +407,6 @@ class BackupRoll :
                
         # Node: left chamfer to right chamfer
         nx = len(self.xbr)
-        print(self.nbr)
         for i in range(1,nx):
             for j in range(0,nc+1):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D1 - msc*j])
@@ -436,7 +438,6 @@ class BackupRoll :
             x = cx +i*mscf
             zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*(ncf-i)
             zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*(ncf-i)
-            print(x,zt,zt1)
             xyz = np.append(xyz, [x, zt])
             cnt_xyz += 1
             for j in range(1,nc+1):
@@ -470,18 +471,21 @@ class BackupRoll :
         cnt_temp = cnt_xyz
         
         # Nodes along left Lf
-        for i in range(1,nl+1):
+        for i in range(1,nl):
             x = 0.5*self.L1 + i*msl
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
                 
         # Nodes to left End
-        for i in range(1,nlf+1):
+        for i in range(0,nlf+1):
             x = 0.5*self.L1 + (self.L2-self.Lf) +i*mslf
+            self.ndfix = np.append(self.ndfix, cnt_xyz)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndfix = np.append(self.ndfix, cnt_xyz-1)
+        print("ndfix",self.ndfix)
                
         # Element: L1 to left L2
         nd0 = cnt_temp - (nc+nd+1)
