@@ -191,6 +191,10 @@ class IntermediateRoll :
         x_value = np.append(x_value, xs)
         print( "x_value", x_value )
         
+        # consider chamfer
+        kcf = self.chamfer[1]/self.chamfer[0]
+        xs = -0.5*self.L1 + self.offset
+        
         nz = len(z_value)
         for i in range(0,len(x_value)):
             x = x_value[i]
@@ -198,13 +202,21 @@ class IntermediateRoll :
                 self.xbr = np.append(self.xbr, x)
                 self.nbr = np.append(self.nbr, cnt_xyz)
             for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                if( x<xs+self.chamfer[0] and j==0):
+                    xyz = np.append(xyz, [x, self.z0+0.5*self.D1-self.chamfer[1]+kcf*(x-xs)])
+                    print("xyz",x,self.z0+0.5*self.D1-self.chamfer[1]+kcf*(x-xs))
+                else:
+                    xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
             for j in range(1,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                if( x<xs+self.chamfer[0] and j==ndd1):
+                    xyz = np.append(xyz, [x, z_value[nz-1]-dd1*ndd1+self.chamfer[1]-kcf*(x-xs)])
+                    print("xyz1",x,z_value[nz-1]-dd1*ndd1,z_value[nz-1]-dd1*ndd1+self.chamfer[1]-kcf*(x-xs))
+                else:
+                    xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
             if( x>=xmr[0]+self.chamfer[0] and x<=self.pxw ):
                 self.xwr = np.append(self.xwr, x)
