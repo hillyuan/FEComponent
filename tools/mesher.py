@@ -919,5 +919,9 @@ for i in range(0,n_element):
 fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
+fo.write("FIELD NODESET 1\n")
+fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + "\n")
+for i in bRoll.ndfix:
+    fo.write(str(i)+'\n')
 
 fo.close()
