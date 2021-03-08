@@ -30,7 +30,7 @@ class IntermediateRoll :
     xbr = np.array([])   # output: x coordinates of support roll
     nbr = np.array([],dtype=int)   # output: node number of support roll
     
-    edload = np.array([],dtype=int) # output: loading edge group
+    edbend = np.array([],dtype=int) # output: loading edge group
     
     n_nd = 0    # ouput: number of nodes 
     
@@ -84,7 +84,7 @@ class IntermediateRoll :
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             if( i<ndf ):
-                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+                self.edbend = np.append(self.edbend, [int(len(elements)/4)-1, 1] )
                 
         # division along radius direction of L21
         dd21 = meshsize
@@ -141,6 +141,8 @@ class IntermediateRoll :
         dd1 = meshsize
         d0 = divmod( 0.5*(self.D1-self.D2), dd1 )
         ndd1 = int(d0[0])
+        if( ndd1==0 ):
+            ndd1 = 1
         if( d0[1]>0.0 ):
             dd1 = 0.5*(self.D1-self.D2)/ndd1
         print("p1",ndd1, dd1, ndd1*dd1)
@@ -281,8 +283,8 @@ class IntermediateRoll :
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
-        print("edload", self.edload)
+            self.edbend = np.append(self.edbend, [int(len(elements)/4)-1, 1] )
+        print("edbend", self.edbend)
                 
         self.n_nd = cnt_xyz - self.gnd0
                 
@@ -518,6 +520,9 @@ class WorkingRoll :
     xbr = np.array([])             # input: x coordinates with inter roll
     nbr = np.array([],dtype=int)   # input: node number with inter roll
     
+    edbend = np.array([],dtype=int) # output: bending loading edge group
+    edload = np.array([],dtype=int) # output: loading edge group
+    
     def generate(self):
         global meshsize, xyz, elements
         print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
@@ -621,6 +626,8 @@ class WorkingRoll :
         dd1 = meshsize
         d0 = divmod( 0.5*(self.D1-self.D2), dd1 )
         ndd1 = int(d0[0])
+        if( ndd1==0 ):
+            ndd1 = 1
         if( d0[1]>0.0 ):
             dd1 = 0.5*(self.D1-self.D2)/ndd1
         #print("D1-D2",ndd1, dd1, ndd1*dd1)
