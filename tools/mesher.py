@@ -32,7 +32,8 @@ class IntermediateRoll :
     xbr = np.array([])             # output: x coordinates of support roll
     nbr = np.array([],dtype=int)   # output: node number of support roll
     
-    edbend = np.array([],dtype=int) # output: loading edge group
+    edbendU = np.array([],dtype=int) # output: loading edge group
+    edbendD = np.array([],dtype=int) # output: loading edge group
     
     n_nd = 0    # ouput: number of nodes 
     
@@ -79,14 +80,17 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
         cnt_temp = cnt_xyz
-                
+
+        self.edbendU = np.append(self.edbendU, [0, 1] )                
         for i in range(0,ndf+nds-1):
             nd0 = self.gnd0 + i*(nd3+1)
             nd1 = nd0 + nd3+1
+            if( i>0 and i<ndf ):
+                self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 1] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             if( i<ndf ):
-                self.edbend = np.append(self.edbend, [int(len(elements)/4)-1, 1] )
+                self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
                 
         # division along radius direction of L21
         dd21 = meshsize
@@ -299,10 +303,12 @@ class IntermediateRoll :
         for i in range(0,ndf):
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
+            self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 1] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-            self.edbend = np.append(self.edbend, [int(len(elements)/4)-1, 1] )
-        print("edbend", self.edbend)
+            self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
+        print("edbendD", self.edbendD)
+        print("edbendU", self.edbendU)
                 
         self.n_nd = cnt_xyz - self.gnd0
                 
@@ -539,8 +545,9 @@ class WorkingRoll :
     xbr = np.array([])             # input: x coordinates with inter roll
     nbr = np.array([],dtype=int)   # input: node number with inter roll
     
-    edbend = np.array([],dtype=int) # output: bending loading edge group
-    edload = np.array([],dtype=int) # output: loading edge group
+    edbendU = np.array([],dtype=int) # output: bending loading edge group
+    edbendD = np.array([],dtype=int) # output: bending loading edge group
+    edload = np.array([],dtype=int)  # output: loading edge group
     
     def generate(self):
         global meshsize, xyz, elements
@@ -920,7 +927,7 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 fo.write("FIELD NODESET 1\n")
-fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + "\n")
+fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
 
