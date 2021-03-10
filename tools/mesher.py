@@ -81,12 +81,12 @@ class IntermediateRoll :
                 cnt_xyz += 1
         cnt_temp = cnt_xyz
 
-        self.edbendU = np.append(self.edbendU, [0, 1] )                
+        self.edbendU = np.append(self.edbendU, [0, 3] )                
         for i in range(0,ndf+nds-1):
             nd0 = self.gnd0 + i*(nd3+1)
             nd1 = nd0 + nd3+1
             if( i>0 and i<ndf ):
-                self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 1] )
+                self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             if( i<ndf ):
@@ -303,7 +303,7 @@ class IntermediateRoll :
         for i in range(0,ndf):
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
-            self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 1] )
+            self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
@@ -590,13 +590,17 @@ class WorkingRoll :
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
         cnt_temp = cnt_xyz
-                
+               
         for i in range(0,ndf+nds-1):
             nd0 = self.gnd0 + i*(nd3+1)
             nd1 = nd0 + nd3+1
+            if( i<ndf ):
+                self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-                
+            if( i<ndf ):
+                self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
+            
         # division along radius direction of L21
         dd21 = meshsize
         d0 = divmod( 0.5*(self.D2-self.D3), dd21 )
@@ -796,8 +800,14 @@ class WorkingRoll :
         for i in range(1,ndf+nds):
             nd0 = cnt_temp + (i-1)*(nd3+1)
             nd1 = nd0 + nd3+1
+            if( i>=nds ):
+                self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            if( i>=nds ):
+                self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
+        print("edbendU", self.edbendU )
+        print("edbendD", self.edbendD )
         
 
 ### 入出力定義 ###
