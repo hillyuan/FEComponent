@@ -715,12 +715,15 @@ class WorkingRoll :
         for j in range(0,nd3+2*nd21):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             
-        # Element in L11
+        # Element to chamfer of inter roll
         for i in range(0,ndl11+ndl12-1):
             nd0 = cnt_temp + i*(2*ndd1+nz) 
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            if( i>=ndl11 ):
+                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+        print("ndl",ndl11,ndl12)
                 
         cnt_temp = cnt_xyz
                 
@@ -736,7 +739,7 @@ class WorkingRoll :
                 xyz = np.append(xyz, [self.xbr[i], z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
          
-        # first row of L12
+        # first row of L1
         nd0 = cnt_temp - (2*ndd1+nz)
         nd1 = nd0 + 2*ndd1+nz
         elements = np.append(elements, [nd0,nd0+1,nd1,self.nbr[0]])
@@ -745,12 +748,16 @@ class WorkingRoll :
             nd1 = nd0 + (2*ndd1+nz-1)
             elements = np.append(elements, [self.nbr[i],nd0,nd1,self.nbr[i+1]])
         
-        # ramins row of L12
+        # ramins row of L1
         for i in range(0,len(self.nbr)):
             nd0 = cnt_temp - (2*ndd1+nz) + 1 + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
             for j in range(0,2*ndd1+nz-2):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            if( i<=len(self.nbr)-ndl11-ndl12 ):
+                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+                
+        print("edload", self.edload )
                 
         cnt_temp = cnt_xyz
         
