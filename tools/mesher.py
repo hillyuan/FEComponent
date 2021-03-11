@@ -943,9 +943,17 @@ for i in range(0,n_element):
 fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
+
 fo.write("FIELD NODESET 1\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
+    
+fo.write("FIELD EDGESET 1\n")
+n_load = int(len(wRoll.edload)/2)
+sload = wRoll.edload.reshape(n_load,2)
+fo.write("ELOAD 2 "+str(n_load) + " int\n")
+for i in range(0,n_load):
+    fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
 
 fo.close()

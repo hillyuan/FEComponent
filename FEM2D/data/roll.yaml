@@ -1,0 +1,17 @@
+%YAML 1.2
+---
+Mesh File: rollsystem.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 206000
+    Poisson Ratio: 0.3
+Constraint:
+  - NSET : NFIX
+    Type : 3
+    Value : 0.0
+DLoad:
+  - SSET : ELOAD
+    Value : [-6.2e3]
+Output:
+  Filename: "rollresult.vtk"
+---
