@@ -5,10 +5,8 @@ Mesher specified for
 Jan. 2021
 """
 
-import os
 import yaml
 import numpy as np
-import math
 
 class IntermediateRoll :
     D1 = 0.0
@@ -362,7 +360,7 @@ class BackupRoll :
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
-            self.ndfix = np.append(self.ndfix, cnt_xyz-1)
+            #self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         for i in range(1,nl):
             x = x0 + self.Lf + i*msl
             for j in range(0,nd+1):
@@ -510,7 +508,7 @@ class BackupRoll :
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
-            self.ndfix = np.append(self.ndfix, cnt_xyz-1)
+          #  self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         print("ndfix",self.ndfix)
                
         # Element: L1 to left L2
@@ -949,10 +947,34 @@ fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
     
-fo.write("FIELD EDGESET 1\n")
+fo.write("FIELD EDGESET 5\n")
 n_load = int(len(wRoll.edload)/2)
 sload = wRoll.edload.reshape(n_load,2)
 fo.write("ELOAD 2 "+str(n_load) + " int\n")
+for i in range(0,n_load):
+    fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+    
+n_load = int(len(wRoll.edbendD)/2)
+sload = wRoll.edbendD.reshape(n_load,2)
+fo.write("WBENDD 2 "+str(n_load) + " int\n")
+for i in range(0,n_load):
+    fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+    
+n_load = int(len(wRoll.edbendU)/2)
+sload = wRoll.edbendU.reshape(n_load,2)
+fo.write("WBENDU 2 "+str(n_load) + " int\n")
+for i in range(0,n_load):
+    fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+    
+n_load = int(len(iRoll.edbendD)/2)
+sload = iRoll.edbendD.reshape(n_load,2)
+fo.write("IBENDD 2 "+str(n_load) + " int\n")
+for i in range(0,n_load):
+    fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+    
+n_load = int(len(iRoll.edbendU)/2)
+sload = iRoll.edbendU.reshape(n_load,2)
+fo.write("IBENDU 2 "+str(n_load) + " int\n")
 for i in range(0,n_load):
     fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
 

@@ -12,6 +12,9 @@ Constraint:
 DLoad:
   - SSET : ELOAD
     Value : [-6.2e3]
-Output:
-  Filename: "rollresult.vtk"
+  - SSET : WBENDD
+    Value : [-65.104]
+  - SSET : IBENDD
+    Value : [-71.875]
+Output File: "rollresult.vtk"
 ---
