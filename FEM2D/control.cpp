@@ -37,19 +37,27 @@ namespace ROLLFEM2D
 			throw std::runtime_error("Material properties not defined!");
 		}
 
+		char* p;
 		if (YAML::Node bnd = config["Constraint"]) {
 			for (YAML::const_iterator it = bnd.begin(); it != bnd.end(); ++it) {
 				const YAML::Node& bnd = *it;
 				int uxy = bnd["Type"].as<int>();
 				double val = bnd["Value"].as<double>();
 				std::string mname = bnd["NSET"].as<std::string>();
-				if (mesh.NodeSets.find(mname) == mesh.NodeSets.end())
-				{
-					std::cout << "NodeSet:" << mname << " not found. Constraint ignored!\n";
+				std::size_t num = strtol(mname.c_str(), &p, 10);
+				if(*p == 0) { 
+					Constraint cst(num, uxy, val);
+					constraints.emplace_back(cst);
 				}
 				else {
-					Constraint cst(mname, uxy, val);
-					constraints.emplace_back(cst);
+					if (mesh.NodeSets.find(mname) == mesh.NodeSets.end())
+					{
+						std::cout << "NodeSet:" << mname << " not found. Constraint ignored!\n";
+					}
+					else {
+						Constraint cst(mname, uxy, val);
+						constraints.emplace_back(cst);
+					}
 				}
 			}
 		}
@@ -91,16 +99,28 @@ namespace ROLLFEM2D
 
 		for (auto cst : constraints)
 		{
-			auto nodes = mesh.NodeSets[cst.NSetName];
-			if (cst.type & Constraint::UX)
-			{
-				for (int j = 0; j < nodes.size(); ++j)
-					indicesToConstraint.push_back(2 * nodes[j]);
+			if (cst.id_node >= 0) {
+				if (cst.type & Constraint::UX)
+				{
+					indicesToConstraint.push_back(2 * cst.id_node);
+				}
+				if (cst.type & Constraint::UY)
+				{
+					indicesToConstraint.push_back(2 * cst.id_node + 1);
+				}
 			}
-			if (cst.type & Constraint::UY)
-			{
-				for (int j = 0; j < nodes.size(); ++j)
-					indicesToConstraint.push_back(2 * nodes[j] + 1);
+			else {
+				auto nodes = mesh.NodeSets[cst.NSetName];
+				if (cst.type & Constraint::UX)
+				{
+					for (int j = 0; j < nodes.size(); ++j)
+						indicesToConstraint.push_back(2 * nodes[j]);
+				}
+				if (cst.type & Constraint::UY)
+				{
+					for (int j = 0; j < nodes.size(); ++j)
+						indicesToConstraint.push_back(2 * nodes[j] + 1);
+				}
 			}
 		}
 
