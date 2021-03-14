@@ -307,7 +307,6 @@ class IntermediateRoll :
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             
-        print("ndbottom",self.ndbottom)
                 
         for i in range(0,ndf):
             nd0 = cnt_temp + (i-1)*(nd3+1)
@@ -373,12 +372,14 @@ class BackupRoll :
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             #self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         for i in range(1,nl):
             x = x0 + self.Lf + i*msl
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)    
                 
         cnt_temp = cnt_xyz
                 
@@ -423,6 +424,8 @@ class BackupRoll :
                 cnt_xyz += 1
             xyz = np.append(xyz, [x, zt1])
             cnt_xyz += 1
+            if( i<ncf ):
+                self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             
         # Element D2->D1
         nd0 = cnt_temp -nd -1
@@ -466,8 +469,10 @@ class BackupRoll :
             nd0 = nd0 + 2*nc+nd-2
             nd1 = nd1 + 2*nc+nd-2
             elements = np.append(elements, [nd0,self.nbr[i],self.nbr[i+1],nd1])
-            
+            self.ndbottom = np.append(self.ndbottom, self.nbr[i])
+               
         cnt_temp = cnt_xyz
+        self.ndbottom = np.append(self.ndbottom, self.nbr[i+1])
             
         # right chamfer to right edge
         cx = 0.5*self.L1- self.chamfer[0]
@@ -488,6 +493,7 @@ class BackupRoll :
                 cnt_xyz += 1
             xyz = np.append(xyz, [x, zt1])
             cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             
         # Element::right chamfer to right edge
         nd0 = cnt_temp - (2*nc+nd)
@@ -513,6 +519,7 @@ class BackupRoll :
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
         # Nodes to left End
         for i in range(0,nlf+1):
@@ -521,8 +528,10 @@ class BackupRoll :
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
           #  self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         print("ndfix",self.ndfix)
+        print("ndbottom",self.ndbottom)
                
         # Element: L1 to left L2
         nd0 = cnt_temp - (nc+nd+1)
@@ -963,12 +972,15 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 
-fo.write("FIELD NODESET 2\n")
+fo.write("FIELD NODESET 3\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
 fo.write("IBOTTOM 1 "+str(len(iRoll.ndbottom)) + " int\n")
 for i in iRoll.ndbottom:
+    fo.write(str(i)+'\n')
+fo.write("BBOTTOM 1 "+str(len(bRoll.ndbottom)) + " int\n")
+for i in bRoll.ndbottom:
     fo.write(str(i)+'\n')
     
 fo.write("FIELD EDGESET 5\n")
