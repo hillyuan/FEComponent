@@ -13,7 +13,7 @@ namespace ROLLFEM2D
 			UY = 1 << 1,
 			UXY = UX | UY
 		};
-		std::string NSetName;    // node set name
+		std::string NSetName;   // node set name
 		std::size_t id_node;    // nodal index
 		Type type;
 		double val;
@@ -57,6 +57,13 @@ namespace ROLLFEM2D
 				type = 2;
 			}
 		};
+	};
+
+	// initial strain
+	struct InitStrain
+	{
+		std::string SetName;      // element set name
+		Eigen::Vector3d strain;   // strain value
 	};
 }
 

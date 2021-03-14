@@ -179,6 +179,29 @@ namespace ROLLFEM2D
 //		std::cout << loads << std::endl;
 	}
 
+	void CControl::ApplyInitialStrain()
+	{
+		Eigen::Matrix<double, 3, 3> D = mesh.materials[0].ElasticMatrix;
+		for (auto load : initstrain)
+		{
+			// consider edge pressure only
+			auto eleids = mesh.ElementSets[load.SetName];
+			for (int i = 0; i < eleids.size(); ++i)
+			{
+				CElement ele = mesh.elements[eleids[i]];
+				Eigen::Vector3d stress = D * load.strain;
+				auto force = stress.transpose()*ele.B;
+			//	loads(2 * nd0) += load.val * normal[0];
+			//	loads(2 * nd0 + 1) += load.val * normal[1];
+			//	loads(2 * nd1) += load.val * normal[0];
+			//	loads(2 * nd1 + 1) += load.val * normal[1];
+
+			}
+		}
+
+		//		std::cout << loads << std::endl;
+	}
+
 	void CControl::Solve()
 	{
 		Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver;

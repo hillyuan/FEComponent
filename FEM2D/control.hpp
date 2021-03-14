@@ -20,8 +20,10 @@ namespace ROLLFEM2D
 		std::vector< Constraint > constraints;
 		std::vector< CLoad > cloads;
 		std::vector< DLoad > dloads;
+		std::vector< InitStrain > initstrain;
 
 		Eigen::VectorXd displacements;
+		Eigen::VectorXd forces;
 
 		std::string outfile;
 		
@@ -34,6 +36,7 @@ namespace ROLLFEM2D
 		}
 		void ApplyConstraints();
 		void ApplyDistributedLoads();
+		void ApplyInitialStrain();
 		void Solve();
 		void Update()
 		{
