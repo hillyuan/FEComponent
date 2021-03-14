@@ -13,8 +13,8 @@ DLoad:
   - SSET : ELOAD
     Value : [-6.2e3]
   - SSET : WBENDD
-    Value : [-65.104]
+    Value : [-130.2083]
   - SSET : IBENDD
-    Value : [-71.875]
+    Value : [-143.75]
 Output File: "rollresult.vtk"
 ---

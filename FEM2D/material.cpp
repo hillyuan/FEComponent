@@ -6,36 +6,61 @@
 namespace ROLLFEM2D
 {
 	CMaterial::CMaterial(std::string& name, double& y, double& p)
-		: name(name), Youngs(y), Poission(p)
+		: name(name), Youngs(y), Poission(p), type(1)
 	{
 		lame_lambda = y*p/(1+p)/(1-2.0*p);
 		lame_mu = 0.5*y/(1+p);
 
-		ElasticMatrix(0,0) = lame_lambda + 2.0 * lame_mu;
-		ElasticMatrix(0,1) = lame_lambda;
-		ElasticMatrix(0,2) = 0.0;
-		ElasticMatrix(1,0) = lame_lambda;
-		ElasticMatrix(1,1) = ElasticMatrix(0,0);
-		ElasticMatrix(1,2) = 0.0;
-		ElasticMatrix(2,0) = 0.0;
-		ElasticMatrix(2,1) = 0.0;
-		ElasticMatrix(2,2) = lame_mu;
+		double cc = Youngs / (1.0 - Poission * Poission);
+		ElasticMatrix(0, 0) = cc;
+		ElasticMatrix(0, 1) = cc * Poission;
+		ElasticMatrix(0, 2) = 0.0;
+		ElasticMatrix(1, 0) = ElasticMatrix(0, 1);
+		ElasticMatrix(1, 1) = ElasticMatrix(0, 0);
+		ElasticMatrix(1, 2) = 0.0;
+		ElasticMatrix(2, 0) = 0.0;
+		ElasticMatrix(2, 1) = 0.0;
+		ElasticMatrix(2, 2) = 0.5 * Youngs / (1.0 + Poission);
 	}
 
-	void CMaterial::StressUpdate(double strain[3], double stress[3]) const
+	void CMaterial::buildElasticMatrix()
 	{
-		stress[0] = 2.0 * lame_mu * strain[0] + lame_lambda * (strain[0] + strain[1]);
-		stress[1] = 2.0 * lame_mu * strain[1] + lame_lambda * (strain[0] + strain[1]);
-		stress[2] = lame_mu * strain[2];
+		if (type == 0)
+		{
+			double cc = Youngs / (1.0 - Poission * Poission);
+			ElasticMatrix(0, 0) = cc;
+			ElasticMatrix(0, 1) = cc* Poission;
+			ElasticMatrix(0, 2) = 0.0;
+			ElasticMatrix(1, 0) = ElasticMatrix(0, 1);
+			ElasticMatrix(1, 1) = ElasticMatrix(0, 0);
+			ElasticMatrix(1, 2) = 0.0;
+			ElasticMatrix(2, 0) = 0.0;
+			ElasticMatrix(2, 1) = 0.0;
+			ElasticMatrix(2, 2) = 0.5 * Youngs / (1.0 + Poission);
+		}
+		else {
+			ElasticMatrix(0, 0) = lame_lambda + 2.0 * lame_mu;
+			ElasticMatrix(0, 1) = lame_lambda;
+			ElasticMatrix(0, 2) = 0.0;
+			ElasticMatrix(1, 0) = lame_lambda;
+			ElasticMatrix(1, 1) = ElasticMatrix(0, 0);
+			ElasticMatrix(1, 2) = 0.0;
+			ElasticMatrix(2, 0) = 0.0;
+			ElasticMatrix(2, 1) = 0.0;
+			ElasticMatrix(2, 2) = lame_mu;
+		}
+
+		std::cout << ElasticMatrix << std::endl;
 	}
+
 
 	Eigen::Vector3d CMaterial::StressUpdate(Eigen::Vector3d& strain) const
 	{
-		Eigen::Vector3d stress;
+		Eigen::Vector3d stress = ElasticMatrix * strain;
 
-		stress[0] = 2.0 * lame_mu * strain[0] + lame_lambda * (strain[0] + strain[1]);
-		stress[1] = 2.0 * lame_mu * strain[1] + lame_lambda * (strain[0] + strain[1]);
-		stress[2] = lame_mu * strain[2];
+	//	stress[0] = 2.0 * lame_mu * strain[0] + lame_lambda * (strain[0] + strain[1]);
+	//	stress[1] = 2.0 * lame_mu * strain[1] + lame_lambda * (strain[0] + strain[1]);
+	//	stress[2] = lame_mu * strain[2];
 
 		return stress;
 	}

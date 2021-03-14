@@ -38,6 +38,16 @@ namespace ROLLFEM2D
 			throw std::runtime_error("Material properties not defined!");
 		}
 
+		if (YAML::Node mtype = config["Problem Type"]) {
+			std::string tt = mtype.as<std::string>();
+			if (tt == "Plane Strain") {
+				for (auto matl : mesh.materials) {
+					matl.setType(1);
+					matl.buildElasticMatrix();
+				}
+			}
+		}
+
 		char* p;
 		if (YAML::Node bnd = config["Constraint"]) {
 			for (YAML::const_iterator it = bnd.begin(); it != bnd.end(); ++it) {
