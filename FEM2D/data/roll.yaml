@@ -17,4 +17,7 @@ DLoad:
   - SSET : IBENDD
     Value : [-143.75]
 Output File: "rollresult.vtk"
+CVS File:
+  - NSET: IBOTTOM
+    File Name: "introll.csv"
 ---

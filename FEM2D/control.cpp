@@ -100,6 +100,20 @@ namespace ROLLFEM2D
 			outfile = doc.as<std::string>();
 		}
 
+		if (YAML::Node cvsout = config["CVS File"]) {
+			int nn = -1;
+			for (YAML::const_iterator it = cvsout.begin(); it != cvsout.end(); ++it) {
+				const YAML::Node& dl = *it;
+				cvsfiles[++nn] = dl["File Name"].as<std::string>();
+				ndsets[nn] = dl["NSET"].as<std::string>();
+				if (mesh.NodeSets.find(ndsets[nn]) == mesh.NodeSets.end())
+				{
+					std::cout << "NodeSet:" << ndsets[nn] << " not found. CVS File ignored!\n";
+					ndsets[nn].clear();
+				}
+			}
+		}
+
 		loads.resize(2 * mesh.num_nodes);
 		loads.setZero();
 	};
@@ -271,6 +285,25 @@ namespace ROLLFEM2D
 		}
 
 		output.close();
+		return 0;
+	}
+
+	int CControl::CVSOutput() const
+	{
+		for (int i = 0; i < 3; ++i) {
+			std::string ndset = ndsets[i];
+			if (ndset.empty()) continue;
+			std::ofstream output(cvsfiles[i].c_str(), std::ios_base::out);
+			if (output.fail()) {
+				return -2;
+			}
+			std::vector<std::size_t> outnodes = mesh.NodeSets.at(ndset);
+			for (auto nd : outnodes) {
+				output << mesh.nodes[nd].x << "," << displacements(nd * 2 + 1) << std::endl;
+			}
+			output.close();
+		}
+
 		return 0;
 	}
 

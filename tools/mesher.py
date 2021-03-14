@@ -31,8 +31,9 @@ class IntermediateRoll :
     xbr = np.array([])             # output: x coordinates of support roll
     nbr = np.array([],dtype=int)   # output: node number of support roll
     
-    edbendU = np.array([],dtype=int) # output: loading edge group
-    edbendD = np.array([],dtype=int) # output: loading edge group
+    edbendU = np.array([],dtype=int)  # output: loading edge group
+    edbendD = np.array([],dtype=int)  # output: loading edge group
+    ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     n_nd = 0    # ouput: number of nodes 
     
@@ -73,11 +74,13 @@ class IntermediateRoll :
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         for i in range(1,nds):
             x = x0 +self.Lf+i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cnt_temp = cnt_xyz
 
         self.edbendU = np.append(self.edbendU, [0, 3] )                
@@ -124,6 +127,7 @@ class IntermediateRoll :
             for j in range(1,nd21+1):
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         
         # save above z-volue        
         z_value = np.array([])
@@ -221,6 +225,7 @@ class IntermediateRoll :
                 else:
                     xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             if( x>=xmr[0]+self.chamfer[0] and x<=self.pxw ):
                 self.xwr = np.append(self.xwr, x)
                 self.nwr = np.append(self.nwr, cnt_xyz-1)
@@ -251,6 +256,7 @@ class IntermediateRoll :
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cxpos = x  # current x position
         
         # first row of L22
@@ -274,6 +280,7 @@ class IntermediateRoll :
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
         cxpos = x  # current x position
                 
@@ -298,6 +305,9 @@ class IntermediateRoll :
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
+        print("ndbottom",self.ndbottom)
                 
         for i in range(0,ndf):
             nd0 = cnt_temp + (i-1)*(nd3+1)
@@ -326,7 +336,8 @@ class BackupRoll :
     xbr = np.array([])             # input: x coordinates of support roll
     nbr = np.array([],dtype=int)   # input: node number of support roll
     
-    ndfix = np.array([],dtype=int) # output: fixed node group
+    ndfix = np.array([],dtype=int)    # output: fixed node group
+    ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     def generate(self):
         global meshsize, xyz, elements
@@ -549,6 +560,7 @@ class WorkingRoll :
     edbendU = np.array([],dtype=int) # output: bending loading edge group
     edbendD = np.array([],dtype=int) # output: bending loading edge group
     edload = np.array([],dtype=int)  # output: loading edge group
+    ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     def generate(self):
         global meshsize, xyz, elements
@@ -951,9 +963,12 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 
-fo.write("FIELD NODESET 1\n")
+fo.write("FIELD NODESET 2\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
+    fo.write(str(i)+'\n')
+fo.write("IBOTTOM 1 "+str(len(iRoll.ndbottom)) + " int\n")
+for i in iRoll.ndbottom:
     fo.write(str(i)+'\n')
     
 fo.write("FIELD EDGESET 5\n")

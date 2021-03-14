@@ -26,7 +26,9 @@ namespace ROLLFEM2D
 		Eigen::VectorXd forces;
 
 		std::string outfile;
-		std::string cvsfile;
+		// cvs output file and ndset name
+		std::string ndsets[3];
+		std::string cvsfiles[3];
 		
 	public:
 		CControl::CControl(char* file);
@@ -45,6 +47,7 @@ namespace ROLLFEM2D
 		}
 
 		int VTKOutput() const;
+		int CVSOutput() const;
 	};
 }
 
