@@ -531,7 +531,6 @@ class BackupRoll :
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
           #  self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         print("ndfix",self.ndfix)
-        print("ndbottom",self.ndbottom)
                
         # Element: L1 to left L2
         nd0 = cnt_temp - (nc+nd+1)
@@ -606,11 +605,13 @@ class WorkingRoll :
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         for i in range(1,nds):
             x = x0 +self.Lf+i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cnt_temp = cnt_xyz
                
         for i in range(0,ndf+nds-1):
@@ -656,6 +657,7 @@ class WorkingRoll :
             for j in range(1,nd21+1):
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
         # save above z-volue        
         z_value = np.array([])
@@ -706,6 +708,7 @@ class WorkingRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         
         # load range to chamfer of inter roll        
         dl11 = meshsize
@@ -730,7 +733,8 @@ class WorkingRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
-        
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
         # Elements of L21 to L1
         nd0 = cnt_temp - 2*nd21 -nd3 -1
         nd1 = cnt_temp + ndd1
@@ -760,6 +764,7 @@ class WorkingRoll :
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [self.xbr[i], z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
          
         # first row of L1
         nd0 = cnt_temp - (2*ndd1+nz)
@@ -789,6 +794,7 @@ class WorkingRoll :
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
         # Element: L1 to L22
         nd0 = cnt_temp - (2*ndd1+nz-1)
@@ -812,12 +818,16 @@ class WorkingRoll :
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 #print(x, self.z0+0.5*self.D3-dd3*j)
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         for i in range(0,ndf+1):
             x = 0.5*self.L1 + self.L2 + self.L3- self.Lf +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
                 #print(x, self.z0+0.5*self.D3-dd3*j)
                 cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
+        print("ndbottom",self.ndbottom)
                 
         # Element: L32-L32f
         nd0 = cnt_temp - (nd3+nd21+1)
@@ -972,7 +982,7 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 
-fo.write("FIELD NODESET 3\n")
+fo.write("FIELD NODESET 4\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
@@ -981,6 +991,9 @@ for i in iRoll.ndbottom:
     fo.write(str(i)+'\n')
 fo.write("BBOTTOM 1 "+str(len(bRoll.ndbottom)) + " int\n")
 for i in bRoll.ndbottom:
+    fo.write(str(i)+'\n')
+fo.write("WBOTTOM 1 "+str(len(wRoll.ndbottom)) + " int\n")
+for i in wRoll.ndbottom:
     fo.write(str(i)+'\n')
     
 fo.write("FIELD EDGESET 5\n")

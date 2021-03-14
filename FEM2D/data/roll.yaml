@@ -20,4 +20,8 @@ Output File: "rollresult.vtk"
 CVS File:
   - NSET: IBOTTOM
     File Name: "introll.csv"
+  - NSET: BBOTTOM
+    File Name: "backroll.csv"
+  - NSET: WBOTTOM
+    File Name: "workroll.csv"
 ---
