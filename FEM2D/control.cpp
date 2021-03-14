@@ -89,77 +89,11 @@ namespace ROLLFEM2D
 		if (YAML::Node doc = config["Output File"]) {
 			outfile = doc.as<std::string>();
 		}
-		if (YAML::Node doc = config["Thickness Define"]) {
-			ThicknessDefine = doc.as<std::vector<double>>();
-		}
 
 		loads.resize(2 * mesh.num_nodes);
 		loads.setZero();
 	};
 
-	void CControl::ConstructElementThickness()
-	{
-		assert(ThicknessDefine.size() == 11);
-		double sy = ThicknessDefine[0];
-		double wD1 = 0.5*ThicknessDefine[1];
-		double wL1 = 0.5*ThicknessDefine[2];
-		double wD2 = 0.5*ThicknessDefine[3];
-		double iD1 = 0.5*ThicknessDefine[4];
-		double iL1 = 0.5*ThicknessDefine[5];
-		double iD2 = 0.5*ThicknessDefine[6];
-		double offset = ThicknessDefine[7];
-		double bD1 = 0.5*ThicknessDefine[8];
-		double bL1 = 0.5*ThicknessDefine[9];
-		double bD2 = 0.5*ThicknessDefine[10];
-		// inter roll
-		double dy;
-		Eigen::Vector2d center;
-		double cy = sy + wD1 + iD1;
-		for (int i = 0; i < mesh.n_iele; ++i)
-		{
-			center = mesh.getCenterCoord(i);
-			dy = center[1] - cy;
-			if( center[0]>-iL1+ offset && center[0] < iL1+ offset) // with diameter D1
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(iD1 * iD1 - dy * dy);
-			} else // with diameter D3
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(iD2 * iD2 - dy * dy);
-			}
-		}
-
-		// back roll
-		cy = cy + iD1 + bD1;
-		for (int i = mesh.n_iele; i < mesh.n_bele; ++i)
-		{
-			center = mesh.getCenterCoord(i);
-			dy = center[1] - cy;
-			if (center[0] > -bL1 && center[0] < bL1) // with diameter D1
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(bD1 * bD1 - dy * dy);
-			}
-			else // with diameter D3
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(bD2 * bD2 - dy * dy);
-			}
-		}
-
-		// work roll
-		for (int i = mesh.n_bele; i < mesh.n_wele; ++i)
-		{
-			center = mesh.getCenterCoord(i);
-			dy = center[1] - cy;
-			if (center[0] > -wL1 && center[0] < wL1) // with diameter D1
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(wD1 * wD1 - dy * dy);
-			}
-			else // with diameter D3
-			{
-				mesh.elements[i].thick = 2.0 * std::sqrt(wD2 * wD2 - dy * dy);
-			}
-		}
-
-	}
 
 	void CControl::ApplyConstraints()
 	{

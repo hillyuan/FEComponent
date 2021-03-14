@@ -25,12 +25,8 @@ namespace ROLLFEM2D
 		Eigen::VectorXd displacements;
 		Eigen::VectorXd forces;
 
-	private:
-		// contruct elements thickness
 		std::string outfile;
-		std::vector<double> ThicknessDefine;
-
-		void ConstructElementThickness();
+		std::string cvsfile;
 		
 	public:
 		CControl::CControl(char* file);
