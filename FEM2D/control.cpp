@@ -44,7 +44,7 @@ namespace ROLLFEM2D
 				int uxy = bnd["Type"].as<int>();
 				double val = bnd["Value"].as<double>();
 				std::string mname = bnd["NSET"].as<std::string>();
-				std::size_t num = strtol(mname.c_str(), &p, 10);
+				int num = strtol(mname.c_str(), &p, 10);
 				if(*p == 0) { 
 					Constraint cst(num, uxy, val);
 					constraints.emplace_back(cst);

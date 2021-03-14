@@ -14,7 +14,7 @@ namespace ROLLFEM2D
 			UXY = UX | UY
 		};
 		std::string NSetName;   // node set name
-		std::size_t id_node;    // nodal index
+		int id_node;    // nodal index
 		Type type;
 		double val;
 
@@ -23,7 +23,7 @@ namespace ROLLFEM2D
 		{
 			type = static_cast<Type>(t);
 		};
-		Constraint(std::size_t& id, int& t, double& v)
+		Constraint(int& id, int& t, double& v)
 			: id_node(id), val(v)
 		{
 			type = static_cast<Type>(t);
