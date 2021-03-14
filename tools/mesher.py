@@ -990,10 +990,10 @@ for i in range(0,n_load):
 fo.write("FIELD ThicknessBuilder 2\n")
 fo.write("ELECOUNT 3 1 int\n")
 fo.write(str(iRoll.gele0)+' '+str(bRoll.gele0)+' '+str(wRoll.gele0) + '\n')
-fo.write("RollShape 12 1 double\n")
+fo.write("RollShape 13 1 double\n")
 fo.write(str(0.0)+' '+str(wRoll.D1)+' '+str(wRoll.L1+2*wRoll.L2)+' '+str(wRoll.D3)  \
-         +' '+str(iRoll.D1) +' '+str(iRoll.L21) +' '+str(iRoll.L22) +' '+str(iRoll.D3) \
-         +' '+str(iRoll.offset) +' '+str(bRoll.D1)+' '+str(bRoll.L1)+' ' \
-         +str(bRoll.D2)+ '\n')
+         +' '+str(iRoll.D1) +' '+str(iRoll.L1) +' '+str(iRoll.L21) +' '+str(iRoll.L22)  \
+         +' '+str(iRoll.D3) +' '+str(iRoll.offset) +' '+str(bRoll.D1)+' '+str(bRoll.L1) \
+         +' '+str(bRoll.D2)+ '\n')
 
 fo.close()

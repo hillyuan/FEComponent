@@ -123,7 +123,7 @@ namespace ROLLFEM2D
 		}
 		input.close();
 
-		//print_elements(std::cout);
+		ConstructElementThickness();
 
 		return 0;
 	}
@@ -153,12 +153,12 @@ namespace ROLLFEM2D
 
 	Eigen::Vector2d CMesh::getCenterCoord(const std::size_t& ele) const
 	{
-		Eigen::Vector2d center;
+		Eigen::Vector2d center(0.0,0.0);
 		for (std::size_t i = 0; i < 4; i++)
 		{
 			auto nd = elements[ele].index_nd[i];
-			center[0] += nodes[nd].x;
-			center[1] += nodes[nd].y;
+			center(0) += nodes[nd].x;
+			center(1) += nodes[nd].y;
 		}
 		center *= 0.25;
 		return center;
@@ -166,18 +166,20 @@ namespace ROLLFEM2D
 
 	void CMesh::ConstructElementThickness()
 	{
-		assert(ThicknessDefine.size() == 11);
+		assert(ThicknessDefine.size() == 13);
 		double sy = ThicknessDefine[0];
 		double wD1 = 0.5 * ThicknessDefine[1];
 		double wL1 = 0.5 * ThicknessDefine[2];
 		double wD2 = 0.5 * ThicknessDefine[3];
 		double iD1 = 0.5 * ThicknessDefine[4];
 		double iL1 = 0.5 * ThicknessDefine[5];
-		double iD2 = 0.5 * ThicknessDefine[6];
-		double offset = ThicknessDefine[7];
-		double bD1 = 0.5 * ThicknessDefine[8];
-		double bL1 = 0.5 * ThicknessDefine[9];
-		double bD2 = 0.5 * ThicknessDefine[10];
+		double iL21 = ThicknessDefine[6];
+		double iL22 = ThicknessDefine[7];
+		double iD2 = 0.5 * ThicknessDefine[8];
+		double offset = ThicknessDefine[9];
+		double bD1 = 0.5 * ThicknessDefine[10];
+		double bL1 = 0.5 * ThicknessDefine[11];
+		double bD2 = 0.5 * ThicknessDefine[12];
 		// inter roll
 		double dy;
 		Eigen::Vector2d center;
@@ -185,8 +187,8 @@ namespace ROLLFEM2D
 		for (int i = 0; i < n_iele; ++i)
 		{
 			center = getCenterCoord(i);
-			dy = center[1] - cy;
-			if (center[0] > -iL1 + offset && center[0] < iL1 + offset) // with diameter D1
+			dy = center(1) - cy;
+			if (center(0) > -iL1 -iL21 + offset && center(0) < iL1 + iL22+offset) // with diameter D1
 			{
 				elements[i].thick = 2.0 * std::sqrt(iD1 * iD1 - dy * dy);
 			}
@@ -201,8 +203,8 @@ namespace ROLLFEM2D
 		for (int i = n_iele; i < n_bele; ++i)
 		{
 			center = getCenterCoord(i);
-			dy = center[1] - cy;
-			if (center[0] > -bL1 && center[0] < bL1) // with diameter D1
+			dy = center(1) - cy;
+			if (center(0) > -bL1 && center(0) < bL1) // with diameter D1
 			{
 				elements[i].thick = 2.0 * std::sqrt(bD1 * bD1 - dy * dy);
 			}
@@ -213,11 +215,12 @@ namespace ROLLFEM2D
 		}
 
 		// work roll
+		cy = sy;
 		for (int i = n_bele; i < n_wele; ++i)
 		{
 			center = getCenterCoord(i);
-			dy = center[1] - cy;
-			if (center[0] > -wL1 && center[0] < wL1) // with diameter D1
+			dy = center(1) - cy;
+			if (center(0) > -wL1 && center(0) < wL1) // with diameter D1
 			{
 				elements[i].thick = 2.0 * std::sqrt(wD1 * wD1 - dy * dy);
 			}
