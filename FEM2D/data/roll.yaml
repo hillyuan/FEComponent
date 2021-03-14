@@ -17,4 +17,5 @@ DLoad:
   - SSET : IBENDD
     Value : [-71.875]
 Output File: "rollresult.vtk"
+Thickness Define: [0.0,272.07,1100.0,160.0,339.23,1100.0,190.0,25.0,910.78,1040.0,550.0]
 ---

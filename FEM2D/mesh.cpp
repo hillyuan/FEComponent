@@ -14,12 +14,13 @@ namespace ROLLFEM2D
 		}
 
 		std::string line;
-		std::string dummy, name, dtype;
+		std::string dummy, name, dtype, numtype;
 		std::istringstream tokenizer;
 
 		double dummyz;
 		int ng, nn, mm;
-		std::size_t n1, n2;
+		std::size_t nnn[100];
+		double mmm[100];
 		std::vector<std::size_t> index;
 		std::vector<CEdge> edges;
 
@@ -55,6 +56,7 @@ namespace ROLLFEM2D
 					tokenizer.clear();
 					tokenizer >> dummy >> elements[i].index_nd[0] >> elements[i].index_nd[1]
 					          >> elements[i].index_nd[2] >> elements[i].index_nd[3];
+					elements[i].thick = 1.0;  // default value
 				}
 				std::getline(input, line);
 			}
@@ -68,7 +70,7 @@ namespace ROLLFEM2D
 					std::cout << line << std::endl;
 					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 					tokenizer.clear();
-					tokenizer >> name >> mm >> nn >> dummy;
+					tokenizer >> name >> mm >> nn >> numtype;
 					index.clear();
 					edges.clear();
 					for (unsigned int j = 0; j < nn; ++j) {
@@ -76,13 +78,23 @@ namespace ROLLFEM2D
 						tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 						tokenizer.clear();
 						if (mm == 2) {   // surface set
-							tokenizer >> n1 >> n2;
-							CEdge edge(n1, n2);
+							tokenizer >> nnn[0] >> nnn[1];
+							CEdge edge(nnn[0], nnn[1]);
 							edges.emplace_back(edge);
 						}
+						else if (mm == 1) {
+							tokenizer >> nnn[0];
+							index.emplace_back(nnn[0]);
+						}
 						else {
-							tokenizer >> n1;
-							index.emplace_back(n1);
+							for (unsigned int k = 0; k < mm; ++k) tokenizer >> nnn[k];
+						}
+						if (dtype == "ThicknessBuilder") {
+							if (name == "ELECOUNT") {
+								n_iele = nnn[0];
+								n_bele = nnn[1];
+								n_wele = nnn[2];
+							}
 						}
 					}
 					if( dtype=="NODESET")
@@ -91,6 +103,7 @@ namespace ROLLFEM2D
 						ElementSets.insert(std::make_pair(name, index));
 					else if(dtype=="EDGESET")
 						SideSets.insert(std::make_pair(name, edges));
+
 				}
 				std::getline(input, line);
 			}
@@ -128,6 +141,19 @@ namespace ROLLFEM2D
 		}
 	}
 
+	Eigen::Vector2d CMesh::getCenterCoord(const std::size_t& ele) const
+	{
+		Eigen::Vector2d center;
+		for (std::size_t i = 0; i < 4; i++)
+		{
+			auto nd = elements[ele].index_nd[i];
+			center[0] += nodes[nd].x;
+			center[1] += nodes[nd].y;
+		}
+		center *= 0.25;
+		return center;
+	}
+
 	void CMesh::calElementalStiffMatrix(const std::size_t& ele, std::array<T,64>& triplets)
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
@@ -140,7 +166,6 @@ namespace ROLLFEM2D
 			ecoord(0,i) = nodes[nd].x;
 			ecoord(1,i) = nodes[nd].y;
 		}
-	//	std::cout << "ecood:" << ecoord << std::endl;
 
 		Eigen::Vector2d lcoord;
 		Eigen::Matrix<double, 8, 8> K = Eigen::Matrix<double, 8, 8>::Zero();
@@ -149,7 +174,7 @@ namespace ROLLFEM2D
 			Eigen::Matrix<double, 4, 2> spderiv = CQuadrature::ShapeDerivs[npg];
 			Jac = ecoord * spderiv;
 			auto inv = Jac.inverse();
-			double wg = CQuadrature::weights[npg] * Jac.determinant();
+			double wg = CQuadrature::weights[npg] * Jac.determinant() * elements[ele].thick;
 			auto gderiv = spderiv * inv;
 			for (std::size_t i = 0; i < 4; i++)
 			{

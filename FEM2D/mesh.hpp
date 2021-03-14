@@ -37,6 +37,8 @@ namespace ROLLFEM2D
 		std::vector<CElement>      elements;
 		std::vector<CMaterial>     materials;
 
+		std::size_t n_wele, n_iele, n_bele;
+
 		std::map< std::string, std::vector<std::size_t> > NodeSets;
 		std::map< std::string, std::vector<std::size_t> > ElementSets;
 		std::map< std::string, std::vector<CEdge> >       SideSets;
@@ -44,6 +46,7 @@ namespace ROLLFEM2D
 		int readin(const char *);
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
+		Eigen::Vector2d getCenterCoord(const std::size_t& ele) const;
 
 		void calElementalStiffMatrix (const std::size_t&, std::array<T,64> & triplets);
 		void calGlobalStiffMatrix(Eigen::SparseMatrix<double>&);

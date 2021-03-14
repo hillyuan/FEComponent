@@ -21,6 +21,7 @@ class IntermediateRoll :
     z0 = 0.0    # z-coordiante of center
     chamfer = np.array([])
     gnd0 = 0    # start node number
+    gele0 = 0   # start element number
     pxb = 0.0   # x position of L1 - chamfer of backup roll 
     pxw = 0.0   # x position of L1 of working roll 
     Rload = 0.0 # range of load upon working rool
@@ -319,6 +320,7 @@ class BackupRoll :
     chamfer = np.array([])
     z0 = 0.0                       # z-coordiante of center
     gnd0 = 0                       # start node number 
+    gele0 = 0                      # start element number
     n_nd = 0                       # ouput: number of nodes 
     
     xbr = np.array([])             # input: x coordinates of support roll
@@ -536,6 +538,7 @@ class WorkingRoll :
     Lf = 0.0                       # Length of constrained edge
     z0 = 0.0                       # z-coordiante of center
     gnd0 = 0                       # start node number 
+    gele0 =0                       # start element number
     n_nd = 0                       # ouput: number of nodes 
     xb = 0.0                       # start position of inter roll
     Rload = 0.0                    # range of load upon working rool
@@ -908,12 +911,16 @@ iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
 iRoll.pxw = 0.5*wRoll.L1
 iRoll.z0 = zw + 0.5*wRoll.D1 + 0.5*iRoll.D1
 iRoll.generate()
+n_element = int(len(elements)/4)
+iRoll.gele0 = n_element
 
 bRoll.gnd0 = iRoll.n_nd
 bRoll.xbr = iRoll.xbr
 bRoll.nbr = iRoll.nbr
 bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
 bRoll.generate()
+n_element = int(len(elements)/4)
+bRoll.gele0 = n_element
 
 wRoll.gnd0 = iRoll.n_nd + bRoll.n_nd
 wRoll.z0 = zw
@@ -921,6 +928,8 @@ wRoll.xb = 0.5*iRoll.L1 - iRoll.offset
 wRoll.xbr = iRoll.xwr
 wRoll.nbr = iRoll.nwr
 wRoll.generate()
+n_element = int(len(elements)/4)
+wRoll.gele0 = n_element
 
 ## Output ##
 fo.write("# vtk DataFile Version 4.0\n")
@@ -977,5 +986,9 @@ sload = iRoll.edbendU.reshape(n_load,2)
 fo.write("IBENDU 2 "+str(n_load) + " int\n")
 for i in range(0,n_load):
     fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+    
+fo.write("FIELD ThicknessBuilder 1\n")
+fo.write("ELECOUNT 3 1 int\n")
+fo.write(str(iRoll.gele0)+' '+str(bRoll.gele0)+' '+str(wRoll.gele0) + '\n')
 
 fo.close()

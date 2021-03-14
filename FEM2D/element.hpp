@@ -26,6 +26,7 @@ namespace ROLLFEM2D
 	{
 	public:
 		int matl_id;
+		double thick;
 		std::size_t index_nd[4];
 
 		Eigen::Matrix<double, 3, 8> B;
