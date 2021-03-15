@@ -95,6 +95,7 @@ namespace ROLLFEM2D
 								index.emplace_back(nnn[0]);
 							}
 							else {
+								// haven't use this
 								for (unsigned int k = 0; k < mm; ++k) tokenizer >> nnn[k];
 							}
 						}
