@@ -425,6 +425,9 @@ class BackupRoll :
             nd1 = nd0 + nd+1
             for j in range(0,nd):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
               
         # D1-D2
         msc = meshsize
@@ -469,6 +472,9 @@ class BackupRoll :
         nd1 = cnt_temp + nc
         for j in range(0,nd):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             
         # Element D1 to first chamfer
         for i in range(0,ncf):
@@ -476,6 +482,9 @@ class BackupRoll :
             nd1 = nd0 + 2*nc+nd+1
             for j in range(0,2*nc+nd):
                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+               cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+               r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+               elethick = np.append(elethick, r)
         ce = len(elements)
         elements[ce-2] = self.nbr[0]
         xyz = np.delete(xyz, [2*cnt_xyz - 1, 2*cnt_xyz-2])
@@ -503,9 +512,15 @@ class BackupRoll :
             nd1 = nd0 + 2*nc+nd
             for j in range(0,2*nc+nd-1):
                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+               cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+               r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+               elethick = np.append(elethick, r)
             nd0 = nd0 + 2*nc+nd-2
             nd1 = nd1 + 2*nc+nd-2
             elements = np.append(elements, [nd0,self.nbr[i],self.nbr[i+1],nd1])
+            cy = 0.25*( xyz[2*nd0+1] + xyz[2*self.nbr[i]+1] + xyz[2*self.nbr[i+1]+1] + xyz[2*nd1+1] )
+            r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             self.ndbottom = np.append(self.ndbottom, self.nbr[i])
                
         cnt_temp = cnt_xyz
@@ -538,15 +553,24 @@ class BackupRoll :
         print(nd0,nd1)
         for j in range(0,2*nc+nd-1):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
         nd0 = nd0 + 2*nc+nd-1
         nd1 = nd1 + 2*nc+nd-1
         elements = np.append(elements, [nd0,self.nbr[nx-1],nd1+1,nd1])
+        cy = 0.25*( xyz[2*nd0+1] + xyz[2*self.nbr[nx-1]+1] + xyz[2*(nd1+1)+1] + xyz[2*nd1+1] )
+        r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+        elethick = np.append(elethick, r)
 
         for i in range(0,ncf-1):
             nd0 = cnt_temp + i*(2*nc+nd+1)
             nd1 = nd0 + 2*nc+nd+1
             for j in range(0,2*nc+nd):
                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+               cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+               r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+               elethick = np.append(elethick, r)
                
         cnt_temp = cnt_xyz
         
@@ -574,6 +598,9 @@ class BackupRoll :
         nd1 = cnt_temp
         for j in range(0,nd):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             
         # Element to left end
         for i in range(0,nlf+nl-1):
@@ -581,6 +608,9 @@ class BackupRoll :
             nd1 = nd0 + nd+1
             for j in range(0,nd):
                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+               cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+               r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+               elethick = np.append(elethick, r)
                
         self.n_nd = cnt_xyz - self.gnd0
                
@@ -658,6 +688,9 @@ class WorkingRoll :
                 self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             if( i<ndf ):
                 self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
             
@@ -695,6 +728,11 @@ class WorkingRoll :
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
+        for j in range(0,nd3):
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
                 
         # save above z-volue        
         z_value = np.array([])
@@ -710,7 +748,10 @@ class WorkingRoll :
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,2*nd21+nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-                
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
+                    
         cnt_temp = cnt_xyz
         
         # division along radius direction of L1
@@ -777,6 +818,9 @@ class WorkingRoll :
         nd1 = cnt_temp + ndd1
         for j in range(0,nd3+2*nd21):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             
         # Element to chamfer of inter roll
         for i in range(0,ndl11+ndl12-1):
@@ -784,6 +828,9 @@ class WorkingRoll :
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             if( i>=ndl11 ):
                 self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
         print("ndl",ndl11,ndl12)
@@ -807,10 +854,16 @@ class WorkingRoll :
         nd0 = cnt_temp - (2*ndd1+nz)
         nd1 = nd0 + 2*ndd1+nz
         elements = np.append(elements, [nd0,nd0+1,nd1,self.nbr[0]])
+        cy = 0.25*( xyz[2*nd0+1] + xyz[2*(nd0+1)+1] + xyz[2*nd1+1] + xyz[2*self.nbr[0]+1] )
+        r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+        elethick = np.append(elethick, r)
         for i in range(0,len(self.nbr)-1):
             nd0 = cnt_temp + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
             elements = np.append(elements, [self.nbr[i],nd0,nd1,self.nbr[i+1]])
+            cy = 0.25*( xyz[2*self.nbr[i]+1] + xyz[2*nd0+1] + xyz[2*nd1+1] + xyz[2*self.nbr[i+1]+1] )
+            r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
         
         # ramins row of L1
         for i in range(0,len(self.nbr)):
@@ -818,6 +871,9 @@ class WorkingRoll :
             nd1 = nd0 + (2*ndd1+nz-1)
             for j in range(0,2*ndd1+nz-2):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             if( i<=len(self.nbr)-ndl11-ndl12 ):
                 self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
                 
@@ -838,6 +894,9 @@ class WorkingRoll :
         nd1 = cnt_temp
         for j in range(0,nz-1):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
         
         #Element: L22
         for i in range(1,ndlf):
@@ -845,6 +904,9 @@ class WorkingRoll :
             nd1 = nd0 + nz
             for j in range(0,nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
                 
         cnt_temp = cnt_xyz
                 
@@ -871,6 +933,9 @@ class WorkingRoll :
         nd1 = cnt_temp
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             
         # Element: L32f
         for i in range(1,ndf+nds):
@@ -880,6 +945,9 @@ class WorkingRoll :
                 self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             if( i>=nds ):
                 self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
         print("edbendU", self.edbendU )
@@ -1073,5 +1141,11 @@ fo.write(str(0.0)+' '+str(wRoll.D1)+' '+str(wRoll.L1+2*wRoll.L2)+' '+str(wRoll.D
          +' '+str(iRoll.D1) +' '+str(iRoll.L1) +' '+str(iRoll.L21) +' '+str(iRoll.L22)  \
          +' '+str(iRoll.D3) +' '+str(iRoll.offset) +' '+str(bRoll.D1)+' '+str(bRoll.L1) \
          +' '+str(bRoll.D2)+ '\n')
+
+fo.write("CELL_DATA "+str(n_element) + "\n")
+fo.write("SCALARS cell_thickness float 1\n")
+fo.write("LOOKUP_TABLE default\n")
+for i in range(0,n_element):
+    fo.write(str(elethick[i]) +'\n')
 
 fo.close()
