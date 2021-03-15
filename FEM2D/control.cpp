@@ -296,15 +296,24 @@ namespace ROLLFEM2D
 		output << "CELL_DATA " << mesh.num_elements << std::endl;
 		output << "SCALARS Strain double 3" << std::endl;
 		output << "LOOKUP_TABLE default" << std::endl;
+		Eigen::Vector3d ss;
 		for (int i = 0; i < mesh.num_elements; ++i) {
-			output << mesh.elements[i].strain[0][0] << " " << mesh.elements[i].strain[0][1] 
-				<< " " << mesh.elements[i].strain[0][2] << std::endl;
+			ss.setZero();
+			for (int j = 0; j < 4; ++j) {
+				ss += mesh.elements[i].strain[j];
+			}
+			ss *= 0.25;
+			output << ss[0] << " " << ss[1] << " " << ss[2] << std::endl;
 		}
 		output << "SCALARS Stress double 3" << std::endl;
 		output << "LOOKUP_TABLE default" << std::endl;
 		for (int i = 0; i < mesh.num_elements; ++i) {
-			output << mesh.elements[i].stress[0][0] << " " << mesh.elements[i].stress[0][1]
-				<< " " << mesh.elements[i].stress[0][2] << std::endl;
+			ss.setZero();
+			for (int j = 0; j < 4; ++j) {
+				ss += mesh.elements[i].stress[j];
+			}
+			ss *= 0.25;
+			output << ss[0] << " " << ss[1] << " " << ss[2] << std::endl;
 		}
 
 		output.close();

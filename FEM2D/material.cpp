@@ -40,11 +40,6 @@ namespace ROLLFEM2D
 	Eigen::Vector3d CMaterial::StressUpdate(Eigen::Vector3d& strain) const
 	{
 		Eigen::Vector3d stress = ElasticMatrix * strain;
-
-	//	stress[0] = 2.0 * lame_mu * strain[0] + lame_lambda * (strain[0] + strain[1]);
-	//	stress[1] = 2.0 * lame_mu * strain[1] + lame_lambda * (strain[0] + strain[1]);
-	//	stress[2] = lame_mu * strain[2];
-
 		return stress;
 	}
 
