@@ -16,6 +16,7 @@ namespace ROLLFEM2D
 		double lame_mu;
 		double Youngs;
 		double Poission;
+		double density;
 		
 	public:
 		CMaterial(int pbtype, std::string&, double&, double&);

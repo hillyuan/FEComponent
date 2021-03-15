@@ -6,7 +6,7 @@
 namespace ROLLFEM2D
 {
 	CMaterial::CMaterial(int pbtype, std::string& name, double& y, double& p)
-		: name(name), Youngs(y), Poission(p), type(pbtype)
+		: name(name), Youngs(y), Poission(p), type(pbtype), density(0.0)
 	{
 		lame_lambda = y*p/(1+p)/(1-2.0*p);
 		lame_mu = 0.5*y/(1+p);

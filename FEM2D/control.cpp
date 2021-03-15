@@ -104,7 +104,7 @@ namespace ROLLFEM2D
 				auto nset = dl["NSET"].as<std::string>();
 				if (mesh.NodeSets.find(nset) == mesh.NodeSets.end())
 				{
-					std::cout << "NodeSet:" << nset << " not found. CVS File ignored!\n";
+					std::cout << "NodeSet:" << nset << " not found. CSV File ignored!\n";
 				}
 				else {
 					cvsout myout(fname, nset, outype);
