@@ -92,22 +92,23 @@ namespace ROLLFEM2D
 		}
 
 		outfile = "out.vtk";
-		if (YAML::Node doc = config["Output File"]) {
+		if (YAML::Node doc = config["VTK File"]) {
 			outfile = doc.as<std::string>();
 		}
 
-		if (YAML::Node cvsout = config["CVS File"]) {
-			int nn = -1;
-			for (YAML::const_iterator it = cvsout.begin(); it != cvsout.end(); ++it) {
+		if (YAML::Node csvdef = config["CSV File"]) {
+			for (YAML::const_iterator it = csvdef.begin(); it != csvdef.end(); ++it) {
 				const YAML::Node& dl = *it;
 				auto fname = dl["File Name"].as<std::string>();
-				cvsfiles[++nn] = fname;
+				auto outype = dl["TYPE"].as<std::string>();
 				auto nset = dl["NSET"].as<std::string>();
-				ndsets[nn] = nset;
-				if (mesh.NodeSets.find(ndsets[nn]) == mesh.NodeSets.end())
+				if (mesh.NodeSets.find(nset) == mesh.NodeSets.end())
 				{
-					std::cout << "NodeSet:" << ndsets[nn] << " not found. CVS File ignored!\n";
-					ndsets[nn].clear();
+					std::cout << "NodeSet:" << nset << " not found. CVS File ignored!\n";
+				}
+				else {
+					cvsout myout(fname, nset, outype);
+					cvsouts.emplace_back(myout);
 				}
 			}
 		}
@@ -312,16 +313,21 @@ namespace ROLLFEM2D
 
 	int CControl::CSVOutput() const
 	{
-		for (int i = 0; i < 3; ++i) {
-			std::string ndset = ndsets[i];
-			if (ndset.empty()) continue;
-			std::ofstream output(cvsfiles[i].c_str(), std::ios_base::out);
+		for (auto csv : cvsouts) {
+			std::ofstream output(csv.fname.c_str(), std::ios_base::out);
 			if (output.fail()) {
 				return -2;
 			}
-			std::vector<std::size_t> outnodes = mesh.NodeSets.at(ndset);
-			for (auto nd : outnodes) {
-				output << mesh.nodes[nd].x << "," << displacements(nd * 2 + 1) << std::endl;
+			std::vector<std::size_t> outnodes = mesh.NodeSets.at(csv.ndset);
+			output << "#Output of " << csv.type << " of nodeset " << csv.ndset << std::endl;
+			if (csv.type == "y-disp") {
+				for (auto nd : outnodes) {
+					output << mesh.nodes[nd].x << "," << displacements(nd * 2 + 1) << std::endl;
+				}
+			} else if (csv.type == "y-force") {
+				for (auto nd : outnodes) {
+					output << mesh.nodes[nd].x << "," << forces(nd * 2 + 1) << std::endl;
+				}
 			}
 			output.close();
 		}

@@ -16,12 +16,18 @@ DLoad:
     Value : [-130.2083]
   - SSET : IBENDD
     Value : [-143.75]
-Output File: "rollresult.vtk"
-CVS File:
+VTK File: "rollresult.vtk"
+CSV File:
   - NSET: IBOTTOM
     File Name: "introll.csv"
+    TYPE: y-disp
   - NSET: BBOTTOM
     File Name: "backroll.csv"
+    TYPE: y-disp
   - NSET: WBOTTOM
     File Name: "workroll.csv"
+    TYPE: y-disp
+  - NSET: NFIX
+    File Name: "bforce.csv"
+    TYPE: y-force
 ---

@@ -9,6 +9,16 @@
 
 namespace ROLLFEM2D
 {
+	struct cvsout
+	{
+		std::string fname;
+		std::string ndset;
+		std::string type;
+
+		cvsout(std::string& name, std::string nd, std::string& t)
+			: fname(name), ndset(nd), type(t)
+		{};
+	};
 
 	class CControl
 	{
@@ -26,9 +36,7 @@ namespace ROLLFEM2D
 		Eigen::VectorXd forces;
 
 		std::string outfile;
-		// cvs output file and ndset name
-		std::string ndsets[3];
-		std::string cvsfiles[3];
+		std::vector<cvsout> cvsouts;
 		
 	public:
 		CControl::CControl() {};
