@@ -18,14 +18,9 @@ namespace ROLLFEM2D
 		double Poission;
 		
 	public:
-		CMaterial(std::string&, double&, double&);
+		CMaterial(int pbtype, std::string&, double&, double&);
 
 		Eigen::Matrix<double, 3, 3> ElasticMatrix;
-		void buildElasticMatrix();
-		void setType(int t)
-		{
-			type = t;
-		}
 		Eigen::Vector3d StressUpdate(Eigen::Vector3d&) const;
 
 		void print(std::ostream& os) const;

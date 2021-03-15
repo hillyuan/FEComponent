@@ -15,6 +15,13 @@ namespace ROLLFEM2D
 		}
 
 		YAML::Node config = YAML::LoadFile(file);
+
+		int pbtype = 0;
+		if (YAML::Node mtype = config["Problem Type"]) {
+			std::string tt = mtype.as<std::string>();
+			if (tt == "Plane Strain") pbtype = 1;
+		}
+
 		if (YAML::Node doc = config["Mesh File"]) {
 			const std::string filename = config["Mesh File"].as<std::string>();
 			mesh.readin(filename.c_str());
@@ -29,23 +36,13 @@ namespace ROLLFEM2D
 				double youngs = matls["Youngs Modulus"].as<double>();
 				double poisson = matls["Poisson Ratio"].as<double>();
 				std::string mname = matls["Name"].as<std::string>();
-				CMaterial matl(mname, youngs, poisson);
+				CMaterial matl(pbtype, mname, youngs, poisson);
 				mesh.materials.emplace_back(matl);
 				matl.print(std::cout);
 			}
 		}
 		else {
 			throw std::runtime_error("Material properties not defined!");
-		}
-
-		if (YAML::Node mtype = config["Problem Type"]) {
-			std::string tt = mtype.as<std::string>();
-			if (tt == "Plane Strain") {
-				for (auto matl : mesh.materials) {
-					matl.setType(1);
-					matl.buildElasticMatrix();
-				}
-			}
 		}
 
 		char* p;
