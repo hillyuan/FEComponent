@@ -163,6 +163,7 @@ namespace ROLLFEM2D
 	{
 		Eigen::Matrix<double, 2, 4> ecoord;
 		Eigen::Matrix<double, 2, 2> Jac;
+		Eigen::Matrix<double, 3, 8> B;
 		int imatl = elements[ele].matl_id;
 
 		for (std::size_t i = 0; i<4; i++ )
@@ -183,14 +184,16 @@ namespace ROLLFEM2D
 			auto gderiv = spderiv * inv;
 			for (std::size_t i = 0; i < 4; i++)
 			{
-				elements[ele].B(0, 2 * i) = gderiv(i, 0);
-				elements[ele].B(0, 2 * i + 1) = 0.0;
-				elements[ele].B(1, 2 * i) = 0.0;
-				elements[ele].B(1, 2 * i + 1) = gderiv(i, 1);
-				elements[ele].B(2, 2 * i) = gderiv(i, 1);
-				elements[ele].B(2, 2 * i + 1) = gderiv(i, 0);
+				B(0, 2 * i) = gderiv(i, 0);
+				B(0, 2 * i + 1) = 0.0;
+				B(1, 2 * i) = 0.0;
+				B(1, 2 * i + 1) = gderiv(i, 1);
+				B(2, 2 * i) = gderiv(i, 1);
+				B(2, 2 * i + 1) = gderiv(i, 0);
 			}
-			K += wg * (elements[ele].B).transpose() * materials[imatl].ElasticMatrix * elements[ele].B;
+			K += wg * B.transpose() * materials[imatl].ElasticMatrix * B;
+			elements[ele].wg[npg] = wg;
+			elements[ele].B[npg] = B;
 		}
 
 	//	std::cout << K << std::endl;
@@ -251,7 +254,7 @@ namespace ROLLFEM2D
 
 			for (std::size_t npg = 0; npg < 4; npg++)
 			{
-				elements[ele].strain[npg] = elements[ele].B * disp;
+				elements[ele].strain[npg] = elements[ele].B[npg] * disp;
 				elements[ele].stress[npg] = materials[imatl].StressUpdate(elements[ele].strain[npg]);
 			}
 		}

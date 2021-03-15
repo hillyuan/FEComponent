@@ -66,6 +66,18 @@ namespace ROLLFEM2D
 		return weight;
 	}
 
+	Eigen::Vector<double, 8> CElement::calNodalForce() const
+	{
+		Eigen::Vector<double, 8> force;
+		force.setZero();
+
+		for (std::size_t npg = 0; npg < 4; npg++)
+		{
+			force += wg[npg] * stress[npg].transpose() * B[npg];
+		}
+		return force;
+	}
+
 	const Eigen::Matrix<double, 4, 2> CQuadrature::qp_coords = make_quadrature();
 	const Eigen::Vector4d CQuadrature::weights = make_weights();
 	const std::array<Eigen::Matrix<double, 4, 2>, 4> CQuadrature::ShapeDerivs = make_ShapeDerivs();

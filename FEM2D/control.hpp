@@ -42,9 +42,11 @@ namespace ROLLFEM2D
 		void ApplyDistributedLoads();
 		void ApplyInitialStrain();
 		void Solve();
+		void calEquivalentNodalForce();
 		void Update()
 		{
 			mesh.updateElements(displacements);
+			calEquivalentNodalForce();
 		}
 
 		int VTKOutput() const;

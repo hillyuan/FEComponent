@@ -100,8 +100,10 @@ namespace ROLLFEM2D
 			int nn = -1;
 			for (YAML::const_iterator it = cvsout.begin(); it != cvsout.end(); ++it) {
 				const YAML::Node& dl = *it;
-				cvsfiles[++nn] = dl["File Name"].as<std::string>();
-				ndsets[nn] = dl["NSET"].as<std::string>();
+				auto fname = dl["File Name"].as<std::string>();
+				cvsfiles[++nn] = fname;
+				auto nset = dl["NSET"].as<std::string>();
+				ndsets[nn] = nset;
 				if (mesh.NodeSets.find(ndsets[nn]) == mesh.NodeSets.end())
 				{
 					std::cout << "NodeSet:" << ndsets[nn] << " not found. CVS File ignored!\n";
@@ -112,6 +114,8 @@ namespace ROLLFEM2D
 
 		loads.resize(2 * mesh.num_nodes);
 		loads.setZero();
+		forces.resize(2 * mesh.num_nodes);
+		forces.setZero();
 	};
 
 
@@ -212,7 +216,7 @@ namespace ROLLFEM2D
 			{
 				CElement ele = mesh.elements[eleids[i]];
 				Eigen::Vector3d stress = D * load.strain;
-				auto force = stress.transpose()*ele.B;
+			//	auto force = stress.transpose()*ele.B;
 			//	loads(2 * nd0) += load.val * normal[0];
 			//	loads(2 * nd0 + 1) += load.val * normal[1];
 			//	loads(2 * nd1) += load.val * normal[0];
@@ -231,6 +235,23 @@ namespace ROLLFEM2D
 		displacements = solver.solve(loads);
 
 	//	std::cout << "displacament:=" << displacements << std::endl;
+	}
+
+	void CControl::calEquivalentNodalForce()
+	{
+		Eigen::Vector<double, 8> eforce;
+//#pragma omp parallel for private(force)
+		for (int i = 0; i < mesh.num_elements; ++i)
+		{
+			eforce = mesh.elements[i].calNodalForce();
+			for (int j=0;j<4;++j)
+			{
+				std::size_t nd = mesh.elements[i].index_nd[j];
+//#pragma omp critical
+				forces(2 * nd) += eforce(j * 2);
+				forces(2 * nd + 1) += eforce(j * 2 + 1);
+			}
+		}
 	}
 
 	int CControl::VTKOutput() const
@@ -264,6 +285,11 @@ namespace ROLLFEM2D
 		std::size_t cnt = -1;
 		for (int i = 0; i < mesh.num_nodes; i++) {
 			output << displacements[++cnt] << " " << displacements[++cnt] << " 0.0" << std::endl;
+		}
+		output << "VECTORS Force double" << std::endl;
+		cnt = -1;
+		for (int i = 0; i < mesh.num_nodes; i++) {
+			output << forces[++cnt] << " " << forces[++cnt] << " 0.0" << std::endl;
 		}
 
 		output << "CELL_DATA " << mesh.num_elements << std::endl;

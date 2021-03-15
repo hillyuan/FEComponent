@@ -28,11 +28,14 @@ namespace ROLLFEM2D
 		int matl_id;
 		double thick;
 		std::size_t index_nd[4];
+		double wg[4];
 
-		Eigen::Matrix<double, 3, 8> B;
+		Eigen::Matrix<double, 3, 8> B[4];
 
 		Eigen::Vector3d strain[4];
 		Eigen::Vector3d stress[4];
+
+		Eigen::Vector<double, 8> calNodalForce() const;
 	};
 }
 
