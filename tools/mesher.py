@@ -38,7 +38,7 @@ class IntermediateRoll :
     n_nd = 0    # ouput: number of nodes 
     
     def generate(self):
-        global meshsize, xyz, elements
+        global meshsize, xyz, elements, elethick
         print("Generating mesh Intermediate Roll begin with:", self.gnd0, self.z0)
         
         x0 = -0.5*self.L1 + self.offset - self.L21 -self.L3
@@ -339,7 +339,7 @@ class BackupRoll :
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     def generate(self):
-        global meshsize, xyz, elements
+        global meshsize, xyz, elements, elethick
         print("Generating mesh of backup roll begin with:", self.gnd0, self.z0)
         
         ## L2 ##
@@ -571,7 +571,7 @@ class WorkingRoll :
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     def generate(self):
-        global meshsize, xyz, elements
+        global meshsize, xyz, elements, elethick
         print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
         
         x0 = -0.5*self.L1 - self.L2 -self.L3
@@ -934,6 +934,7 @@ n_node = 0
 xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
+elethick = np.array([], dtype=int)
 
 zw = 0.0   # z-coordinate of working roll
 

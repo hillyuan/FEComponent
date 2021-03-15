@@ -34,7 +34,6 @@ namespace ROLLFEM2D
 				std::getline(input, line);
 			}
 			else if (line.find("POINTS") == 0) {
-				std::cout << line << std::endl;
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
 				tokenizer >> dummy >> num_nodes;
@@ -45,7 +44,6 @@ namespace ROLLFEM2D
 				std::getline(input, line);
 			}
 			else if (line.find("CELLS") == 0) {
-				std::cout << line << std::endl;
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
 				tokenizer >> dummy >> num_elements >> dummy;
@@ -61,13 +59,11 @@ namespace ROLLFEM2D
 				std::getline(input, line);
 			}
 			else if (line.find("FIELD") == 0) {
-				std::cout << line << std::endl;
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
 				tokenizer >> name >> dtype >> ng;
 				for (unsigned int i = 0; i < ng; ++i) {
 					std::getline(input, line);
-					std::cout << line << std::endl;
 					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 					tokenizer.clear();
 					tokenizer >> name >> mm >> nn >> numtype;

@@ -47,7 +47,7 @@ namespace ROLLFEM2D
 		}
 
 		int VTKOutput() const;
-		int CVSOutput() const;
+		int CSVOutput() const;
 	};
 }
 

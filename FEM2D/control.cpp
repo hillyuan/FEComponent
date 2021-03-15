@@ -38,7 +38,6 @@ namespace ROLLFEM2D
 				std::string mname = matls["Name"].as<std::string>();
 				CMaterial matl(pbtype, mname, youngs, poisson);
 				mesh.materials.emplace_back(matl);
-				matl.print(std::cout);
 			}
 		}
 		else {
@@ -285,7 +284,7 @@ namespace ROLLFEM2D
 		return 0;
 	}
 
-	int CControl::CVSOutput() const
+	int CControl::CSVOutput() const
 	{
 		for (int i = 0; i < 3; ++i) {
 			std::string ndset = ndsets[i];
