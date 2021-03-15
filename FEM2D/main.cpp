@@ -9,20 +9,13 @@
 #include "mesh.hpp"
 #include "control.hpp"
 
-/**
- * \brief struct of command-line option
- */
-struct option_rec {
-	char* option_name;
-	void (*func)(char*);
-};
 
 /**
  * \brief show available command line option
  */
 void help() {
 	printf("usage: rollfem2d [options] \n");
-	printf(" -f: filename: control file name \n");
+	printf(" -f: filename: control file name (neccesary)\n");
 	printf(" -h: Show this help message. (optional)\n");
 	printf(" -t <n>: Set number of OpenMP threads (optional)\n");
 	exit(0);
@@ -52,6 +45,13 @@ int main(int argc, char *argv[])
 {
 	char date[64];
 	time_t t = time(NULL);
+	std::cout << "=================================================================\n";
+	std::cout << "=                                                               =\n";
+	std::cout << "=                       RollFEM2D 1.0                           =\n";
+	std::cout << "=                         March 2021                            =\n";
+	std::cout << "=                                                               =\n";
+	std::cout << "=================================================================\n\n";
+
 	printf("Host info    \n");
 	char* libvar;
 #ifdef _WINDOWS
