@@ -6,20 +6,53 @@
 #include <iomanip>
 #include <omp.h>
 
-
 #include "mesh.hpp"
 #include "control.hpp"
 
-int main(int argc, char *argv[])
-{
-	if (argc < 2) {
-		std::cout << "Usage: rollfem2d filename(control file)";
-		return -1; 
+/**
+ * \brief struct of command-line option
+ */
+struct option_rec {
+	char* option_name;
+	void (*func)(char*);
+};
+
+/**
+ * \brief show available command line option
+ */
+void help() {
+	printf("usage: rollfem2d [options] \n");
+	printf(" -f: filename: control file name \n");
+	printf(" -h: Show this help message. (optional)\n");
+	printf(" -t <n>: Set number of OpenMP threads (optional)\n");
+	exit(0);
+}
+
+void set_num_threads(char* arg) {
+	int exec_threads;
+
+	if (arg == NULL) {
+		fprintf(stderr, "Error : specify number of OpenMP threads.\n");
+		fprintf(stderr, "Format: -t <n>\n");
+		exit(1);
 	}
 
+	exec_threads = atoi(arg);
+
+	if (exec_threads == 0) {
+		fprintf(stderr, "Error : specify 1 or more OpenMP threads.\n");
+		exit(1);
+	}
+	omp_set_num_threads(exec_threads);
+}
+
+
+
+int main(int argc, char *argv[])
+{
 	char date[64];
 	time_t t = time(NULL);
-	printf("execute......  \n");
+	printf("Host info    \n");
 	char* libvar;
 #ifdef _WINDOWS
 	libvar = getenv("COMPUTERNAME");
@@ -34,23 +67,41 @@ int main(int argc, char *argv[])
 #endif
 	strftime(date, sizeof(date), "%Y-%m-%dT%H:%M:%S%z", localtime(&t));
 	printf("  date:       %s\n", date);
-	printf("  threads:    %d\n\n", omp_get_max_threads());
 
 
 	std::clock_t c_start = std::clock();
 	auto t_start = std::chrono::high_resolution_clock::now();
 
-	ROLLFEM2D::CControl control(argv[1]);
+	bool ok = false;
+	ROLLFEM2D::CControl control;
+	for (unsigned int i = 1; i < argc; i++) {
+		if (strncmp("-f", argv[i], 2)==0) {
+			control = ROLLFEM2D::CControl(argv[i+1]);
+			ok = true; ++i;
+		} else if (strncmp("-h", argv[i], 2) == 0) {
+			help();
+		}
+		else if (strncmp("-t", argv[i], 2) == 0) {
+			set_num_threads(argv[i+1]);
+		}
+	}
+	if (!ok) {
+		help();
+		return -1;
+	}
+	printf("  threads:    %d\n\n", omp_get_max_threads());
 
-	printf("calculating......  \n");
+	//ROLLFEM2D::CControl control(argv[1]);
+
+	printf("Calculating......  \n");
 	control.calGlobalStiffMatrix();
 	control.ApplyDistributedLoads();
 	control.ApplyConstraints();
 	control.Solve();
 	std::clock_t c_end = std::clock();
-	std::cout << "  calculate time:  " << (c_end - c_start) / CLOCKS_PER_SEC << " sec\n\n";
+	std::cout << "  calculate time:  " << (c_end - c_start) / CLOCKS_PER_SEC << " s\n\n";
 
-	printf("outputing......  \n\n");
+	printf("Outputing......  \n\n");
 	control.Update();
 	int c = control.VTKOutput();
 	c = control.CSVOutput();
@@ -58,7 +109,7 @@ int main(int argc, char *argv[])
 	c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
 
-	printf("summary:  \n");
+	printf("Summary:  \n");
 	std::cout << std::fixed << std::setprecision(2) << "  CPU time used: "
 		<< (c_end - c_start) / CLOCKS_PER_SEC << " s\n"
 		<< "  Wall clock time passed: "

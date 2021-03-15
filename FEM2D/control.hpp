@@ -31,6 +31,7 @@ namespace ROLLFEM2D
 		std::string cvsfiles[3];
 		
 	public:
+		CControl::CControl() {};
 		CControl::CControl(char* file);
 
 		void calGlobalStiffMatrix()
