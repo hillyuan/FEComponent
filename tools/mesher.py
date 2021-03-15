@@ -6,6 +6,7 @@ Jan. 2021
 """
 
 import yaml
+import math
 import numpy as np
 
 class IntermediateRoll :
@@ -91,6 +92,9 @@ class IntermediateRoll :
                 self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             if( i<ndf ):
                 self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
                 
@@ -115,6 +119,8 @@ class IntermediateRoll :
         nd1 = cnt_temp + nd21
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            
+        print("elethick",elethick)
         
         for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
@@ -128,6 +134,11 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+           
+        for j in range(0,nd3):
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
         
         # save above z-volue        
         z_value = np.array([])
@@ -143,6 +154,9 @@ class IntermediateRoll :
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,2*nd21+nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
                 
         cnt_temp = cnt_xyz
                 
@@ -229,6 +243,11 @@ class IntermediateRoll :
             if( x>=xmr[0]+self.chamfer[0] and x<=self.pxw ):
                 self.xwr = np.append(self.xwr, x)
                 self.nwr = np.append(self.nwr, cnt_xyz-1)
+                
+        for j in range(0,nd3+2*nd21):
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
    
         print( "xbr", self.xbr )
         print( "xwr", self.xwr )             
@@ -240,6 +259,9 @@ class IntermediateRoll :
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
                 
         cnt_temp = cnt_xyz
                 
@@ -264,6 +286,9 @@ class IntermediateRoll :
         nd1 = cnt_temp
         for j in range(0,nz-1):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
 
         #other L22
         for i in range(1,ndl4):
@@ -271,6 +296,9 @@ class IntermediateRoll :
             nd1 = nd0 + 2*nd21+nd3 + 1
             for j in range(0,nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
                 
         cnt_temp = cnt_xyz
         
@@ -289,6 +317,9 @@ class IntermediateRoll :
         nd1 = cnt_temp
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+            cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+            r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+            elethick = np.append(elethick, r)
             
         # other row of L32
         for i in range(1,nds):
@@ -296,6 +327,9 @@ class IntermediateRoll :
             nd1 = nd0 + nd3+1
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
                 
         cnt_temp = cnt_xyz
                 
@@ -314,6 +348,9 @@ class IntermediateRoll :
             self.edbendU = np.append(self.edbendU, [int(len(elements)/4), 3] )
             for j in range(0,nd3):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
+                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
+                r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
+                elethick = np.append(elethick, r)
             self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
         print("edbendD", self.edbendD)
         print("edbendU", self.edbendU)

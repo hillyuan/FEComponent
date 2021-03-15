@@ -15,7 +15,7 @@
  */
 void help() {
 	printf("usage: rollfem2d [options] \n");
-	printf(" -f: filename: control file name (neccesary)\n");
+	printf(" -f <filename>: Set control file name (neccesary)\n");
 	printf(" -h: Show this help message. (optional)\n");
 	printf(" -t <n>: Set number of OpenMP threads (optional)\n");
 	exit(0);
@@ -35,6 +35,10 @@ void set_num_threads(char* arg) {
 	if (exec_threads == 0) {
 		fprintf(stderr, "Error : specify 1 or more OpenMP threads.\n");
 		exit(1);
+	}
+	if (exec_threads > omp_get_max_threads() ) {
+		fprintf(stderr, "Warning : Ignored: too many OpenMP threads.\n");
+		exec_threads = omp_get_max_threads();
 	}
 	omp_set_num_threads(exec_threads);
 }
