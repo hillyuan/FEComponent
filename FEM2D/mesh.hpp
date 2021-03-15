@@ -53,9 +53,6 @@ namespace ROLLFEM2D
 
 	private:
 		std::size_t n_wele, n_iele, n_bele;
-		std::vector<double> ThicknessDefine;
-
-		void ConstructElementThickness();
 	};
 }
 

@@ -58,6 +58,17 @@ namespace ROLLFEM2D
 				}
 				std::getline(input, line);
 			}
+			else if (line.find("CELL_DATA") == 0) {
+				std::getline(input, line);
+				std::getline(input, line);
+				for (size_t i = 0; i < num_elements; ++i) {
+					std::getline(input, line);
+					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
+					tokenizer.clear();
+					tokenizer >> dummyz;
+					elements[i].thick = dummyz;
+				}
+			}
 			else if (line.find("FIELD") == 0) {
 				tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
 				tokenizer.clear();
@@ -86,21 +97,10 @@ namespace ROLLFEM2D
 							else {
 								for (unsigned int k = 0; k < mm; ++k) tokenizer >> nnn[k];
 							}
-							if (dtype == "ThicknessBuilder") {
-								if (name == "ELECOUNT") {
-									n_iele = nnn[0];
-									n_bele = nnn[1];
-									n_wele = nnn[2];
-								}
-							}
 						}
 						else if (numtype == "double") {
+							// haven't use this
 							for (unsigned int k = 0; k < mm; ++k) tokenizer >> mmm[k];
-							if (dtype == "ThicknessBuilder") {
-								if (name == "RollShape") {
-									for (unsigned int k = 0; k < mm; ++k) ThicknessDefine.emplace_back(mmm[k]);
-								}
-							}
 						}
 					}
 					if( dtype=="NODESET")
@@ -118,8 +118,6 @@ namespace ROLLFEM2D
 			}
 		}
 		input.close();
-
-		ConstructElementThickness();
 
 		return 0;
 	}
@@ -158,74 +156,6 @@ namespace ROLLFEM2D
 		}
 		center *= 0.25;
 		return center;
-	}
-
-	void CMesh::ConstructElementThickness()
-	{
-		assert(ThicknessDefine.size() == 13);
-		double sy = ThicknessDefine[0];
-		double wD1 = 0.5 * ThicknessDefine[1];
-		double wL1 = 0.5 * ThicknessDefine[2];
-		double wD2 = 0.5 * ThicknessDefine[3];
-		double iD1 = 0.5 * ThicknessDefine[4];
-		double iL1 = 0.5 * ThicknessDefine[5];
-		double iL21 = ThicknessDefine[6];
-		double iL22 = ThicknessDefine[7];
-		double iD2 = 0.5 * ThicknessDefine[8];
-		double offset = ThicknessDefine[9];
-		double bD1 = 0.5 * ThicknessDefine[10];
-		double bL1 = 0.5 * ThicknessDefine[11];
-		double bD2 = 0.5 * ThicknessDefine[12];
-		// inter roll
-		double dy;
-		Eigen::Vector2d center;
-		double cy = sy + wD1 + iD1;
-		for (int i = 0; i < n_iele; ++i)
-		{
-			center = getCenterCoord(i);
-			dy = center(1) - cy;
-			if (center(0) > -iL1 -iL21 + offset && center(0) < iL1 + iL22+offset) // with diameter D1
-			{
-				elements[i].thick = 2.0 * std::sqrt(iD1 * iD1 - dy * dy);
-			}
-			else // with diameter D3
-			{
-				elements[i].thick = 2.0 * std::sqrt(iD2 * iD2 - dy * dy);
-			}
-		}
-
-		// back roll
-		cy = cy + iD1 + bD1;
-		for (int i = n_iele; i < n_bele; ++i)
-		{
-			center = getCenterCoord(i);
-			dy = center(1) - cy;
-			if (center(0) > -bL1 && center(0) < bL1) // with diameter D1
-			{
-				elements[i].thick = 2.0 * std::sqrt(bD1 * bD1 - dy * dy);
-			}
-			else // with diameter D3
-			{
-				elements[i].thick = 2.0 * std::sqrt(bD2 * bD2 - dy * dy);
-			}
-		}
-
-		// work roll
-		cy = sy;
-		for (int i = n_bele; i < n_wele; ++i)
-		{
-			center = getCenterCoord(i);
-			dy = center(1) - cy;
-			if (center(0) > -wL1 && center(0) < wL1) // with diameter D1
-			{
-				elements[i].thick = 2.0 * std::sqrt(wD1 * wD1 - dy * dy);
-			}
-			else // with diameter D3
-			{
-				elements[i].thick = 2.0 * std::sqrt(wD2 * wD2 - dy * dy);
-			}
-		}
-
 	}
 
 	void CMesh::calElementalStiffMatrix(const std::size_t& ele, std::array<T,64>& triplets)
