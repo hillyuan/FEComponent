@@ -119,8 +119,6 @@ class IntermediateRoll :
         nd1 = cnt_temp + nd21
         for j in range(0,nd3):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-            
-        print("elethick",elethick)
         
         for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
@@ -637,6 +635,10 @@ class WorkingRoll :
     edload = np.array([],dtype=int)  # output: loading edge group
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
+    convex = np.array([], ndmin=2)   # initial strain definition
+    esets = np.array([],dtype=int,ndmin=2)  # element sets with initial strain
+    estrain = np.array([] )          # initial strain of above element sets
+    
     def generate(self):
         global meshsize, xyz, elements, elethick
         print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
@@ -1032,7 +1034,10 @@ for key, value in data.items():
                 iRoll.Rload = v2
                 wRoll.Rload = v2
             print (key,k2,v2)
-            
+    elif key == "Convexity":
+        wRoll.convex = value
+
+print( "Convexity:", wRoll.convex )            
 
 ## initial ##
 n_node = 0

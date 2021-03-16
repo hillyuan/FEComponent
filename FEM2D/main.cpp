@@ -1,4 +1,4 @@
-#include <fstream>
+﻿#include <fstream>
 #include <cassert>
 #include <chrono>
 #include <ctime>
@@ -51,7 +51,10 @@ int main(int argc, char *argv[])
 	time_t t = time(NULL);
 	std::cout << "=================================================================\n";
 	std::cout << "=                                                               =\n";
-	std::cout << "=                       RollFEM2D 1.0                           =\n";
+	std::cout << "=  2D FEM Software for Elastic Deformation of Mill Roll System  =\n";
+	std::cout << "=                      ---------------                          =\n";
+	std::cout << "=                     | RollFEM2D 1.0 |                         =\n";
+	std::cout << "=                      ---------------                          =\n";
 	std::cout << "=                         March 2021                            =\n";
 	std::cout << "=                                                               =\n";
 	std::cout << "=================================================================\n\n";
