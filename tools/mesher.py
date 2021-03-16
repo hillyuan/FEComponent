@@ -513,8 +513,8 @@ class BackupRoll :
                cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
                r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
                elethick = np.append(elethick, r)
-            nd0 = nd0 + 2*nc+nd-2
-            nd1 = nd1 + 2*nc+nd-2
+            nd0 = nd0 + 2*nc+nd-1
+            nd1 = nd1 + 2*nc+nd-1
             elements = np.append(elements, [nd0,self.nbr[i],self.nbr[i+1],nd1])
             cy = 0.25*( xyz[2*nd0+1] + xyz[2*self.nbr[i]+1] + xyz[2*self.nbr[i+1]+1] + xyz[2*nd1+1] )
             r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
@@ -636,7 +636,7 @@ class WorkingRoll :
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
     
     convex = np.array([], ndmin=2)   # initial strain definition
-    esets = np.array([],dtype=int,ndmin=2)  # element sets with initial strain
+    esets = np.array([], dtype=int)  # element sets with initial strain
     estrain = np.array([] )          # initial strain of above element sets
     
     def generate(self):
