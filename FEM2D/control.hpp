@@ -30,7 +30,7 @@ namespace ROLLFEM2D
 		std::vector< Constraint > constraints;
 		std::vector< CLoad > cloads;
 		std::vector< DLoad > dloads;
-		std::vector< InitStrain > initstrain;
+		std::vector< InitStrain > initstrains;
 
 		Eigen::VectorXd displacements;
 		Eigen::VectorXd forces;

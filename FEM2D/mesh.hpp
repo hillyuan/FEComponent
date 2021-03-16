@@ -38,6 +38,10 @@ namespace ROLLFEM2D
 		std::vector<CElement>      elements;
 		std::vector<CMaterial>     materials;
 
+		// this two specified for describe convexicty of working roll
+		std::vector<double> initst;
+		std::vector<std::string> EsetName;
+
 		std::map< std::string, std::vector<std::size_t> > NodeSets;
 		std::map< std::string, std::vector<std::size_t> > ElementSets;
 		std::map< std::string, std::vector<CEdge> >       SideSets;

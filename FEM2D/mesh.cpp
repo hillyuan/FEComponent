@@ -100,14 +100,18 @@ namespace ROLLFEM2D
 							}
 						}
 						else if (numtype == "double") {
-							// haven't use this
-							for (unsigned int k = 0; k < mm; ++k) tokenizer >> mmm[k];
+							for (unsigned int k = 0; k < mm; ++k) {
+								tokenizer >> mmm[k];
+								if( name=="INITSTRAIN" ) initst.emplace_back(mmm[k]);
+							}
 						}
 					}
-					if( dtype=="NODESET")
+					if (dtype == "NODESET")
 						NodeSets.insert(std::make_pair(name, index));
-					else if (dtype == "ELEMENTSET")
+					else if (dtype == "ELEMENTSET") {
+						EsetName.emplace_back(name);
 						ElementSets.insert(std::make_pair(name, index));
+					}
 					else if(dtype=="EDGESET")
 						SideSets.insert(std::make_pair(name, edges));
 

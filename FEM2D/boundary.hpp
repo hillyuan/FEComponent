@@ -64,6 +64,12 @@ namespace ROLLFEM2D
 	{
 		std::string SetName;      // element set name
 		Eigen::Vector3d strain;   // strain value
+
+		InitStrain(const std::string& name, double s0, double s1, double s2)
+			: SetName(name)
+		{
+			strain = Eigen::Vector3d(s0, s1, s2);
+		}
 	};
 }
 

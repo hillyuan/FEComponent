@@ -983,7 +983,7 @@ class WorkingRoll :
                 if( cx >= self.convex[k][0] and cx < self.convex[k+1][0] ):
                     lamb = (cx-self.convex[k][0])/(self.convex[k+1][0]-self.convex[k][0])
                     dd = (1.0-lamb) * self.convex[k][1] + lamb*self.convex[k+1][1]
-                    self.estrain = np.append(self.estrain, dd/self.D1)
+                    self.estrain = np.append(self.estrain, 2.0*dd/self.D1)
                     exit
         print( "estrain", self.estrain)
         nstrain = len(self.estrain)
@@ -1194,7 +1194,7 @@ for i in range(0,len(wRoll.estrain)):
         fo.write(str(wRoll.esets[j,i])+'\n')
         
 fo.write("FIELD INITIALSTRAIN 1\n")
-fo.write("INISTRAIN 1 "+ str(len(wRoll.estrain)) + ' double\n')
+fo.write("INITSTRAIN 1 "+ str(len(wRoll.estrain)) + ' double\n')
 for i in range(0,len(wRoll.estrain)):
     fo.write(str(wRoll.estrain[i]) + "\n")
     
