@@ -14,6 +14,7 @@
  * \brief show available command line option
  */
 void help() {
+	printf("==RollFEM2D 1.0== \n");
 	printf("usage: rollfem2d [options] \n");
 	printf(" -f <filename>: Set control file name (neccesary)\n");
 	printf(" -h: Show this help message. (optional)\n");
@@ -49,15 +50,15 @@ int main(int argc, char *argv[])
 {
 	char date[64];
 	time_t t = time(NULL);
-	std::cout << "=================================================================\n";
-	std::cout << "=                                                               =\n";
-	std::cout << "=  2D FEM Software for Elastic Deformation of Mill Roll System  =\n";
-	std::cout << "=                      ---------------                          =\n";
-	std::cout << "=                     | RollFEM2D 1.0 |                         =\n";
-	std::cout << "=                      ---------------                          =\n";
-	std::cout << "=                         March 2021                            =\n";
-	std::cout << "=                                                               =\n";
-	std::cout << "=================================================================\n\n";
+	std::cout << "==========================================================================\n";
+	std::cout << "=                                                                        =\n";
+	std::cout << "=  2D FEM Software for Elastic Deformation Analysis of Mill Roll System  =\n";
+	std::cout << "=                           ---------------                              =\n";
+	std::cout << "=                          | RollFEM2D 1.0 |                             =\n";
+	std::cout << "=                           ---------------                              =\n";
+	std::cout << "=                             March 2021                                 =\n";
+	std::cout << "=                                                                        =\n";
+	std::cout << "==========================================================================\n\n";
 
 	printf("Host info    \n");
 	char* libvar;

@@ -637,11 +637,13 @@ class WorkingRoll :
     
     convex = np.array([], ndmin=2)   # initial strain definition
     esets = np.array([], dtype=int)  # element sets with initial strain
-    estrain = np.array([] )          # initial strain of above element sets
+    estrain = np.array([])           # initial strain of above element sets
     
     def generate(self):
         global meshsize, xyz, elements, elethick
         print("Generating mesh of working roll begin with:", self.gnd0, self.z0)
+        ncx = len(self.convex)
+        print("Convexity range", self.convex[0][0], " and ", self.convex[ncx-1][0])
         
         x0 = -0.5*self.L1 - self.L2 -self.L3
         
@@ -823,7 +825,9 @@ class WorkingRoll :
             cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
             r = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             elethick = np.append(elethick, r)
-            
+      
+        seleD1 = int(len(elements)/4)
+        
         # Element to chamfer of inter roll
         for i in range(0,ndl11+ndl12-1):
             nd0 = cnt_temp + i*(2*ndd1+nz) 
@@ -880,6 +884,9 @@ class WorkingRoll :
                 self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
                 
         print("edload", self.edload )
+        eeleD1 = int(len(elements)/4)
+        neperow = 2*ndd1+nz-1
+        print("eleD1", seleD1, eeleD1)
                 
         cnt_temp = cnt_xyz
         
@@ -954,6 +961,46 @@ class WorkingRoll :
                 self.edbendD = np.append(self.edbendD, [int(len(elements)/4)-1, 1] )
         print("edbendU", self.edbendU )
         print("edbendD", self.edbendD )
+        
+        # construct intiial strain element sets
+        spos = np.array([])
+        for i in range(seleD1,eeleD1):
+            nd0 = elements[4*i]
+            nd1 = elements[4*i+1]
+            nd2 = elements[4*i+2]
+            nd3 = elements[4*i+3]
+            cx = 0.25*( xyz[2*nd0] + xyz[2*nd1] + xyz[2*nd2] + xyz[2*nd3] )
+            spos = np.append(spos, cx)
+        out2 = set(spos.flatten())
+        spos = np.array(list(out2)) 
+        spos_sort = np.sort(spos)
+        print( "sspos", len(spos_sort),spos_sort)
+        
+        for cx in spos_sort:
+            lamb = -1.0;
+            for k in range(0,ncx-1):
+                if( cx >= self.convex[k][0] and cx < self.convex[k+1][0] ):
+                    lamb = (cx-self.convex[k][0])/(self.convex[k+1][0]-self.convex[k][0])
+                    dd = lamb * self.convex[k][1] + (1.0-lamb)*self.convex[k+1][1]
+                    self.estrain = np.append(self.estrain, dd/self.D1)
+                    exit
+        print( "estrain", self.estrain)
+        nstrain = len(self.estrain)
+        dd = int((len(spos_sort)-nstrain)/2)
+        
+        self.esets = np.arange(neperow*nstrain).reshape((neperow,nstrain))
+        ecnt = np.zeros(nstrain, dtype = int)
+        for i in range(seleD1,eeleD1):
+            nd0 = elements[4*i]
+            nd1 = elements[4*i+1]
+            nd2 = elements[4*i+2]
+            nd3 = elements[4*i+3]
+            cx = 0.25*( xyz[2*nd0] + xyz[2*nd1] + xyz[2*nd2] + xyz[2*nd3] )
+            for k in range(0, len(self.estrain)):
+                if( abs(cx-spos_sort[k+dd]) < 1.e-8 ):
+                    #print(i,k,ecnt[k] ,cx,spos_sort[k+dd] )
+                    self.esets[ecnt[k],k]=i
+                    ecnt[k] += 1
         
 
 ### 入出力定義 ###
@@ -1137,6 +1184,14 @@ sload = iRoll.edbendU.reshape(n_load,2)
 fo.write("IBENDU 2 "+str(n_load) + " int\n")
 for i in range(0,n_load):
     fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
+
+n = len(wRoll.esets)
+print("n", n, len(wRoll.estrain))  
+fo.write("FIELD ELEMENTSET "+ str(len(wRoll.estrain)) + '\n')
+for i in range(0,len(wRoll.estrain)):
+    fo.write("ESET" +str(i)+ " 1 "+str(n) + " int\n")
+    for j in range(0,n):
+        fo.write(str(wRoll.esets[j,i])+'\n')
     
 #fo.write("FIELD ThicknessBuilder 2\n")
 #fo.write("ELECOUNT 3 1 int\n")
