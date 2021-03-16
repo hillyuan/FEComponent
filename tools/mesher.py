@@ -975,13 +975,14 @@ class WorkingRoll :
         spos = np.array(list(out2)) 
         spos_sort = np.sort(spos)
         print( "sspos", len(spos_sort),spos_sort)
+        print( "convex", self.convex)
         
         for cx in spos_sort:
             lamb = -1.0;
             for k in range(0,ncx-1):
                 if( cx >= self.convex[k][0] and cx < self.convex[k+1][0] ):
                     lamb = (cx-self.convex[k][0])/(self.convex[k+1][0]-self.convex[k][0])
-                    dd = lamb * self.convex[k][1] + (1.0-lamb)*self.convex[k+1][1]
+                    dd = (1.0-lamb) * self.convex[k][1] + lamb*self.convex[k+1][1]
                     self.estrain = np.append(self.estrain, dd/self.D1)
                     exit
         print( "estrain", self.estrain)
@@ -1185,13 +1186,17 @@ fo.write("IBENDU 2 "+str(n_load) + " int\n")
 for i in range(0,n_load):
     fo.write(str(sload[i,0])+' '+str(sload[i,1]) + '\n')
 
-n = len(wRoll.esets)
-print("n", n, len(wRoll.estrain))  
+n = len(wRoll.esets)  
 fo.write("FIELD ELEMENTSET "+ str(len(wRoll.estrain)) + '\n')
 for i in range(0,len(wRoll.estrain)):
     fo.write("ESET" +str(i)+ " 1 "+str(n) + " int\n")
     for j in range(0,n):
         fo.write(str(wRoll.esets[j,i])+'\n')
+        
+fo.write("FIELD INITIALSTRAIN 1\n")
+fo.write("INISTRAIN 1 "+ str(len(wRoll.estrain)) + ' double\n')
+for i in range(0,len(wRoll.estrain)):
+    fo.write(str(wRoll.estrain[i]) + "\n")
     
 #fo.write("FIELD ThicknessBuilder 2\n")
 #fo.write("ELECOUNT 3 1 int\n")
