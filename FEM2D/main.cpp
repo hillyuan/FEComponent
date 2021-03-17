@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
 		help();
 		return -1;
 	}
-	printf("  threads:    %d\n\n", omp_get_max_threads());
+	printf("  threads:    %d\n\n", Eigen::nbThreads());
 
 	//ROLLFEM2D::CControl control(argv[1]);
 

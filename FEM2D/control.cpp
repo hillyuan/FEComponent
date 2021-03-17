@@ -120,7 +120,6 @@ namespace ROLLFEM2D
 		if (mesh.initst.size() == mesh.ElementSets.size()) {
 			int cnt = -1;
 			for (auto p: mesh.EsetName) {
-				std::cout << p << std::endl;
 				InitStrain cst(p, 0.0, mesh.initst[++cnt], 0.0);
 				initstrains.emplace_back(cst);
 			}
