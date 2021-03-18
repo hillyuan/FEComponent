@@ -246,6 +246,7 @@ namespace ROLLFEM2D
 		}
 
 		if (convexity) ApplyInitialStrain();
+		if (gravity) ApplyGravity();
 	}
 
 	void CControl::ApplyInitialStrain()
@@ -275,15 +276,16 @@ namespace ROLLFEM2D
 
 	void CControl::ApplyGravity()
 	{
-		double density = mesh.materials[0].getDensity();
 		Eigen::Vector<double, 8> force;
 
 //#pragma omp parallel for private(force)
 		for (int i = 0; i < mesh.num_elements; ++i)
 		{
-			force.setZero();
+			force = mesh.calElementalGravity(i, gxy);
 			for (int j = 0; j < 4; ++j) {
-		//		force += ele.wg[j] * stress.transpose() * ele.B[j];
+				std::size_t nd = mesh.elements[i].index_nd[j];
+				loads(2 * nd) += force(j * 2);
+				loads(2 * nd + 1) += force(j * 2 + 1);
 			}
 		}
 	}
