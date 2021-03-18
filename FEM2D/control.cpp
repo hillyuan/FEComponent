@@ -211,8 +211,6 @@ namespace ROLLFEM2D
 		{
 			loads(idit) = 0.0;
 		}
-
-	//	std::cout << StiffMatrix << std::endl;
 	}
 
 	void CControl::ApplyDistributedLoads()
@@ -295,8 +293,6 @@ namespace ROLLFEM2D
 		Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver;
 		solver.compute(StiffMatrix);
 		displacements = solver.solve(loads);
-
-	//	std::cout << "displacament:=" << displacements << std::endl;
 	}
 
 	void CControl::calEquivalentNodalForce()
