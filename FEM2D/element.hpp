@@ -8,19 +8,19 @@
 
 namespace ROLLFEM2D
 {
-	Eigen::Vector2d ShapeFunc(Eigen::Vector2d& lcoord);
+	Eigen::Vector<double, 4> ShapeFunc(Eigen::Vector2d& lcoord);
 	Eigen::Matrix<double, 4, 2> ShapeDeriv(Eigen::Vector2d& lcoord);
 
 	Eigen::Matrix<double, 4, 2> make_quadrature();
 	Eigen::Vector4d make_weights();
-	std::array< Eigen::Vector2d, 4 > make_ShapeFuncs();
+	std::array< Eigen::Vector<double, 4>, 4 > make_ShapeFuncs();
 	std::array<Eigen::Matrix<double, 4, 2>, 4> make_ShapeDerivs();
 
 	struct CQuadrature
 	{
 		const static Eigen::Vector4d weights;
 		const static Eigen::Matrix<double, 4, 2> qp_coords;
-		const static std::array< Eigen::Vector2d, 4 > ShapeFuncs;
+		const static std::array< Eigen::Vector<double, 4>, 4 > ShapeFuncs;
 		const static std::array<Eigen::Matrix<double, 4, 2>,4> ShapeDerivs;
 	};
 

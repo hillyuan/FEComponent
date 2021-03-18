@@ -3,9 +3,9 @@
 
 namespace ROLLFEM2D
 {
-	Eigen::Vector2d ShapeFunc(Eigen::Vector2d& lcoord)
+	Eigen::Vector<double,4> ShapeFunc(Eigen::Vector2d& lcoord)
 	{
-		Eigen::Vector2d sfunc;
+		Eigen::Vector<double,4> sfunc;
 		sfunc[0] = 0.25 * (1.0 - lcoord[0]) * (1.0 - lcoord[1]);
 		sfunc[1] = 0.25 * (1.0 + lcoord[0]) * (1.0 - lcoord[1]);
 		sfunc[2] = 0.25 * (1.0 + lcoord[0]) * (1.0 + lcoord[1]);
@@ -42,9 +42,9 @@ namespace ROLLFEM2D
 		return qp_coords;
 	}
 
-	std::array< Eigen::Vector2d, 4 > make_ShapeFuncs()
+	std::array< Eigen::Vector<double, 4>, 4 > make_ShapeFuncs()
 	{
-		std::array< Eigen::Vector2d, 4 > spfunc;
+		std::array< Eigen::Vector<double, 4>, 4 > spfunc;
 		Eigen::Vector2d lcoord;
 		for (unsigned int i = 0; i < 4; i++)
 		{
@@ -93,6 +93,6 @@ namespace ROLLFEM2D
 	const Eigen::Matrix<double, 4, 2> CQuadrature::qp_coords = make_quadrature();
 	const Eigen::Vector4d CQuadrature::weights = make_weights();
 	const std::array<Eigen::Matrix<double, 4, 2>, 4> CQuadrature::ShapeDerivs = make_ShapeDerivs();
-	const std::array< Eigen::Vector2d, 4 > CQuadrature::ShapeFuncs = make_ShapeFuncs();
+	const std::array< Eigen::Vector<double,4>, 4 > CQuadrature::ShapeFuncs = make_ShapeFuncs();
 }
 

@@ -5,9 +5,8 @@ Material:
   - Name : steel
     Youngs Modulus: 10.0
     Poisson Ratio: 0.3
-  - Name : other
-    Youngs Modulus: 10.0
-    Poisson Ratio: 0.3
+    Density: 1.0
+Gravity: [1.0,0.0]
 Constraint:
   - NSET : 0
     Type : 3
@@ -15,11 +14,5 @@ Constraint:
   - NSET : 3
     Type : 1
     Value: 0.0
-DLoad:
-  - SSET : EG1
-    Value : [1.0]
-Initial Strain:
-  - ESET : EALL
-    Value : [0.1,0.0,0.0]
 VTK File: "2elementout.vtk"
 ---

@@ -226,7 +226,7 @@ namespace ROLLFEM2D
 		force.setZero();
 		for (std::size_t npg = 0; npg < 4; npg++)
 		{
-			Eigen::Vector2d spfunc = CQuadrature::ShapeFuncs[npg];
+			Eigen::Vector<double,4> spfunc = CQuadrature::ShapeFuncs[npg];
 			for (std::size_t i = 0; i < 4; i++)
 			{
 				force(i * 2) += elements[ele].wg[i] * pg[0] * spfunc[i];
