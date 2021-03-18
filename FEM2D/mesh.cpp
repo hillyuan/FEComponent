@@ -177,7 +177,6 @@ namespace ROLLFEM2D
 			ecoord(1,i) = nodes[nd].y;
 		}
 
-		Eigen::Vector2d lcoord;
 		Eigen::Matrix<double, 8, 8> K = Eigen::Matrix<double, 8, 8>::Zero();
 		for (std::size_t npg = 0; npg < 4; npg++)
 		{
@@ -216,6 +215,27 @@ namespace ROLLFEM2D
 				  T(2 * elements[ele].index_nd[i] + 1, 2 * elements[ele].index_nd[j] + 1, K(2 * i + 1, 2 * j + 1));
 			}
 		}
+	}
+
+	Eigen::Vector<double, 8> CMesh::calElementalGravity(const std::size_t& ele, const double pg[2])
+	{
+		Eigen::Vector<double, 8> force;
+		int imatl = elements[ele].matl_id;
+		double density = materials[imatl].getDensity();
+
+		force.setZero();
+		for (std::size_t npg = 0; npg < 4; npg++)
+		{
+			Eigen::Vector2d spfunc = CQuadrature::ShapeFuncs[npg];
+			for (std::size_t i = 0; i < 4; i++)
+			{
+				force(i * 2) += elements[ele].wg[i] * pg[0] * spfunc[i];
+				force(i * 2 + 1) += elements[ele].wg[i] * pg[1] * spfunc[i];
+			}
+		}
+		force = density * force;
+
+		return force;
 	}
 
 	void CMesh::calGlobalStiffMatrix(Eigen::SparseMatrix<double>& StiffMatrix)

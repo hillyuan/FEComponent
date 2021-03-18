@@ -37,6 +37,10 @@ namespace ROLLFEM2D
 
 		std::string outfile;
 		std::vector<cvsout> cvsouts;
+
+		bool convexity;    // if consider convexicty
+		bool gravity;      // if consider gravity
+		double gxy[2];     // gravity definition
 		
 	public:
 		CControl::CControl() {};
@@ -49,6 +53,7 @@ namespace ROLLFEM2D
 		void ApplyConstraints();
 		void ApplyDistributedLoads();
 		void ApplyInitialStrain();
+		void ApplyGravity();
 		void Solve();
 		void calEquivalentNodalForce();
 		void Update()

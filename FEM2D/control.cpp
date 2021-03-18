@@ -8,6 +8,7 @@
 namespace ROLLFEM2D
 {
 	CControl::CControl(char* file)
+		: convexity(true), gravity(false)
 	{
 		if (!std::filesystem::exists(file)) {
 			std::cout << "Input file: " << file << " not found!\n" ;
@@ -20,6 +21,17 @@ namespace ROLLFEM2D
 		if (YAML::Node mtype = config["Problem Type"]) {
 			std::string tt = mtype.as<std::string>();
 			if (tt == "Plane Strain") pbtype = 1;
+		}
+
+		if (YAML::Node cnx = config["Convexity"]) {
+			convexity = cnx.as<bool>();
+		}
+		if (YAML::Node gv = config["Gravity"]) {
+			auto gvt = gv.as<std::vector<double>>();
+			if (gvt[0] != 0.0 || gvt[1] != 0.0) {
+				gravity = true;
+				gxy[0] = gvt[0];  gxy[1] = gvt[1];
+			}
 		}
 
 		if (YAML::Node doc = config["Mesh File"]) {
@@ -35,8 +47,13 @@ namespace ROLLFEM2D
 				const YAML::Node& matls = *it;
 				double youngs = matls["Youngs Modulus"].as<double>();
 				double poisson = matls["Poisson Ratio"].as<double>();
+				double density = 0.0;
+				if (YAML::Node rd = matls["Density"]) {
+					density = rd.as<double>();
+				}
+				if (density == 0.0) gravity = false;
 				std::string mname = matls["Name"].as<std::string>();
-				CMaterial matl(pbtype, mname, youngs, poisson);
+				CMaterial matl(pbtype, mname, youngs, poisson, density);
 				mesh.materials.emplace_back(matl);
 			}
 		}
@@ -228,7 +245,7 @@ namespace ROLLFEM2D
 			}
 		}
 
-		ApplyInitialStrain();
+		if (convexity) ApplyInitialStrain();
 	}
 
 	void CControl::ApplyInitialStrain()
@@ -252,6 +269,21 @@ namespace ROLLFEM2D
 					loads(2 * nd) += force(j * 2);
 					loads(2 * nd + 1) += force(j * 2 + 1);
 				}
+			}
+		}
+	}
+
+	void CControl::ApplyGravity()
+	{
+		double density = mesh.materials[0].getDensity();
+		Eigen::Vector<double, 8> force;
+
+//#pragma omp parallel for private(force)
+		for (int i = 0; i < mesh.num_elements; ++i)
+		{
+			force.setZero();
+			for (int j = 0; j < 4; ++j) {
+		//		force += ele.wg[j] * stress.transpose() * ele.B[j];
 			}
 		}
 	}

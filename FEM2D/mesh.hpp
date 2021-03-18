@@ -52,6 +52,7 @@ namespace ROLLFEM2D
 		Eigen::Vector2d getCenterCoord(const std::size_t& ele) const;
 
 		void calElementalStiffMatrix (const std::size_t&, std::array<T,64> & triplets);
+		Eigen::Vector<double, 8> calElementalGravity(const std::size_t&, const double pg[2]);
 		void calGlobalStiffMatrix(Eigen::SparseMatrix<double>&);
 		void updateElements(Eigen::VectorXd&);
 

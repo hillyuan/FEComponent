@@ -5,6 +5,7 @@ Material:
   - Name : steel
     Youngs Modulus: 206000
     Poisson Ratio: 0.3
+    Density: 7850.0e-9
 Constraint:
   - NSET : NFIX
     Type : 3
@@ -16,6 +17,8 @@ DLoad:
     Value : [-130.2083]
   - SSET : IBENDD
     Value : [-143.75]
+Gravity: [0.0,9.8]
+Convexity: true
 VTK File: "rollresult.vtk"
 CSV File:
   - NSET: IBOTTOM

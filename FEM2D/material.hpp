@@ -16,15 +16,19 @@ namespace ROLLFEM2D
 		double lame_mu;
 		double Youngs;
 		double Poission;
-		double density;
+		double Density;
 		
 	public:
-		CMaterial(int pbtype, std::string&, double&, double&);
+		CMaterial(int pbtype, std::string&, double&, double&, double&);
 
 		Eigen::Matrix<double, 3, 3> ElasticMatrix;
 		Eigen::Vector3d StressUpdate(Eigen::Vector3d&) const;
 
 		void print(std::ostream& os) const;
+		double getDensity() const
+		{
+			return Density;
+		}
 	};
 }
 

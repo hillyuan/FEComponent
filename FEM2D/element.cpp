@@ -42,6 +42,19 @@ namespace ROLLFEM2D
 		return qp_coords;
 	}
 
+	std::array< Eigen::Vector2d, 4 > make_ShapeFuncs()
+	{
+		std::array< Eigen::Vector2d, 4 > spfunc;
+		Eigen::Vector2d lcoord;
+		for (unsigned int i = 0; i < 4; i++)
+		{
+			lcoord[0] = CQuadrature::qp_coords(i, 0);
+			lcoord[1] = CQuadrature::qp_coords(i, 1);
+			spfunc[i] = ShapeFunc(lcoord);
+		}
+		return spfunc;
+	}
+
 	std::array<Eigen::Matrix<double, 4, 2>, 4> make_ShapeDerivs()
 	{
 		std::array<Eigen::Matrix<double, 4, 2>, 4> spderivs;
@@ -51,7 +64,6 @@ namespace ROLLFEM2D
 			lcoord[0] = CQuadrature::qp_coords(i, 0);
 			lcoord[1] = CQuadrature::qp_coords(i, 1);
 			spderivs[i] = ShapeDeriv(lcoord);
-		//	std::cout << spderivs.at(i) << std::endl;
 		}
 		return spderivs;
 	}
@@ -81,6 +93,6 @@ namespace ROLLFEM2D
 	const Eigen::Matrix<double, 4, 2> CQuadrature::qp_coords = make_quadrature();
 	const Eigen::Vector4d CQuadrature::weights = make_weights();
 	const std::array<Eigen::Matrix<double, 4, 2>, 4> CQuadrature::ShapeDerivs = make_ShapeDerivs();
-
+	const std::array< Eigen::Vector2d, 4 > CQuadrature::ShapeFuncs = make_ShapeFuncs();
 }
 
