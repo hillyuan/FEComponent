@@ -87,8 +87,21 @@ namespace ROLLFEM2D
 				}
 			}
 		}
-		else {
-			throw std::runtime_error("Constraint condition not defined!");
+
+		if (YAML::Node ist = config["Initial Strain"]) {
+			for (YAML::const_iterator it = ist.begin(); it != ist.end(); ++it) {
+				const YAML::Node& dl = *it;
+				std::vector<double> val = dl["Value"].as<std::vector<double>>();
+				std::string mname = dl["ESET"].as<std::string>();
+				if (mesh.ElementSets.find(mname) == mesh.ElementSets.end())
+				{
+					std::cout << "ElementSet:" << mname << " not found. Initial Strain ignored!\n";
+				}
+				else {
+					InitStrain cst(mname, val[0],val[1],val[2]);
+					initstrains.emplace_back(cst);
+				}
+			}
 		}
 
 		outfile = "out.vtk";
@@ -215,12 +228,13 @@ namespace ROLLFEM2D
 			}
 		}
 
-//		std::cout << loads << std::endl;
+		ApplyInitialStrain();
 	}
 
 	void CControl::ApplyInitialStrain()
 	{
 		Eigen::Matrix<double, 3, 3> D = mesh.materials[0].ElasticMatrix;
+		Eigen::Vector<double, 8> force;
 		for (auto load : initstrains)
 		{
 			// consider edge pressure only
@@ -229,16 +243,17 @@ namespace ROLLFEM2D
 			{
 				CElement ele = mesh.elements[eleids[i]];
 				Eigen::Vector3d stress = D * load.strain;
-			//	auto force = stress.transpose()*ele.B;
-			//	loads(2 * nd0) += load.val * normal[0];
-			//	loads(2 * nd0 + 1) += load.val * normal[1];
-			//	loads(2 * nd1) += load.val * normal[0];
-			//	loads(2 * nd1 + 1) += load.val * normal[1];
-
+				force.setZero();
+				for (int j = 0; j < 4; ++j) {
+					force += ele.wg[j] * stress.transpose() * ele.B[j];
+				}
+				for (int j = 0; j < 4; ++j) {
+					std::size_t nd = ele.index_nd[j];
+					loads(2 * nd) += force(j * 2);
+					loads(2 * nd + 1) += force(j * 2 + 1);
+				}
 			}
 		}
-
-		//		std::cout << loads << std::endl;
 	}
 
 	void CControl::Solve()

@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 	c_end = std::clock();
 	auto t_end = std::chrono::high_resolution_clock::now();
 
-	printf("Summary:  \n");
+	std::cout << "Successfully Completed  \n";
 	std::cout << std::fixed << std::setprecision(2) << "  CPU time used: "
 		<< (c_end - c_start) / CLOCKS_PER_SEC << " s\n"
 		<< "  Wall clock time passed: "

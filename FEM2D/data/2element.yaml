@@ -18,5 +18,8 @@ Constraint:
 DLoad:
   - SSET : EG1
     Value : [1.0]
-Output File: "2elementout.vtk"
+Initial Strain:
+  - ESET : EALL
+    Value : [0.1,0.0,0.0]
+VTK File: "2elementout.vtk"
 ---
