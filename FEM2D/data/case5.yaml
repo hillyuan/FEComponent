@@ -1,0 +1,36 @@
+%YAML 1.2
+---
+Mesh File: rollsystem.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 206000
+    Poisson Ratio: 0.3
+    Density: 7850.0e-9
+Constraint:
+  - NSET : NFIX
+    Type : 3
+    Value : 0.0
+DLoad:
+  - SSET : ELOAD
+    Value : [-5.83e3]
+  - SSET : WBENDU
+    Value : [-152.78]
+  - SSET : IBENDD
+    Value : [-143.75]
+Gravity: [0.0,-9.8]
+Convexity: true
+VTK File: "rollresult.vtk"
+CSV File:
+  - NSET: IBOTTOM
+    File Name: "introll.csv"
+    TYPE: y-disp
+  - NSET: BBOTTOM
+    File Name: "backroll.csv"
+    TYPE: y-disp
+  - NSET: WBOTTOM
+    File Name: "workroll.csv"
+    TYPE: y-disp
+  - NSET: NFIX
+    File Name: "bforce.csv"
+    TYPE: y-force
+---
