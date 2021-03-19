@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 	control.ApplyConstraints();
 	control.Solve();
 	std::clock_t c_end = std::clock();
-	std::cout << "  calculate time:  " << (c_end - c_start) / CLOCKS_PER_SEC << " s\n\n";
+	std::cout << "  calculate time:  " << 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << " ms\n\n";
 
 	printf("Outputing......  \n\n");
 	control.Update();
@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
 
 	std::cout << "Successfully Completed  \n";
 	std::cout << std::fixed << std::setprecision(2) << "  CPU time used: "
-		<< (c_end - c_start) / CLOCKS_PER_SEC << " s\n"
+		<< 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC << " ms\n"
 		<< "  Wall clock time passed: "
-		<< std::chrono::duration<double>(t_end - t_start).count()
-		<< " s\n";
+		<< 1000.0 * std::chrono::duration<double>(t_end - t_start).count()
+		<< " ms\n";
 }
