@@ -220,7 +220,6 @@ namespace ROLLFEM2D
 		{
 			// consider edge pressure only
 			auto edges = mesh.SideSets[load.SetName];
-#pragma omp parallel for private( normal )
 			for (int i = 0; i < edges.size(); ++i)
 			{
 				std::size_t nd0 = edges[i].n_edge;
@@ -250,11 +249,11 @@ namespace ROLLFEM2D
 	{
 		const Eigen::Matrix<double, 3, 3> D = mesh.materials[0].ElasticMatrix;
 		Eigen::Vector<double, 8> force;
+
 		for (auto load : initstrains)
 		{
 			// consider edge pressure only
 			auto eleids = mesh.ElementSets[load.SetName];
-#pragma omp parallel for private( force )
 			for (int i = 0; i < eleids.size(); ++i)
 			{
 				CElement ele = mesh.elements[eleids[i]];
@@ -265,7 +264,6 @@ namespace ROLLFEM2D
 				}
 				for (int j = 0; j < 4; ++j) {
 					std::size_t nd = ele.index_nd[j];
-#pragma omp critical
 					{
 						loads(2 * nd) += force(j * 2);
 						loads(2 * nd + 1) += force(j * 2 + 1);
