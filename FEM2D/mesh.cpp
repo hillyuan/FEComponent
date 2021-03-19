@@ -132,7 +132,7 @@ namespace ROLLFEM2D
 		os << "Number of elements = " << num_elements << std::endl;
 		os << "Element ID:    Nodes List\n";
 		std::size_t ne = -1;
-		for ( auto ele: elements )
+		for ( const auto& ele: elements )
 		{
 			os << ++ne << "  " << ele.index_nd[0] << "  " << ele.index_nd[1]
 			   << "  " << ele.index_nd[2] << "  " << ele.index_nd[3] << std::endl;
@@ -144,7 +144,7 @@ namespace ROLLFEM2D
 		os << "Number of nodes = " << num_nodes << std::endl;
 		os << "Node ID:    Coordinate\n";
 		std::size_t cnt = -1;
-		for ( auto nd: nodes)
+		for ( const auto& nd: nodes)
 		{
 			os << ++cnt << "  " << nd.x  <<  "  " << nd.y << std::endl;
 		}
@@ -199,8 +199,6 @@ namespace ROLLFEM2D
 			elements[ele].B[npg] = B;
 		}
 
-	//	std::cout << K << std::endl;
-	//	triplets.clear();
 		for (std::size_t i = 0; i < 4; i++)
 		{
 			for (std::size_t j = 0; j < 4; j++)
@@ -265,6 +263,7 @@ namespace ROLLFEM2D
 	{
 		Eigen::Matrix<double,8,1> disp;
 
+#pragma omp parallel for private(disp)
 		for (int ele = 0; ele < num_elements; ++ele)
 		{
 			int imatl = elements[ele].matl_id;

@@ -215,17 +215,17 @@ namespace ROLLFEM2D
 
 	void CControl::ApplyDistributedLoads()
 	{
-		std::size_t nd0, nd1, ie;
 		double normal[2];
 		for( auto load: dloads)
 		{
 			// consider edge pressure only
 			auto edges = mesh.SideSets[load.SetName];
+#pragma omp parallel for private( normal )
 			for (int i = 0; i < edges.size(); ++i)
 			{
-				nd0 = edges[i].n_edge;
-				nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
-				ie = edges[i].id_element;
+				std::size_t nd0 = edges[i].n_edge;
+				std::size_t nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
+				std::size_t ie = edges[i].id_element;
 				nd0 = mesh.elements[ie].index_nd[nd0];
 				nd1 = mesh.elements[ie].index_nd[nd1];
 				normal[0] = 0.5 * (mesh.nodes[nd1].y - mesh.nodes[nd0].y);
@@ -239,7 +239,6 @@ namespace ROLLFEM2D
 				loads(2 * nd0 + 1) += load.val * normal[1];
 				loads(2 * nd1) += load.val * normal[0];
 				loads(2 * nd1 + 1) += load.val * normal[1];
-				
 			}
 		}
 
@@ -249,12 +248,13 @@ namespace ROLLFEM2D
 
 	void CControl::ApplyInitialStrain()
 	{
-		Eigen::Matrix<double, 3, 3> D = mesh.materials[0].ElasticMatrix;
+		const Eigen::Matrix<double, 3, 3> D = mesh.materials[0].ElasticMatrix;
 		Eigen::Vector<double, 8> force;
 		for (auto load : initstrains)
 		{
 			// consider edge pressure only
 			auto eleids = mesh.ElementSets[load.SetName];
+#pragma omp parallel for private( force )
 			for (int i = 0; i < eleids.size(); ++i)
 			{
 				CElement ele = mesh.elements[eleids[i]];
@@ -265,8 +265,11 @@ namespace ROLLFEM2D
 				}
 				for (int j = 0; j < 4; ++j) {
 					std::size_t nd = ele.index_nd[j];
-					loads(2 * nd) += force(j * 2);
-					loads(2 * nd + 1) += force(j * 2 + 1);
+#pragma omp critical
+					{
+						loads(2 * nd) += force(j * 2);
+						loads(2 * nd + 1) += force(j * 2 + 1);
+					}
 				}
 			}
 		}
@@ -274,16 +277,17 @@ namespace ROLLFEM2D
 
 	void CControl::ApplyGravity()
 	{
-		Eigen::Vector<double, 8> force;
-
-//#pragma omp parallel for private(force)
+#pragma omp parallel for
 		for (int i = 0; i < mesh.num_elements; ++i)
 		{
-			force = mesh.calElementalGravity(i, gxy);
+			Eigen::Vector<double, 8> force = mesh.calElementalGravity(i, gxy);
 			for (int j = 0; j < 4; ++j) {
 				std::size_t nd = mesh.elements[i].index_nd[j];
-				loads(2 * nd) += force(j * 2);
-				loads(2 * nd + 1) += force(j * 2 + 1);
+#pragma omp critical
+				{
+					loads(2 * nd) += force(j * 2);
+					loads(2 * nd + 1) += force(j * 2 + 1);
+				}
 			}
 		}
 	}
@@ -297,17 +301,18 @@ namespace ROLLFEM2D
 
 	void CControl::calEquivalentNodalForce()
 	{
-		Eigen::Vector<double, 8> eforce;
-//#pragma omp parallel for private(force)
+#pragma omp parallel for
 		for (int i = 0; i < mesh.num_elements; ++i)
 		{
-			eforce = mesh.elements[i].calNodalForce();
+			Eigen::Vector<double, 8> eforce = mesh.elements[i].calNodalForce();
 			for (int j=0;j<4;++j)
 			{
 				std::size_t nd = mesh.elements[i].index_nd[j];
-//#pragma omp critical
-				forces(2 * nd) += eforce(j * 2);
-				forces(2 * nd + 1) += eforce(j * 2 + 1);
+#pragma omp critical
+				{
+					forces(2 * nd) += eforce(j * 2);
+					forces(2 * nd + 1) += eforce(j * 2 + 1);
+				}
 			}
 		}
 	}
@@ -329,7 +334,7 @@ namespace ROLLFEM2D
 		}
 
 		output << "CELLS " << mesh.num_elements << " " << mesh.num_elements * 5 << std::endl;
-		for (auto ele: mesh.elements) {
+		for (const auto& ele: mesh.elements) {
 			output << 4 << " " << ele.index_nd[0] << " " << ele.index_nd[1] <<
 				" " << ele.index_nd[2] << " " << ele.index_nd[3] << std::endl;
 		}
