@@ -282,6 +282,7 @@ class IntermediateRoll :
         # first row of L22
         nd0 = cnt_temp - nd3 -2*nd21 -ndd1-1
         nd1 = cnt_temp
+        print(nd0,nd1)
         for j in range(0,nz-1):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
@@ -290,8 +291,9 @@ class IntermediateRoll :
 
         #other L22
         for i in range(1,ndl4):
-            nd0 = cnt_temp 
+            nd0 = cnt_temp + (i-1)*nz
             nd1 = nd0 + 2*nd21+nd3 + 1
+            print(nd0,nd1)
             for j in range(0,nz-1):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
