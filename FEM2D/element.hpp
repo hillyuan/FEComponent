@@ -36,6 +36,7 @@ namespace ROLLFEM2D
 
 		Eigen::Vector3d strain[4];
 		Eigen::Vector3d stress[4];
+		Eigen::Vector3d initstrain;
 
 		Eigen::Vector<double, 8> calNodalForce() const;
 	};

@@ -54,7 +54,8 @@ namespace ROLLFEM2D
 					tokenizer.clear();
 					tokenizer >> dummy >> elements[i].index_nd[0] >> elements[i].index_nd[1]
 					          >> elements[i].index_nd[2] >> elements[i].index_nd[3];
-					elements[i].thick = 1.0;  // default value
+					elements[i].thick = 1.0;          // default value
+					elements[i].initstrain.setZero(); // default value
 				}
 				std::getline(input, line);
 			}
@@ -277,7 +278,7 @@ namespace ROLLFEM2D
 
 			for (std::size_t npg = 0; npg < 4; npg++)
 			{
-				elements[ele].strain[npg] = elements[ele].B[npg] * disp;
+				elements[ele].strain[npg] = elements[ele].B[npg] * disp - elements[ele].initstrain;
 				elements[ele].stress[npg] = materials[imatl].StressUpdate(elements[ele].strain[npg]);
 			}
 		}

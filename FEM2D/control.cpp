@@ -258,6 +258,7 @@ namespace ROLLFEM2D
 			{
 				CElement ele = mesh.elements[eleids[i]];
 				Eigen::Vector3d stress = D * load.strain;
+				mesh.elements[eleids[i]].initstrain = load.strain;
 				force.setZero();
 				for (int j = 0; j < 4; ++j) {
 					force += ele.wg[j] * stress.transpose() * ele.B[j];
