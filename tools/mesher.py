@@ -48,9 +48,12 @@ class IntermediateRoll :
         dd3 = meshsize
         d0 = divmod( self.D3, dd3 )
         nd3 = int(d0[0])
+        if (nd3 % 2) != 0:
+            nd3 += 1
+            dd3 = self.D3/nd3
         if( d0[1]>0.0 ):
             dd3 = self.D3/nd3
-        #print("nd3",nd3, dd3, nd3*dd3)
+        print("nd3",self.D3, nd3, dd3, nd3*dd3)
         
         # division along L31 load edge
         ddf = meshsize
@@ -1372,6 +1375,6 @@ fo.write("CELL_DATA "+str(n_element) + "\n")
 fo.write("SCALARS cell_thickness float 1\n")
 fo.write("LOOKUP_TABLE default\n")
 for i in range(0,n_element):
-    fo.write(str(elethick[i]) +'\n')
+    fo.write(str(0.5*elethick[i]) +'\n')
 
 fo.close()
