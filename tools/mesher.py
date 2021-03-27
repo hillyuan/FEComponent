@@ -51,9 +51,10 @@ class IntermediateRoll :
         if (nd3 % 2) != 0:
             nd3 += 1
             dd3 = self.D3/nd3
-        if( d0[1]>0.0 ):
-            dd3 = self.D3/nd3
-        print("nd3",self.D3, nd3, dd3, nd3*dd3)
+        else:
+            if( d0[1]>0.0 ):
+                dd3 = self.D3/nd3
+        #print("nd3",self.D3, nd3, dd3, nd3*dd3)
         
         # division along L31 load edge
         ddf = meshsize
@@ -179,13 +180,16 @@ class IntermediateRoll :
         dd1 = meshsize
         d0 = divmod( 0.5*(self.D1-self.D2), dd1 )
         ndd1 = int(d0[0])
+        dd0 = d0[1]
         if( ndd1==0 ):
             ndd1 = 1
-        if( d0[1]>0.5*dd1 ):
+            dd0 = 0.5*(self.D1-self.D2) - dd1
+        print(dd0,dd1)
+        if( dd0>0.5*dd1 ):
             ndd1 += 1
-        if( d0[1]>0.0 ):
+        if( dd0 != 0.0 ):
             dd1 = 0.5*(self.D1-self.D2)/ndd1
-        #print("p1",ndd1, dd1, ndd1*dd1)
+        print("p1",ndd1, dd1, ndd1*dd1)
         
         
         # Elements of L21 to L1
@@ -199,10 +203,7 @@ class IntermediateRoll :
         xmr = np.append(xmr, -0.5*self.L1 + self.offset)  # start point
         if( -self.Rload != xmr[0] ):
             xmr = np.append(xmr, -self.Rload)
-        xmr = np.append(xmr,xmr[0] + self.chamfer[0])
-        xmr = np.append(xmr,-self.pxb)                    # chamfer
         xmr = np.append(xmr,0.0)                          # center
-        xmr = np.append(xmr,self.pxb)                     # chamfer
         xmr = np.append(xmr, self.Rload)
         xmr = np.append(xmr,self.pxw)                     # end point of woring roll
         xmr = np.append(xmr, 0.5*self.L1 + self.offset)   # end point
@@ -230,7 +231,6 @@ class IntermediateRoll :
         print( "x_value", x_value )
         
         # consider chamfer
-        kcf = self.chamfer[1]/self.chamfer[0]
         xs = -0.5*self.L1 + self.offset
         
         nz = len(z_value)
@@ -240,19 +240,13 @@ class IntermediateRoll :
                 self.xbr = np.append(self.xbr, x)
                 self.nbr = np.append(self.nbr, cnt_xyz)
             for j in range(0,ndd1+1):
-                if( x<xs+self.chamfer[0] and j==0):
-                    xyz = np.append(xyz, [x, self.z0+0.5*self.D1-self.chamfer[1]+kcf*(x-xs)])
-                else:
-                    xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
             for j in range(1,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
-                if( x<xs+self.chamfer[0] and j==ndd1):
-                    xyz = np.append(xyz, [x, z_value[nz-1]-dd1*ndd1+self.chamfer[1]-kcf*(x-xs)])
-                else:
-                    xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             if( x>=xmr[0]+self.chamfer[0] and x<=self.pxw ):
@@ -1277,7 +1271,7 @@ bRoll.gnd0 = iRoll.n_nd
 bRoll.xbr = iRoll.xbr
 bRoll.nbr = iRoll.nbr
 bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
-bRoll.generate()
+#bRoll.generate()
 n_element = int(len(elements)/4)
 bRoll.gele0 = n_element
 
@@ -1286,7 +1280,7 @@ wRoll.z0 = zw
 wRoll.xb = 0.5*iRoll.L1 - iRoll.offset
 wRoll.xbr = iRoll.xwr
 wRoll.nbr = iRoll.nwr
-wRoll.generate()
+#wRoll.generate()
 n_element = int(len(elements)/4)
 wRoll.gele0 = n_element
 
@@ -1375,6 +1369,6 @@ fo.write("CELL_DATA "+str(n_element) + "\n")
 fo.write("SCALARS cell_thickness float 1\n")
 fo.write("LOOKUP_TABLE default\n")
 for i in range(0,n_element):
-    fo.write(str(0.5*elethick[i]) +'\n')
+    fo.write(str(elethick[i]) +'\n')
 
 fo.close()
