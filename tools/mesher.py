@@ -251,7 +251,7 @@ class IntermediateRoll :
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-            if( x>=xmr[0]+self.chamfer[0] and x<=self.pxw ):
+            if( x<=self.pxw ):
                 self.xwr = np.append(self.xwr, x)
                 self.nwr = np.append(self.nwr, cnt_xyz-1)
                 
@@ -741,12 +741,6 @@ class WorkingRoll :
             ddlf = self.L2/ndlf
         #print("L2",ndlf, ddlf, ndlf*ddlf)
         
-        # L3 to L2
-        nd0 = cnt_temp - nd3 -1
-        nd1 = cnt_temp + nd21
-        for j in range(0,nd3):
-            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-        
         for i in range(0,ndlf):
             x = x0 +self.L3+i*ddlf
             for j in range(0,nd21+1):
@@ -759,8 +753,12 @@ class WorkingRoll :
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-            
+        
+        # L3 to L2
+        nd0 = cnt_temp - nd3 -1
+        nd1 = cnt_temp + nd21
         for j in range(0,nd3):
+            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
             #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
             #r = 2.0*math.sqrt( 0.25*self.D3*self.D3 - (cy-self.z0)*(cy-self.z0) )
             #elethick = np.append(elethick, r)
@@ -806,42 +804,17 @@ class WorkingRoll :
         #print("D1-D2",ndd1, dd1, ndd1*dd1)
         print("xbr", self.xbr)
         
-        # division to edge of load range
+        # division to start position of inter roll
         dl11 = meshsize
-        d0 = divmod( 0.5*self.L1-self.Rload, dl11 )
+        d0 = divmod( 0.5*self.L1+self.xbr[0], dl11 )
         ndl11 = int(d0[0])
         if( d0[1]>0.0 ):
-            dl11 = (0.5*self.L1-self.Rload)/ndl11
-        #print("L11",ndl11, dl11, ndl11*dl11)
+            dl11 = (0.5*self.L1+self.xbr[0])/ndl11
+        print("L11",ndl11, dl11, ndl11*dl11,0.5*self.L1,self.xbr[0])
         #print("z_value:",z_value)     
         nz = len(z_value)
         for i in range(0,ndl11):
             x = -0.5*self.L1 + i*dl11
-            print("x",x)
-            for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
-                cnt_xyz += 1
-            for j in range(1,nz):
-                xyz = np.append(xyz, [x, z_value[j]])
-                cnt_xyz += 1
-            for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
-                cnt_xyz += 1
-            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-        
-        # load range to chamfer of inter roll        
-        dl11 = meshsize
-        d0 = divmod( self.Rload+self.xbr[0], dl11 )
-        ndl12 = int(d0[0])
-        if(ndl12==0):
-            ndl12 = 1
-        if( d0[1]>0.0 ):
-            dl11 = (self.Rload+self.xbr[0])/ndl12
-        #print("L11",ndl11, dl11, ndl11*dl11)
-        #print("z_value:",z_value)     
-        nz = len(z_value)
-        for i in range(0,ndl12):
-            x = -self.Rload + i*dl11
             print("x",x)
             for j in range(0,ndd1+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
@@ -869,6 +842,32 @@ class WorkingRoll :
             elethick = np.append(elethick, (r0+r1))
       
         seleD1 = int(len(elements)/4)
+        
+        # load range to chamfer of inter roll        
+        dl11 = meshsize
+        d0 = divmod( self.Rload+self.xbr[0], dl11 )
+        ndl12 = int(d0[0])
+        if(ndl12==0):
+            ndl12 = 1
+        if( d0[1]>0.0 ):
+            dl11 = (self.Rload+self.xbr[0])/ndl12
+        #print("L11",ndl11, dl11, ndl11*dl11)
+        #print("z_value:",z_value)     
+        nz = len(z_value)
+        for i in range(0,ndl12):
+            x = -self.Rload + i*dl11
+            print("x",x)
+            for j in range(0,ndd1+1):
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
+                cnt_xyz += 1
+            for j in range(1,nz):
+                xyz = np.append(xyz, [x, z_value[j]])
+                cnt_xyz += 1
+            for j in range(1,ndd1+1):
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
+                cnt_xyz += 1
+            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
         
         # Element to chamfer of inter roll
         for i in range(0,ndl11+ndl12-1):
@@ -1200,7 +1199,7 @@ wRoll.z0 = zw
 wRoll.xb = 0.5*iRoll.L1 - iRoll.offset
 wRoll.xbr = iRoll.xwr
 wRoll.nbr = iRoll.nwr
-#wRoll.generate()
+wRoll.generate()
 n_element = int(len(elements)/4)
 wRoll.gele0 = n_element
 
