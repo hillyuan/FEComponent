@@ -35,6 +35,7 @@ class IntermediateRoll :
     edbendU = np.array([],dtype=int)  # output: loading edge group
     edbendD = np.array([],dtype=int)  # output: loading edge group
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
+    ndaxis = np.array([],dtype=int)   # output: axis nodes
     
     n_nd = 0    # ouput: number of nodes 
     
@@ -78,12 +79,16 @@ class IntermediateRoll :
             x = x0 +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         for i in range(1,nds):
             x = x0 +self.Lf+i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cnt_temp = cnt_xyz
@@ -135,11 +140,14 @@ class IntermediateRoll :
                 cnt_xyz += 1
             for j in range(1,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,nd21+1):
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
            
         for j in range(0,nd3):
             #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
@@ -246,6 +254,8 @@ class IntermediateRoll :
                 cnt_xyz += 1
             for j in range(1,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
+                if( abs(z_value[j]-self.z0)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
@@ -254,6 +264,7 @@ class IntermediateRoll :
             if( x<=self.pxw ):
                 self.xwr = np.append(self.xwr, x)
                 self.nwr = np.append(self.nwr, cnt_xyz-1)
+
                 
         for j in range(0,nd3+2*nd21):
             #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
@@ -298,6 +309,8 @@ class IntermediateRoll :
             x = 0.5*self.L1 + self.offset + i*dl4
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
+                if( abs(z_value[j]-self.z0)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cxpos = x  # current x position
@@ -338,6 +351,8 @@ class IntermediateRoll :
             x = cxpos + i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
@@ -379,8 +394,12 @@ class IntermediateRoll :
             x = cxpos +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+            
+        print ("ndaxis", self.ndaxis)
             
                 
         for i in range(0,ndf):
@@ -1199,7 +1218,7 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 
-fo.write("FIELD NODESET 4\n")
+fo.write("FIELD NODESET 5\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
@@ -1211,6 +1230,9 @@ for i in bRoll.ndbottom:
     fo.write(str(i)+'\n')
 fo.write("WBOTTOM 1 "+str(len(wRoll.ndbottom)) + " int\n")
 for i in wRoll.ndbottom:
+    fo.write(str(i)+'\n')
+fo.write("NIAXIS 1 "+str(len(iRoll.ndaxis)) + " int\n")
+for i in iRoll.ndaxis:
     fo.write(str(i)+'\n')
     
 fo.write("FIELD EDGESET 5\n")
