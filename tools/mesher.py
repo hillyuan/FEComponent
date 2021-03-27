@@ -201,10 +201,12 @@ class IntermediateRoll :
         # x coordinates of L1 division
         xmr = np.array([])
         xmr = np.append(xmr, -0.5*self.L1 + self.offset)  # start point
+        xmr = np.append(xmr, -self.pxb)                   # back roll position
         if( -self.Rload != xmr[0] ):
             xmr = np.append(xmr, -self.Rload)
         xmr = np.append(xmr,0.0)                          # center
         xmr = np.append(xmr, self.Rload)
+        xmr = np.append(xmr, self.pxb)                    # back roll position
         xmr = np.append(xmr,self.pxw)                     # end point of woring roll
         xmr = np.append(xmr, 0.5*self.L1 + self.offset)   # end point
         print("points along L1 of inter roll:",xmr)
@@ -487,34 +489,48 @@ class BackupRoll :
        # print("D2 to D1", nc, msc, nc*msc)
 
         # L chamfer        
-        mscf = meshsize
-        d0 = divmod( self.chamfer[0], mscf )
-        ncf = int(d0[0])
-        if( d0[1]>0.0 ):
-            mscf = self.chamfer[0]/ncf
-        dz = self.chamfer[1]/self.chamfer[0]*mscf
+        #mscf = meshsize
+        #d0 = divmod( self.chamfer[0], mscf )
+        #ncf = int(d0[0])
+        #if( d0[1]>0.0 ):
+        #    mscf = self.chamfer[0]/ncf
+        #dz = self.chamfer[1]/self.chamfer[0]*mscf
        # print("L chamfer", ncf, mscf, ncf*mscf,dz)
         
-        cx = x0 + self.L2
-        for i in range(0,ncf+1):
-            x = cx +i*mscf
-            zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*i
-            zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*i
-            xyz = np.append(xyz, [x, zt])
-            cnt_xyz += 1
-            for j in range(1,nc+1):
-                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
+        #cx = x0 + self.L2
+        #for i in range(0,ncf+1):
+        #    x = cx +i*mscf
+        #    zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*i
+        #    zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*i
+        #    xyz = np.append(xyz, [x, zt])
+        #    cnt_xyz += 1
+        #    for j in range(1,nc+1):
+        #        xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
+        #        cnt_xyz += 1
+        #    for j in range(1,nd+1):
+        #        xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
+        #        cnt_xyz += 1
+        #    for j in range(1,nc):
+        #        xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
+        #        cnt_xyz += 1
+        #    xyz = np.append(xyz, [x, zt1])
+        #    cnt_xyz += 1
+        #    if( i<ncf ):
+        #        self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
+        
+
+        # Node: alone L1
+        nx = len(self.xbr)
+        for i in range(0,nx):
+            for j in range(0,nc+1):
+                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D1 - msc*j])
                 cnt_xyz += 1
             for j in range(1,nd+1):
-                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
+                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D2 - msd*j])
                 cnt_xyz += 1
             for j in range(1,nc):
-                xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
+                xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
                 cnt_xyz += 1
-            xyz = np.append(xyz, [x, zt1])
-            cnt_xyz += 1
-            if( i<ncf ):
-                self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             
         # Element D2->D1
         nd0 = cnt_temp -nd -1
@@ -530,42 +546,10 @@ class BackupRoll :
             r1 = 2.0*math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             elethick = np.append(elethick, 0.5*(r0+r1))
             
-        # Element D1 to first chamfer
-        for i in range(0,ncf):
-            nd0 = cnt_temp + i*(2*nc+nd+1)
-            nd1 = nd0 + 2*nc+nd+1
-            for j in range(0,2*nc+nd):
-               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-               #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
-               #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               #elethick = np.append(elethick, r)
-               cy = xyz[2*(nd0+j)+1]
-               r0 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               cy = xyz[2*(nd0+j+1)+1]
-               r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               elethick = np.append(elethick, (r0+r1))
-        ce = len(elements)
-        elements[ce-2] = self.nbr[0]
-        xyz = np.delete(xyz, [2*cnt_xyz - 1, 2*cnt_xyz-2])
-        cnt_xyz -= 1
-        cnt_temp = cnt_xyz
-               
-        # Node: left chamfer to right chamfer
-        nx = len(self.xbr)
-        for i in range(1,nx):
-            for j in range(0,nc+1):
-                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D1 - msc*j])
-                cnt_xyz += 1
-            for j in range(1,nd+1):
-                xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D2 - msd*j])
-                cnt_xyz += 1
-            for j in range(1,nc):
-                xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
-                cnt_xyz += 1
-                
-        # Element: left chamfer to right chamfer
+        # Element along L1
+        print(self.nbr)
         for i in range(0,nx-1):
-            nd0 = cnt_temp + (i-1)*(2*nc+nd)
+            nd0 = cnt_temp + i*(2*nc+nd)
             nd1 = nd0 + 2*nc+nd
             for j in range(0,2*nc+nd-1):
                elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
@@ -583,83 +567,14 @@ class BackupRoll :
             nd0 = nd0 + 2*nc+nd-1
             nd1 = nd1 + 2*nc+nd-1
             elements = np.append(elements, [nd0,self.nbr[i],self.nbr[i+1],nd1])
-            #cy = 0.25*( xyz[2*nd0+1] + xyz[2*self.nbr[i]+1] + xyz[2*self.nbr[i+1]+1] + xyz[2*nd1+1] )
-            #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-            #elethick = np.append(elethick, r)
             cy = xyz[2*nd0+1]
             r0 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-            cy = xyz[2*self.nbr[i]+1]
-            r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
+            r1 = 0.0
             elethick = np.append(elethick, (r0+r1))
+            
+        for i in range(0,nx):
             self.ndbottom = np.append(self.ndbottom, self.nbr[i])
-               
-        cnt_temp = cnt_xyz
-        self.ndbottom = np.append(self.ndbottom, self.nbr[i+1])
             
-        # right chamfer to right edge
-        cx = 0.5*self.L1- self.chamfer[0]
-        for i in range(1,ncf+1):
-            x = cx +i*mscf
-            zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*(ncf-i)
-            zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*(ncf-i)
-            xyz = np.append(xyz, [x, zt])
-            cnt_xyz += 1
-            for j in range(1,nc+1):
-                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
-                cnt_xyz += 1
-            for j in range(1,nd+1):
-                xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
-                cnt_xyz += 1
-            for j in range(1,nc):
-                xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
-                cnt_xyz += 1
-            xyz = np.append(xyz, [x, zt1])
-            cnt_xyz += 1
-            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-            
-        # Element::right chamfer to right edge
-        nd0 = cnt_temp - (2*nc+nd)
-        nd1 = nd0 + 2*nc+nd
-        print(nd0,nd1)
-        for j in range(0,2*nc+nd-1):
-            elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-            #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
-            #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-            #elethick = np.append(elethick, r)
-            cy = xyz[2*(nd0+j)+1]
-            if( 0.5*self.D1 < abs(cy-self.z0) ):
-                r0 =0.0
-            else:
-                r0 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-            cy = xyz[2*(nd0+j+1)+1]
-            r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-            elethick = np.append(elethick, (r0+r1))
-        nd0 = nd0 + 2*nc+nd-1
-        nd1 = nd1 + 2*nc+nd-1
-        elements = np.append(elements, [nd0,self.nbr[nx-1],nd1+1,nd1])
-        #cy = 0.25*( xyz[2*nd0+1] + xyz[2*self.nbr[nx-1]+1] + xyz[2*(nd1+1)+1] + xyz[2*nd1+1] )
-        #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-        #elethick = np.append(elethick, r)
-        cy = xyz[2*nd0+1]
-        r0 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-        cy = xyz[2*self.nbr[nx-1]+1]
-        r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-        elethick = np.append(elethick, (r0+r1))
-
-        for i in range(0,ncf-1):
-            nd0 = cnt_temp + i*(2*nc+nd+1)
-            nd1 = nd0 + 2*nc+nd+1
-            for j in range(0,2*nc+nd):
-               elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
-               #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
-               #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               #elethick = np.append(elethick, r)
-               cy = xyz[2*(nd0+j)+1]
-               r0 = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               cy = xyz[2*(nd0+j+1)+1]
-               r1 = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
-               elethick = np.append(elethick, 0.5*(r0+r1))
-               
         cnt_temp = cnt_xyz
         
         # Nodes along left Lf
@@ -680,9 +595,10 @@ class BackupRoll :
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
           #  self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         print("ndfix",self.ndfix)
+        print("ndbottom",self.ndbottom)
                
         # Element: L1 to left L2
-        nd0 = cnt_temp - (nc+nd+1)
+        nd0 = cnt_temp - (nc+nd)
         nd1 = cnt_temp
         for j in range(0,nd):
             elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
@@ -695,7 +611,10 @@ class BackupRoll :
             else:
                 r0 = math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             cy = xyz[2*(nd0+j+1)+1]
-            r1 = math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
+            if( 0.5*self.D2 < abs(cy-self.z0) ):
+                r1 =0.0
+            else:
+                r1 = math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             elethick = np.append(elethick, (r0+r1))
             
         # Element to left end
@@ -1260,7 +1179,8 @@ elethick = np.array([], dtype=int)
 zw = 0.0   # z-coordinate of working roll
 
 iRoll.gnd0 = 0  
-iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
+#iRoll.pxb = 0.5*bRoll.L1 - bRoll.chamfer[0]
+iRoll.pxb = 0.5*bRoll.L1
 iRoll.pxw = 0.5*wRoll.L1
 iRoll.z0 = zw + 0.5*wRoll.D1 + 0.5*iRoll.D1
 iRoll.generate()
@@ -1271,7 +1191,7 @@ bRoll.gnd0 = iRoll.n_nd
 bRoll.xbr = iRoll.xbr
 bRoll.nbr = iRoll.nbr
 bRoll.z0 = iRoll.z0 + 0.5*iRoll.D1 + 0.5*bRoll.D1
-#bRoll.generate()
+bRoll.generate()
 n_element = int(len(elements)/4)
 bRoll.gele0 = n_element
 
