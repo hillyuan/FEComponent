@@ -439,6 +439,7 @@ class BackupRoll :
     
     ndfix = np.array([],dtype=int)    # output: fixed node group
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
+    ndaxis = np.array([],dtype=int)   # output: axis nodes
     
     def generate(self):
         global meshsize, xyz, elements, elethick
@@ -461,9 +462,13 @@ class BackupRoll :
         msd = meshsize
         d0 = divmod( self.D2, msd )
         nd = int(d0[0])
-        if( d0[1]>0.0 ):
+        if (nd % 2) != 0:
+            nd += 1
             msd = self.D2/nd
-       # print("D2:", nd, msd, nd*msd)
+        else:
+            if( d0[1]>0.0 ):
+                msd = self.D2/nd
+        #print("D2:", nd, msd, nd*msd, self.D2)
 
         cnt_xyz = self.gnd0
         
@@ -473,6 +478,8 @@ class BackupRoll :
             self.ndfix = np.append(self.ndfix, cnt_xyz)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                if( abs(0.5*self.D2-msd*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             #self.ndfix = np.append(self.ndfix, cnt_xyz-1)
@@ -480,6 +487,8 @@ class BackupRoll :
             x = x0 + self.Lf + i*msl
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                if( abs(0.5*self.D2-msd*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)    
                 
@@ -505,38 +514,7 @@ class BackupRoll :
         nc = int(d0[0])
         if( d0[1]>0.0 ):
             msc = 0.5*(self.D1-self.D2)/nc
-       # print("D2 to D1", nc, msc, nc*msc)
-
-        # L chamfer        
-        #mscf = meshsize
-        #d0 = divmod( self.chamfer[0], mscf )
-        #ncf = int(d0[0])
-        #if( d0[1]>0.0 ):
-        #    mscf = self.chamfer[0]/ncf
-        #dz = self.chamfer[1]/self.chamfer[0]*mscf
-       # print("L chamfer", ncf, mscf, ncf*mscf,dz)
-        
-        #cx = x0 + self.L2
-        #for i in range(0,ncf+1):
-        #    x = cx +i*mscf
-        #    zt = self.z0 + 0.5*self.D1 - self.chamfer[1] + dz*i
-        #    zt1 = self.z0 - 0.5*self.D1 + self.chamfer[1] - dz*i
-        #    xyz = np.append(xyz, [x, zt])
-        #    cnt_xyz += 1
-        #    for j in range(1,nc+1):
-        #        xyz = np.append(xyz, [x, self.z0 + 0.5*self.D1 - msc*j])
-        #        cnt_xyz += 1
-        #    for j in range(1,nd+1):
-        #        xyz = np.append(xyz, [x, self.z0 + 0.5*self.D2 - msd*j])
-        #        cnt_xyz += 1
-        #    for j in range(1,nc):
-        #        xyz = np.append(xyz, [x, self.z0 - 0.5*self.D2 - msc*j])
-        #        cnt_xyz += 1
-        #    xyz = np.append(xyz, [x, zt1])
-        #    cnt_xyz += 1
-        #    if( i<ncf ):
-        #        self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-        
+       # print("D2 to D1", nc, msc, nc*msc)        
 
         # Node: alone L1
         nx = len(self.xbr)
@@ -546,6 +524,8 @@ class BackupRoll :
                 cnt_xyz += 1
             for j in range(1,nd+1):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 + 0.5*self.D2 - msd*j])
+                if( abs(0.5*self.D2-msd*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,nc):
                 xyz = np.append(xyz, [self.xbr[i], self.z0 - 0.5*self.D2 - msc*j])
@@ -601,6 +581,8 @@ class BackupRoll :
             x = 0.5*self.L1 + i*msl
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                if( abs(0.5*self.D2-msd*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
@@ -610,11 +592,14 @@ class BackupRoll :
             self.ndfix = np.append(self.ndfix, cnt_xyz)
             for j in range(0,nd+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D2-msd*j])
+                if( abs(0.5*self.D2-msd*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
           #  self.ndfix = np.append(self.ndfix, cnt_xyz-1)
         print("ndfix",self.ndfix)
         print("ndbottom",self.ndbottom)
+        print("ndaxis",self.ndaxis)
                
         # Element: L1 to left L2
         nd0 = cnt_temp - (nc+nd)
@@ -675,6 +660,7 @@ class WorkingRoll :
     edbendD = np.array([],dtype=int) # output: bending loading edge group
     edload = np.array([],dtype=int)  # output: loading edge group
     ndbottom = np.array([],dtype=int) # output: lowerest nodes
+    ndaxis = np.array([],dtype=int)   # output: axis nodes
     
     convex = np.array([], ndmin=2)   # initial strain definition
     esets = np.array([], dtype=int)  # element sets with initial strain
@@ -692,8 +678,12 @@ class WorkingRoll :
         dd3 = meshsize
         d0 = divmod( self.D3, dd3 )
         nd3 = int(d0[0])
-        if( d0[1]>0.0 ):
+        if (nd3 % 2) != 0:
+            nd3 += 1
             dd3 = self.D3/nd3
+        else:
+            if( d0[1]>0.0 ):
+                dd3 = self.D3/nd3
         #print("nd3",nd3, dd3, nd3*dd3)
         
         # division along L31 load edge
@@ -716,12 +706,16 @@ class WorkingRoll :
             x = x0 +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         for i in range(1,nds):
             x = x0 +self.Lf+i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
         cnt_temp = cnt_xyz
@@ -767,6 +761,8 @@ class WorkingRoll :
                 cnt_xyz += 1
             for j in range(1,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,nd21+1):
                 xyz = np.append(xyz, [x, self.z0-0.5*self.D3-dd21*j])
@@ -839,6 +835,8 @@ class WorkingRoll :
                 cnt_xyz += 1
             for j in range(1,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
+                if( abs(self.z0-z_value[j])<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
@@ -886,6 +884,8 @@ class WorkingRoll :
                 cnt_xyz += 1
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
+                if( abs(self.z0-z_value[j])<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
                 xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
@@ -951,6 +951,8 @@ class WorkingRoll :
             x = 0.5*self.L1 + i*ddlf
             for j in range(0,nz):
                 xyz = np.append(xyz, [x, z_value[j]])
+                if( abs(self.z0-z_value[j])<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
                 
@@ -990,6 +992,8 @@ class WorkingRoll :
             x = 0.5*self.L1 + self.L2 + i*dds
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 #print(x, self.z0+0.5*self.D3-dd3*j)
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
@@ -997,11 +1001,13 @@ class WorkingRoll :
             x = 0.5*self.L1 + self.L2 + self.L3- self.Lf +i*ddf
             for j in range(0,nd3+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D3-dd3*j])
-                #print(x, self.z0+0.5*self.D3-dd3*j)
+                if( abs(0.5*self.D3-dd3*j)<1.e-6 ):
+                    self.ndaxis = np.append( self.ndaxis,cnt_xyz )
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
             
         print("ndbottom",self.ndbottom)
+        print("ndaxis",self.ndaxis)
                 
         # Element: L32-L32f
         nd0 = cnt_temp - (nd3+nd21+1)
@@ -1218,7 +1224,7 @@ fo.write("CELL_TYPES "+str(n_element) + "\n")
 for i in range(0,n_element):
     fo.write('9\n')
 
-fo.write("FIELD NODESET 5\n")
+fo.write("FIELD NODESET 7\n")
 fo.write("NFIX 1 "+str(len(bRoll.ndfix)) + " int\n")
 for i in bRoll.ndfix:
     fo.write(str(i)+'\n')
@@ -1233,6 +1239,12 @@ for i in wRoll.ndbottom:
     fo.write(str(i)+'\n')
 fo.write("NIAXIS 1 "+str(len(iRoll.ndaxis)) + " int\n")
 for i in iRoll.ndaxis:
+    fo.write(str(i)+'\n')
+fo.write("NBAXIS 1 "+str(len(bRoll.ndaxis)) + " int\n")
+for i in bRoll.ndaxis:
+    fo.write(str(i)+'\n')
+fo.write("NWAXIS 1 "+str(len(wRoll.ndaxis)) + " int\n")
+for i in wRoll.ndaxis:
     fo.write(str(i)+'\n')
     
 fo.write("FIELD EDGESET 5\n")

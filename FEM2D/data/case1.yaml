@@ -36,4 +36,10 @@ CSV File:
   - NSET: NIAXIS
     File Name: "iaxis.csv"
     TYPE: y-disp
+  - NSET: NWAXIS
+    File Name: "waxis.csv"
+    TYPE: y-disp
+  - NSET: NBAXIS
+    File Name: "baxis.csv"
+    TYPE: y-disp
 ---
