@@ -840,37 +840,9 @@ class WorkingRoll :
             cy = xyz[2*(nd0+j+1)+1]
             r1 = math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             elethick = np.append(elethick, (r0+r1))
-      
-        seleD1 = int(len(elements)/4)
         
-        # load range to chamfer of inter roll        
-        dl11 = meshsize
-        d0 = divmod( self.Rload+self.xbr[0], dl11 )
-        ndl12 = int(d0[0])
-        if(ndl12==0):
-            ndl12 = 1
-        if( d0[1]>0.0 ):
-            dl11 = (self.Rload+self.xbr[0])/ndl12
-        #print("L11",ndl11, dl11, ndl11*dl11)
-        #print("z_value:",z_value)     
-        nz = len(z_value)
-        for i in range(0,ndl12):
-            x = -self.Rload + i*dl11
-            print("x",x)
-            for j in range(0,ndd1+1):
-                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
-                cnt_xyz += 1
-            for j in range(1,nz):
-                xyz = np.append(xyz, [x, z_value[j]])
-                cnt_xyz += 1
-            for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
-                cnt_xyz += 1
-            self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
-            
-        
-        # Element to chamfer of inter roll
-        for i in range(0,ndl11+ndl12-1):
+        # Element to start position of inter roll
+        for i in range(0,ndl11-1):
             nd0 = cnt_temp + i*(2*ndd1+nz) 
             nd1 = nd0 + 2*ndd1+nz
             for j in range(0,2*ndd1+nz-1):
@@ -883,22 +855,19 @@ class WorkingRoll :
                 cy = xyz[2*(nd0+j+1)+1]
                 r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
                 elethick = np.append(elethick, (r0+r1))
-            if( i>=ndl11 ):
-                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
-        print("ndl",ndl11,ndl12)
                 
         cnt_temp = cnt_xyz
                 
         # Nodes to left edge
-        for i in range(0,len(self.nbr)):
+        for x in self.xbr:
             for j in range(1,ndd1):
-                xyz = np.append(xyz, [self.xbr[i], self.z0+0.5*self.D1-dd1*j])
+                xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
             for j in range(0,nz):
-                xyz = np.append(xyz, [self.xbr[i], z_value[j]])
+                xyz = np.append(xyz, [x, z_value[j]])
                 cnt_xyz += 1
             for j in range(1,ndd1+1):
-                xyz = np.append(xyz, [self.xbr[i], z_value[nz-1]-dd1*j])
+                xyz = np.append(xyz, [x, z_value[nz-1]-dd1*j])
                 cnt_xyz += 1
             self.ndbottom = np.append(self.ndbottom, cnt_xyz-1)
          
@@ -918,6 +887,7 @@ class WorkingRoll :
             nd0 = cnt_temp + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
             elements = np.append(elements, [self.nbr[i],nd0,nd1,self.nbr[i+1]])
+            cx = xyz[2*self.nbr[i+1]]
             #cy = 0.25*( xyz[2*self.nbr[i]+1] + xyz[2*nd0+1] + xyz[2*nd1+1] + xyz[2*self.nbr[i+1]+1] )
             #r = 2.0*math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
             #elethick = np.append(elethick, r)
@@ -931,6 +901,10 @@ class WorkingRoll :
         for i in range(0,len(self.nbr)):
             nd0 = cnt_temp - (2*ndd1+nz) + 1 + i*(2*ndd1+nz-1) 
             nd1 = nd0 + (2*ndd1+nz-1)
+            cx1 = xyz[2*nd0]
+            cx2 = xyz[2*nd1]
+            if( abs(cx1+self.Rload)< 1.e-6 ):
+                seleD1 = int(len(elements)/4)
             for j in range(0,2*ndd1+nz-2):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
@@ -941,11 +915,12 @@ class WorkingRoll :
                 cy = xyz[2*(nd0+j+1)+1]
                 r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
                 elethick = np.append(elethick, (r0+r1))
-            if( i<=len(self.nbr)-ndl11-ndl12 ):
+            if( i<=len(self.nbr)-ndl11 ):
                 self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+            if( abs(cx2-self.Rload)< 1.e-6 ):
+                eeleD1 = int(len(elements)/4) -1
                 
         print("edload", self.edload )
-        eeleD1 = int(len(elements)/4)
         neperow = 2*ndd1+nz-1
         print("eleD1", seleD1, eeleD1)
                 
