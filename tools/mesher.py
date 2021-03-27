@@ -815,7 +815,6 @@ class WorkingRoll :
         nz = len(z_value)
         for i in range(0,ndl11):
             x = -0.5*self.L1 + i*dl11
-            print("x",x)
             for j in range(0,ndd1+1):
                 xyz = np.append(xyz, [x, self.z0+0.5*self.D1-dd1*j])
                 cnt_xyz += 1
@@ -840,6 +839,9 @@ class WorkingRoll :
             cy = xyz[2*(nd0+j+1)+1]
             r1 = math.sqrt( 0.25*self.D2*self.D2 - (cy-self.z0)*(cy-self.z0) )
             elethick = np.append(elethick, (r0+r1))
+            
+        # first elements of L1
+        seleD1 = int(len(elements)/4)
         
         # Element to start position of inter roll
         for i in range(0,ndl11-1):
@@ -900,11 +902,7 @@ class WorkingRoll :
         # ramins row of L1
         for i in range(0,len(self.nbr)):
             nd0 = cnt_temp - (2*ndd1+nz) + 1 + i*(2*ndd1+nz-1) 
-            nd1 = nd0 + (2*ndd1+nz-1)
-            cx1 = xyz[2*nd0]
-            cx2 = xyz[2*nd1]
-            if( abs(cx1+self.Rload)< 1.e-6 ):
-                seleD1 = int(len(elements)/4)
+            nd1 = nd0 + (2*ndd1+nz-1) 
             for j in range(0,2*ndd1+nz-2):
                 elements = np.append(elements, [nd0+j,nd0+1+j,nd1+1+j,nd1+j])
                 #cy = 0.25*( xyz[2*(nd0+j)+1] + xyz[2*(nd0+1+j)+1] + xyz[2*(nd1+1+j)+1] + xyz[2*(nd1+j)+1] )
@@ -915,13 +913,16 @@ class WorkingRoll :
                 cy = xyz[2*(nd0+j+1)+1]
                 r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
                 elethick = np.append(elethick, (r0+r1))
-            if( i<=len(self.nbr)-ndl11 ):
+            cx0 = xyz[2*nd0]
+            cx1 = xyz[2*nd1]
+            if( cx0>=-self.Rload and cx1<=self.Rload ):
                 self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
-            if( abs(cx2-self.Rload)< 1.e-6 ):
-                eeleD1 = int(len(elements)/4) -1
                 
         print("edload", self.edload )
         neperow = 2*ndd1+nz-1
+        
+        # last element of D1
+        eeleD1 = int(len(elements)/4) -1
         print("eleD1", seleD1, eeleD1)
                 
         cnt_temp = cnt_xyz
