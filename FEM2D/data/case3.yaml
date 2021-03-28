@@ -18,7 +18,7 @@ DLoad:
   - SSET : IBENDD
     Value : [-143.75]
 Gravity: [0.0,-9.8]
-Convexity: true
+Convexity: false
 VTK File: "rollresult.vtk"
 CSV File:
   - NSET: IBOTTOM
@@ -33,4 +33,13 @@ CSV File:
   - NSET: NFIX
     File Name: "bforce.csv"
     TYPE: y-force
+  - NSET: NIAXIS
+    File Name: "iaxis.csv"
+    TYPE: y-disp
+  - NSET: NWAXIS
+    File Name: "waxis.csv"
+    TYPE: y-disp
+  - NSET: NBAXIS
+    File Name: "baxis.csv"
+    TYPE: y-disp
 ---

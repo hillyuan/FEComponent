@@ -18,7 +18,7 @@ DLoad:
   - SSET : IBENDD
     Value : [-143.75]
 Gravity: [0.0,-9.8]
-Convexity: true
+Convexity: false
 VTK File: "rollresult.vtk"
 CSV File:
   - NSET: IBOTTOM
