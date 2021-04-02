@@ -1,0 +1,18 @@
+%YAML 1.2
+---
+Mesh File: 2element.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 10.0
+    Poisson Ratio: 0.3
+    Density: 1.0
+Gravity: [1.0,0.0]
+Constraint:
+  - NSET : 0
+    Type : 3
+    Value : 0.0
+  - NSET : 3
+    Type : 1
+    Value: 0.0
+VTK File: "2elementout.vtk"
+---

@@ -2,29 +2,43 @@
 #define _ROLLFEM2D_ELEMENT_HPP
 
 #include <iostream>
-#include <valarray>
+#include <array>
 #include <string>
 #include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {
-	void ShapeFunc(double lcoord[2], double sfunc[4]);
+	Eigen::Vector<double, 4> ShapeFunc(Eigen::Vector2d& lcoord);
 	Eigen::Matrix<double, 4, 2> ShapeDeriv(Eigen::Vector2d& lcoord);
 
 	Eigen::Matrix<double, 4, 2> make_quadrature();
 	Eigen::Vector4d make_weights();
+	std::array< Eigen::Vector<double, 4>, 4 > make_ShapeFuncs();
+	std::array<Eigen::Matrix<double, 4, 2>, 4> make_ShapeDerivs();
 
 	struct CQuadrature
 	{
 		const static Eigen::Vector4d weights;
 		const static Eigen::Matrix<double, 4, 2> qp_coords;
+		const static std::array< Eigen::Vector<double, 4>, 4 > ShapeFuncs;
+		const static std::array<Eigen::Matrix<double, 4, 2>,4> ShapeDerivs;
 	};
 
 	class CElement
 	{
 	public:
 		int matl_id;
+		double thick;
 		std::size_t index_nd[4];
+		double wg[4];
+
+		Eigen::Matrix<double, 3, 8> B[4];
+
+		Eigen::Vector3d strain[4];
+		Eigen::Vector3d stress[4];
+		Eigen::Vector3d initstrain;
+
+		Eigen::Vector<double, 8> calNodalForce() const;
 	};
 }
 

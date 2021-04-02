@@ -19,9 +19,9 @@ if(YAMLCPP_USE_STATIC_LIBS)
 endif()
 
 if(${MSVC})    ### Set Yaml libary name for Windows
-	set(YAMLCPP_LIBNAME "libyaml-cppmd" CACHE STRING "Name of YAML library")
-set(YAMLCPP_LIBNAME optimized ${YAMLCPP_LIBNAME} debug ${YAMLCPP_LIBNAME}d)
-	else()                      ### Set Yaml libary name for Unix, Linux, OS X, etc
+	set(YAMLCPP_LIBNAME "yaml-cpp" CACHE STRING "Name of YAML library")
+	set(YAMLCPP_LIBNAME optimized ${YAMLCPP_LIBNAME} debug ${YAMLCPP_LIBNAME}d)
+else()                      ### Set Yaml libary name for Unix, Linux, OS X, etc
 	set(YAMLCPP_LIBNAME "yaml-cpp" CACHE STRING "Name of YAML library")
 endif()
 

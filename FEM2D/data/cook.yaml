@@ -1,0 +1,16 @@
+%YAML 1.2
+---
+Mesh File: cook64.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 250
+    Poisson Ratio: 0.3
+Constraint:
+  - NSET : N1
+    Type : 3
+    Value : 0.0
+DLoad:
+  - SSET : S1
+    Value : [0, 6.25]
+Output File: "out.vtk"
+---

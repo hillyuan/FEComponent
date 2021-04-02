@@ -1,0 +1,25 @@
+%YAML 1.2
+---
+Mesh File: cpe4.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 1.e6
+    Poisson Ratio: 0.25
+Constraint:
+  - NSET : N1
+    Type : 3
+    Value : 0.0
+  - NSET : N2
+    Type : 2
+    Value : 0.0
+DLoad:
+  - SSET : EG1
+    Value : [-10.0]
+  - SSET : EG2
+    Value : [-10.0]
+  - SSET : EG3
+    Value : [-10.0]
+  - SSET : EG4
+    Value : [-10.0]
+Output File: "out.vtk"
+---

@@ -1,0 +1,28 @@
+# vtk DataFile Version 4.0
+3-Roller System
+ASCII
+DATASET UNSTRUCTURED_GRID
+POINTS 6 double
+0.0 0.0 0.0
+1.0 0.0 0.0
+2.0 0.0 0.0
+0.0 1.0 0.0
+1.0 1.0 0.0
+2.0 1.0 0.0
+CELLS 2 10
+4 0 1 4 3
+4 1 2 5 4
+CELL_TYPES 2
+9
+9
+FIELD NODESET 1
+N1 1 2 int
+0
+3
+FIELD EDGESET 1
+EG1 2 1 int
+1 1
+FIELD ELEMENTSET 1
+EALL 1 2 int
+0
+1

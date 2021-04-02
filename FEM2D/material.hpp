@@ -2,24 +2,33 @@
 #define ROLLFEM2D_MATERIAL_HPP
 
 #include <iostream>
-#include <valarray>
 #include <string>
+#include <Eigen\Eigen>
 
 namespace ROLLFEM2D
 {
 	class CMaterial
 	{
 	private:
+		std::string name;
+		int type;             // 0: plane stress; 1: plane strain
 		double lame_lambda;
 		double lame_mu;
 		double Youngs;
 		double Poission;
+		double Density;
 		
 	public:
-		CMaterial(double&, double&);
+		CMaterial(int pbtype, std::string&, double&, double&, double&);
 
-		double ElasticMatrix[3][3];
-		void StressUpdate(double strain[3], double stress[3]) const;
+		Eigen::Matrix<double, 3, 3> ElasticMatrix;
+		Eigen::Vector3d StressUpdate(Eigen::Vector3d&) const;
+
+		void print(std::ostream& os) const;
+		double getDensity() const
+		{
+			return Density;
+		}
 	};
 }
 
