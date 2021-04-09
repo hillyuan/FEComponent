@@ -1,0 +1,39 @@
+#!/bin/bash
+
+rm CMakeCache.txt
+rm -R CMakeFiles
+
+EXTRA_ARGS=$@
+
+cmake .. \
+          -D CMAKE_BUILD_TYPE:STRING=RELEASE \
+		  -DTrilinos_ENABLE_STK=ON  \
+		  -DTrilinos_ENABLE_SEACASExodus=ON \
+		  -DTrilinos_ENABLE_Pamgen=ON  \
+		  -DTrilinos_ENABLE_TrilinosCouplings=ON  \
+		  -DTrilinos_ENABLE_Panzer:BOOL=ON \
+		  -DPanzer_ENABLE_TESTS:BOOL=ON \
+		  -DTrilinosCouplings_ENABLE_EXAMPLES=ON \
+		  -DBelos_ENABLE_TESTS=ON \
+          -DIfpack2_ENABLE_TESTS=ON \
+          -DAnasazi_ENABLE_TESTS=OFF  \
+          -DML_ENABLE_TESTS=ON \
+          -DML_ENABLE_EXAMPLES=ON \
+          -D TPL_ENABLE_MPI:BOOL=ON \
+		  -DTPL_ENABLE_Boost:BOOL=ON \
+          -DTPL_ENABLE_HDF5=ON \
+		  -DTPL_ENABLE_Netcdf=ON \
+          -DKokkos_ENABLE_OpenMP=ON  \
+          -DTrilinos_ENABLE_OpenMP=ON \
+          -DNetcdf_LIBRARY_DIRS="${HOME}/lib"  \
+          -DNetcdf_INCLUDE_DIRS="${HOME}/include"  \
+          -D Boost_LIBRARY_DIRS="/lib64"  \
+          -D Boost_INCLUDE_DIRS="/usr/include/boost"  \
+          -D BUILD_SHARED_LIBS:BOOL=OFF \
+          -DTrilinos_ENABLE_EXPLICIT_INSTANTIATION:BOOL=ON  \
+          -D CMAKE_INSTALL_PREFIX:PATH="$HOME/Trilinos" \
+          -D DART_TESTING_TIMEOUT:STRING=300 \
+          -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE       \
+          -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE   \
+          ${EXTRA_ARGS} \
+          ${TRILINOS_PATH}
