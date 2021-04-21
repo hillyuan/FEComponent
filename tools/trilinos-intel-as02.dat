@@ -1,0 +1,44 @@
+#!/bin/bash
+
+rm CMakeCache.txt
+rm -R CMakeFiles
+
+EXTRA_ARGS=$@
+
+~/bin/cmake .. \
+          -D CMAKE_BUILD_TYPE:STRING=RELEASE \
+		  -D CMAKE_C_COMPILER:STRING="mpicc" \
+		  -D CMAKE_CXX_COMPILER:STRING="mpicc" \
+		  -D CMAKE_EXE_LINKER_FLAGS:STRING="${CMAKE_EXE_LINKER_FLAGS} -lstdc++ -lm" \
+          -D Trilinos_ENABLE_Panzer:BOOL=ON \
+          -D Trilinos_ENABLE_NOX:BOOL=ON \
+          -D Trilinos_ENABLE_TESTS:BOOL=OFF \
+		  -DTempus_ENABLE_TESTS=OFF \
+		  -DThyra_ENABLE_TESTS=OFF \
+		  -DPanzer_ENABLE_TESTS=ON \
+		  -D Trilinos_ENABLE_ROL:BOOL=OFF \
+		  -D Trilinos_ENABLE_Galeri:BOOL=OFF \
+		  -D Trilinos_ENABLE_Stokhos:BOOL=OFF \
+          -D Trilinos_DUMP_PACKAGE_DEPENDENCIES:BOOL=ON \
+          -DTrilinos_ENABLE_Fortran:BOOL=OFF \
+          -D TPL_ENABLE_MPI:BOOL=ON \
+		  -DTPL_ENABLE_Boost:BOOL=OFF \
+          -DTPL_ENABLE_HDF5=ON \
+		  -DTPL_ENABLE_Netcdf=ON \
+          -DTrilinos_ENABLE_Kokkos:BOOL=ON \
+          -DKokkos_ENABLE_OpenMP=ON  \
+          -DTrilinos_ENABLE_OpenMP=ON \
+          -D HDF5_LIBRARY_DIRS="/lib64"  \
+          -D HDF5_INCLUDE_DIRS="/usr/include"  \
+          -D Boost_LIBRARY_DIRS="/lib64"  \
+          -D Boost_INCLUDE_DIRS="/usr/include/boost"  \
+          -D EpetraExt_USING_HDF5:BOOL=OFF   \
+          -D TPL_BLAS_LIBRARIES:STRING="-lmkl_intel_lp64 -Wl,--start-group -lmkl_intel_thread -lmkl_core -Wl,--end-group -liomp5 -lpthread" \
+          -D TPL_LAPACK_LIBRARIES:STRING="-lmkl_intel_lp64 -Wl,--start-group -lmkl_intel_thread -lmkl_core -Wl,--end-group -liomp5 -lpthread" \
+          -D BUILD_SHARED_LIBS:BOOL=OFF \
+          -D CMAKE_INSTALL_PREFIX:PATH="$HOME/Trilinos" \
+          -D DART_TESTING_TIMEOUT:STRING=300 \
+          -D CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE       \
+          -D Trilinos_VERBOSE_CONFIGURE:BOOL=FALSE   \
+          ${EXTRA_ARGS} \
+          ${TRILINOS_PATH}
