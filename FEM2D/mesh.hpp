@@ -32,6 +32,9 @@ namespace ROLLFEM2D
 		typedef Eigen::Triplet<double> T;
 
 	public:
+		CMesh() : thickness(1.0), usemythick(false)
+		{};
+
 		std::size_t num_nodes;
 		std::size_t num_elements;
 		std::vector<CNode>         nodes;
@@ -46,7 +49,7 @@ namespace ROLLFEM2D
 		std::map< std::string, std::vector<std::size_t> > ElementSets;
 		std::map< std::string, std::vector<CEdge> >       SideSets;
 
-		int readin(const char *);
+		int readin(const char *); 
 		void print_elements(std::ostream& os) const;
 		void print_nodes(std::ostream& os) const;
 		Eigen::Vector2d getCenterCoord(const std::size_t& ele) const;
@@ -55,9 +58,16 @@ namespace ROLLFEM2D
 		Eigen::Vector<double, 8> calElementalGravity(const std::size_t&, const double pg[2]);
 		void calGlobalStiffMatrix(Eigen::SparseMatrix<double>&);
 		void updateElements(Eigen::VectorXd&);
+		void setThickness(double& t)
+		{
+			thickness = t;
+			usemythick = true;
+		}
 
 	private:
 		std::size_t n_wele, n_iele, n_bele;
+		double thickness;
+		bool usemythick;
 	};
 }
 

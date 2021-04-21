@@ -6,6 +6,7 @@ Material:
     Youngs Modulus: 206000
     Poisson Ratio: 0.3
     Density: 7850.0e-9
+Thickness : 1.0
 Constraint:
   - NSET : NFIX
     Type : 3

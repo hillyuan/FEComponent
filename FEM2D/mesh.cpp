@@ -54,7 +54,7 @@ namespace ROLLFEM2D
 					tokenizer.clear();
 					tokenizer >> dummy >> elements[i].index_nd[0] >> elements[i].index_nd[1]
 					          >> elements[i].index_nd[2] >> elements[i].index_nd[3];
-					elements[i].thick = 1.0;          // default value
+					elements[i].thick = thickness;    // default value
 					elements[i].initstrain.setZero(); // default value
 				}
 				std::getline(input, line);
@@ -64,10 +64,12 @@ namespace ROLLFEM2D
 				std::getline(input, line);
 				for (size_t i = 0; i < num_elements; ++i) {
 					std::getline(input, line);
-					tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
-					tokenizer.clear();
-					tokenizer >> dummyz;
-					elements[i].thick = dummyz;
+					if (!usemythick) {
+						tokenizer.str(line.substr(0, line.find_last_not_of(" \r\n") + 1));
+						tokenizer.clear();
+						tokenizer >> dummyz;
+						elements[i].thick = dummyz;
+					}
 				}
 			}
 			else if (line.find("FIELD") == 0) {

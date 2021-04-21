@@ -33,6 +33,10 @@ namespace ROLLFEM2D
 				gxy[0] = gvt[0];  gxy[1] = gvt[1];
 			}
 		}
+		if (YAML::Node tk = config["Thickness"]) {
+			double thickness = tk.as<double>();
+			if (thickness > 0.0) mesh.setThickness(thickness);
+		}
 
 		if (YAML::Node doc = config["Mesh File"]) {
 			const std::string filename = config["Mesh File"].as<std::string>();
