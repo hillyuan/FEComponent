@@ -1,0 +1,20 @@
+%YAML 1.2
+---
+Mesh File: beam.vtk
+Material:
+  - Name : steel
+    Youngs Modulus: 10000
+    Poisson Ratio: 0.3
+Thickness : 0.5
+Constraint:
+  - NSET : NLEFT
+    Type : 3
+    Value : 0.0
+  - NSET : NRIGHT
+    Type : 3
+    Value : 0.0
+DLoad:
+  - SSET : S1
+    Value : [-1.0]
+VTK File: "beamresult.vtk"
+---

@@ -31,9 +31,6 @@ CSV File:
   - NSET: WBOTTOM
     File Name: "workroll.csv"
     TYPE: y-disp
-  - NSET: NFIX
-    File Name: "bforce.csv"
-    TYPE: y-force
   - NSET: NIAXIS
     File Name: "iaxis.csv"
     TYPE: y-disp
