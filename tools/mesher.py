@@ -1174,7 +1174,7 @@ n_node = 0
 xyz = np.array([])
 n_element = 0
 elements = np.array([], dtype=int)
-elethick = np.array([], dtype=int)
+elethick = np.array([], dtype=float)
 
 zw = 0.0   # z-coordinate of working roll
 

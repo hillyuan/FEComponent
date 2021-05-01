@@ -1,11 +1,10 @@
 %YAML 1.2
 ---
-Mesh File: beam.vtk
+Mesh File: cylinder.vtk
 Material:
   - Name : steel
     Youngs Modulus: 10000
     Poisson Ratio: 0.3
-Thickness : 0.5
 Constraint:
   - NSET : NLEFT
     Type : 3

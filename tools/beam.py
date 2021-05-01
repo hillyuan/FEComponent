@@ -5,7 +5,7 @@ Mesher specified for
 Mar. 2021
 """
 
-import sys
+import math
 import numpy as np
 
 ### 入出力定義 ###
@@ -22,11 +22,11 @@ ndright = np.array([], dtype=int)
 n_element = 0
 elements = np.array([], dtype=int)
 surface = np.array([], dtype=int)
+elethick = np.array([], dtype=float)
 
-
-L= 10.0
-W = 0.5
-d = 0.1
+L= 100.0
+W = 5.0
+d = 0.25
 ddL = d
 dL = divmod( L, d )
 nL = int(dL[0])
@@ -59,6 +59,9 @@ ne = 0
 for i in range(0,nL):
     for j in range(0,nW):
         elements = np.append(elements, [nd,nd+nW+1,nd+2+nW,nd+1])
+        cy = 0.25*( xyz[2*nd+1] + xyz[2*(nd+nW+1)+1] + xyz[2*(nd+2+nW)+1] + xyz[2*(nd+1)+1] )
+        r = 2.0*math.sqrt( 0.25*W*W - (cy-0.5*W)*(cy-0.5*W) )
+        elethick = np.append(elethick, r)
         nd += 1
         ne += 1
     nd += 1
@@ -99,5 +102,10 @@ ns = int(len(surface)/2)
 fo.write("S1 2 "+str(ns) +" int\n")
 for i in range(0,ns):
     fo.write(str(surface[2*i])+' '+str(surface[2*i+1])+'\n')
+fo.write("CELL_DATA "+str(n_element) + "\n")
+fo.write("SCALARS cell_thickness float 1\n")
+fo.write("LOOKUP_TABLE default\n")
+for i in range(0,n_element):
+    fo.write(str(elethick[i]) +'\n')
 
 fo.close()
