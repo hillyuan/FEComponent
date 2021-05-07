@@ -25,7 +25,6 @@ class IntermediateRoll :
     gele0 = 0   # start element number
     pxb = 0.0   # x position of L1 - chamfer of backup roll 
     pxw = 0.0   # x position of L1 of working roll 
-    Rload = 0.0 # range of load upon working rool
     
     xwr = np.array([])             # output: x coordinates of work roll
     nwr = np.array([],dtype=int)   # output: node number of work roll
@@ -210,10 +209,7 @@ class IntermediateRoll :
         xmr = np.array([])
         xmr = np.append(xmr, -0.5*self.L1 + self.offset)  # start point
         xmr = np.append(xmr, -self.pxb)                   # back roll position
-        if( -self.Rload != xmr[0] ):
-            xmr = np.append(xmr, -self.Rload)
         xmr = np.append(xmr,0.0)                          # center
-        xmr = np.append(xmr, self.Rload)
         xmr = np.append(xmr, self.pxb)                    # back roll position
         xmr = np.append(xmr,self.pxw)                     # end point of woring roll
         xmr = np.append(xmr, 0.5*self.L1 + self.offset)   # end point
@@ -651,7 +647,6 @@ class WorkingRoll :
     gele0 =0                       # start element number
     n_nd = 0                       # ouput: number of nodes 
     xb = 0.0                       # start position of inter roll
-    Rload = 0.0                    # range of load upon working rool
     
     xbr = np.array([])             # input: x coordinates with inter roll
     nbr = np.array([],dtype=int)   # input: node number with inter roll
@@ -874,6 +869,7 @@ class WorkingRoll :
                 cy = xyz[2*(nd0+j+1)+1]
                 r1 = math.sqrt( 0.25*self.D1*self.D1 - (cy-self.z0)*(cy-self.z0) )
                 elethick = np.append(elethick, (r0+r1))
+            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
                 
         cnt_temp = cnt_xyz
                 
@@ -934,8 +930,7 @@ class WorkingRoll :
                 elethick = np.append(elethick, (r0+r1))
             cx0 = xyz[2*nd0]
             cx1 = xyz[2*nd1]
-            if( cx0>=-self.Rload and cx1<=self.Rload ):
-                self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
+            self.edload = np.append(self.edload, [int(len(elements)/4)-1, 1] )
                 
         print("edload", self.edload )
         neperow = 2*ndd1+nz-1
@@ -1160,9 +1155,6 @@ for key, value in data.items():
                 wRoll.L3 = v2
             elif k2 == "Lf":
                 wRoll.Lf = v2
-            elif k2 == "RLoad":
-                iRoll.Rload = v2
-                wRoll.Rload = v2
             print (key,k2,v2)
     elif key == "Convexity":
         wRoll.convex = value

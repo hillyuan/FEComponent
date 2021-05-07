@@ -43,6 +43,7 @@ namespace ROLLFEM2D
 		std::string SetName;      // edge/element sets name
 		int type;                 // 0: volume force; 1: surface pressuure 2: surface load in direction[2]
 		double val;               // surface pressure
+		std::size_t npos;
 		std::vector<double> pos;  
 		std::vector<double> vals; // surface pressure upon pos, type must be 1 in this case
 		double direction[2];

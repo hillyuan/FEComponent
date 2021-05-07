@@ -124,6 +124,7 @@ namespace ROLLFEM2D
 						cst.pos.emplace_back(val[0]);
 						cst.vals.emplace_back(val[1]);
 					}
+					cst.npos = cst.pos.size();
 					dloads.emplace_back(cst);
 				}
 			}
@@ -244,24 +245,76 @@ namespace ROLLFEM2D
 		{
 			// consider edge pressure only
 			auto edges = mesh.SideSets[load.SetName];
-			for (int i = 0; i < edges.size(); ++i)
-			{
-				std::size_t nd0 = edges[i].n_edge;
-				std::size_t nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
-				std::size_t ie = edges[i].id_element;
-				nd0 = mesh.elements[ie].index_nd[nd0];
-				nd1 = mesh.elements[ie].index_nd[nd1];
-				normal[0] = 0.5 * (mesh.nodes[nd1].y - mesh.nodes[nd0].y);
-				normal[1] = 0.5 * (mesh.nodes[nd0].x - mesh.nodes[nd1].x);
-				if (load.type == 2) {   // surface presuure
-					double area = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
-					normal[0] = area * load.direction[0];
-					normal[1] = area * load.direction[1];
+			if (load.pos.empty()) {
+				for (int i = 0; i < edges.size(); ++i)
+				{
+					std::size_t nd0 = edges[i].n_edge;
+					std::size_t nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
+					std::size_t ie = edges[i].id_element;
+					nd0 = mesh.elements[ie].index_nd[nd0];
+					nd1 = mesh.elements[ie].index_nd[nd1];
+					normal[0] = 0.5 * (mesh.nodes[nd1].y - mesh.nodes[nd0].y);
+					normal[1] = 0.5 * (mesh.nodes[nd0].x - mesh.nodes[nd1].x);
+					if (load.type == 2) {   // surface presuure
+						double area = sqrt(normal[0] * normal[0] + normal[1] * normal[1]);
+						normal[0] = area * load.direction[0];
+						normal[1] = area * load.direction[1];
+					}
+					loads(2 * nd0) += load.val * normal[0];
+					loads(2 * nd0 + 1) += load.val * normal[1];
+					loads(2 * nd1) += load.val * normal[0];
+					loads(2 * nd1 + 1) += load.val * normal[1];
 				}
-				loads(2 * nd0) += load.val * normal[0];
-				loads(2 * nd0 + 1) += load.val * normal[1];
-				loads(2 * nd1) += load.val * normal[0];
-				loads(2 * nd1 + 1) += load.val * normal[1];
+			} else {
+				std::size_t nedge = edges.size();
+				std::vector<double> nodalValue(nedge +1,0.0);
+				for (int i = 0; i < nedge; ++i)
+				{
+					std::size_t nd0 = edges[i].n_edge;
+					std::size_t nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
+					std::size_t ie = edges[i].id_element;
+					nd0 = mesh.elements[ie].index_nd[nd0];
+					nd1 = mesh.elements[ie].index_nd[nd1];
+					if (mesh.nodes[nd0].x < load.pos[0]) continue;
+					if (mesh.nodes[nd0].x > load.pos[load.npos - 1]) break;
+
+					double x = mesh.nodes[nd0].x;
+					auto it0 = std::lower_bound(load.pos.begin(), load.pos.end(), x);
+					if (it0 == load.pos.end()) continue;
+					double x0, x1;
+					std::size_t pos0;
+					if (it0 == load.pos.begin()) {
+						x0 = *it0;
+						x1 = *(it0 + 1);
+						pos0 = std::distance(load.pos.begin(), it0);
+					}
+					else {
+						x0 = *(it0 - 1);
+						x1 = *it0;
+						pos0 = std::distance(load.pos.begin(), (it0 - 1));
+					}
+					double lambd = (x - x0) / (x1 - x0);
+					double myval = load.vals[pos0] + lambd * (load.vals[pos0+1] - load.vals[pos0]);
+					nodalValue[i] = myval;
+				}
+				for (int i = 0; i < nedge; ++i)
+				{
+					if (fabs(nodalValue[i]) <= 0.0) continue;
+					if (fabs(nodalValue[i + 1]) <= 0.0) break;
+
+					std::size_t nd0 = edges[i].n_edge;
+					std::size_t nd1 = edges[i].n_edge == 3 ? 0 : edges[i].n_edge + 1;
+					std::size_t ie = edges[i].id_element;
+					nd0 = mesh.elements[ie].index_nd[nd0];
+					nd1 = mesh.elements[ie].index_nd[nd1];
+					double myval = 0.5 * (nodalValue[i] + nodalValue[i + 1]);
+					normal[0] = 0.5 * (mesh.nodes[nd1].y - mesh.nodes[nd0].y);
+					normal[1] = 0.5 * (mesh.nodes[nd0].x - mesh.nodes[nd1].x);
+					loads(2 * nd0) += myval * normal[0];
+					loads(2 * nd0 + 1) += myval * normal[1];
+					loads(2 * nd1) += myval * normal[0];
+					loads(2 * nd1 + 1) += myval * normal[1];
+				}
 			}
 		}
 
