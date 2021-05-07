@@ -24,9 +24,9 @@ elements = np.array([], dtype=int)
 surface = np.array([], dtype=int)
 elethick = np.array([], dtype=float)
 
-L= 100.0
+L= 5.0
 W = 5.0
-d = 0.25
+d = 0.125
 ddL = d
 dL = divmod( L, d )
 nL = int(dL[0])

@@ -18,6 +18,9 @@ DLoad:
     Value : [-130.2083]
   - SSET : IBENDD
     Value : [-143.75]
+LoadCurve:
+  - SSET : ELOAD
+    Value : [[-500,-6.35e3],[-400,-5.e3]]
 Gravity: [0.0,-9.8]
 Convexity: false
 VTK File: "rollresult.vtk"

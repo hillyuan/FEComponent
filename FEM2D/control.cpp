@@ -108,6 +108,26 @@ namespace ROLLFEM2D
 				}
 			}
 		}
+		if (YAML::Node dload = config["LoadCurve"]) {
+			for (YAML::const_iterator it = dload.begin(); it != dload.end(); ++it) {
+				const YAML::Node& dl = *it;
+				std::string mname = dl["SSET"].as<std::string>();
+				if (mesh.SideSets.find(mname) == mesh.SideSets.end())
+				{
+					std::cout << "SideSet:" << mname << " not found. DLoad ignored!\n";
+				}
+				else {
+					DLoad cst(mname);
+					const YAML::Node& vals = dl["Value"];
+					for (YAML::const_iterator valsit = vals.begin(); valsit != vals.end(); ++valsit) {
+						std::vector<double> val = valsit->as<std::vector<double>>();
+						cst.pos.emplace_back(val[0]);
+						cst.vals.emplace_back(val[1]);
+					}
+					dloads.emplace_back(cst);
+				}
+			}
+		}
 
 		if (YAML::Node ist = config["Initial Strain"]) {
 			for (YAML::const_iterator it = ist.begin(); it != ist.end(); ++it) {

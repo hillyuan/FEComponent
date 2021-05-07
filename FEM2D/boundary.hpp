@@ -40,9 +40,11 @@ namespace ROLLFEM2D
 	// Distributed loads
 	struct DLoad
 	{
-		std::string SetName;   // edge/element sets name
-		int type;              // 0: volume force; 1: surface pressuure 2: surface load in direction[2]
-		double val;            // surface pressure; maybe a table
+		std::string SetName;      // edge/element sets name
+		int type;                 // 0: volume force; 1: surface pressuure 2: surface load in direction[2]
+		double val;               // surface pressure
+		std::vector<double> pos;  
+		std::vector<double> vals; // surface pressure upon pos, type must be 1 in this case
 		double direction[2];
 
 		DLoad(std::string& name, std::vector<double>& v)
@@ -57,6 +59,9 @@ namespace ROLLFEM2D
 				type = 2;
 			}
 		};
+
+		DLoad(std::string& name) : SetName(name)
+		{};
 	};
 
 	// initial strain
