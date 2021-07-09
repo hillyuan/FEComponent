@@ -110,8 +110,8 @@ int main(int argc, char *argv[])
 
 	printf("Outputing......  \n\n");
 	control.Update();
-	int c = control.VTKOutput();
-	c = control.CSVOutput();
+	control.VTKOutput();
+	control.CSVOutput();
 	
 	c_end = omp_get_wtime();
 
